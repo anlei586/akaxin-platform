@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.zaly.common.command.Command;
 import com.zaly.common.command.CommandResponse;
 import com.zaly.common.constant.CommandConst;
@@ -32,7 +31,7 @@ public class ApiUserHandler extends AbstractCommonHandler<Command> {
 	 * 上传/更新用户个人信息
 	 */
 	public boolean upload(Command command) {
-		logger.info("====== user info upload ======");
+		logger.info("====== api.user.upload ======");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errCode = ErrorCode.ERROR;
@@ -56,14 +55,14 @@ public class ApiUserHandler extends AbstractCommonHandler<Command> {
 			userBean.setPushToken(request.getPushToken());
 			userBean.setRom(request.getRom());
 
-			System.out.println("userInfoBean=" + userBean.toString());
+			logger.info("userInfoBean=" + userBean.toString());
 
 			if (UserInfoDao.getInstance().uploadUserInfo(userBean)) {
 				errCode = ErrorCode.SUCCESS;
 			}
 
-		} catch (InvalidProtocolBufferException e) {
-			commandResponse.setErrInfo("upload user info error!");
+		} catch (Exception e) {
+			commandResponse.setErrInfo("api.user.upload exception!");
 			logger.error("upload user info error.", e);
 		}
 		command.setResponse(commandResponse.setErrCode(errCode));
@@ -75,7 +74,7 @@ public class ApiUserHandler extends AbstractCommonHandler<Command> {
 	 * 
 	 */
 	public boolean realName(Command command) {
-		logger.info("=======become real name user with phone=======");
+		logger.info("------------api.user.realName-----------");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
@@ -119,9 +118,9 @@ public class ApiUserHandler extends AbstractCommonHandler<Command> {
 				commandResponse.setErrInfo("verify phone code error.");
 			}
 
-		} catch (InvalidProtocolBufferException e) {
-			commandResponse.setErrInfo("real name exception");
-			logger.error("real name error.", e);
+		} catch (Exception e) {
+			commandResponse.setErrInfo("api.user.realName exception");
+			logger.error("api.user.realName error.", e);
 		}
 
 		command.setResponse(commandResponse.setErrCode(errorCode));

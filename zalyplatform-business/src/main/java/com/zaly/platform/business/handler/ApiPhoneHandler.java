@@ -33,7 +33,7 @@ public class ApiPhoneHandler extends AbstractCommonHandler<Command> {
 	 * 
 	 */
 	public boolean verifyCode(Command command) {
-		logger.info(" ========verify phone code========");
+		logger.info("========api.phone.verify========");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;

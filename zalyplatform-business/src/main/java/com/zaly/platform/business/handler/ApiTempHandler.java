@@ -27,7 +27,7 @@ public class ApiTempHandler extends AbstractCommonHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiTempHandler.class);
 
 	public boolean upload(Command command) {
-		logger.info("-----tmp space upload -----");
+		logger.info("-----api.tmp.upload-----");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
@@ -55,7 +55,7 @@ public class ApiTempHandler extends AbstractCommonHandler<Command> {
 	}
 
 	public boolean download(Command command) {
-		logger.info("------tmp space download-----");
+		logger.info("------api.tmp.download-----");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;

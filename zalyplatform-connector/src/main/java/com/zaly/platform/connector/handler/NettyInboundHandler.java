@@ -3,11 +3,15 @@ package com.zaly.platform.connector.handler;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.protobuf.ByteString;
 import com.zaly.common.channel.ChannelSession;
 import com.zaly.common.command.Command;
 import com.zaly.common.command.CommandResponse;
 import com.zaly.common.command.RedisCommand;
+import com.zaly.common.constant.CommandConst;
 import com.zaly.common.executor.AbstracteExecutor;
 import com.zaly.platform.business.service.MesageService;
 import com.zaly.platform.connector.codec.parser.ParserConst;
@@ -17,13 +21,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisCommand> {
+	private static final Logger logger = LoggerFactory.getLogger(NettyInboundHandler.class);
 	private AbstracteExecutor<Command> executor;
 
 	public NettyInboundHandler(AbstracteExecutor<Command> executor) {
-
 		this.executor = executor;
-
-		System.out.println("NettyInboundHandler.executor=" + this.executor);
 	}
 
 	@Override
@@ -31,15 +33,13 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 		/**
 		 * 用户建立连接到服务端，执行此方法。
 		 */
-
 		ctx.channel().attr(ParserConst.CHANNELSESSION).set(new ChannelSession(ctx.channel()));
-
-		System.out.println("================NettyInboundHandler.channelActive");
+		logger.info("client connect to platform");
 	}
 
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		System.out.println("================NettyInboundHandler.channelInactive");
+		logger.info("client close the connection");
 		// ChannelSession channelSession =
 		// ctx.channel().attr(ParserConst.CHANNELSESSION).get();
 		// ChannelManager.getInstance().delChannel(channelSession.getUserId());
@@ -47,9 +47,8 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RedisCommand redisCommand) throws Exception {
-
 		try {
-			System.out.println("-------Receive data from client-------");
+			logger.info("-------Receive data from client-------");
 
 			ChannelSession channelSession = ctx.channel().attr(ParserConst.CHANNELSESSION).get();
 			String version = redisCommand.getParameterByIndex(0);
@@ -69,17 +68,16 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			String siteSessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
 
 			System.out.println("API.Plt 请求 sessionId  =" + siteSessionId);
+			logger.info("API.Plt 请求 sessionId  =" + siteSessionId);
 
 			command.setParams(packageData.getData().toByteArray());
 			CommandResponse commandResponse = new MesageService().executor(this.executor, command);
 
+			CoreProto.TransportPackageData.Builder packageBuilder = CoreProto.TransportPackageData.newBuilder();
 			// response
 			CoreProto.ErrorInfo errinfo = CoreProto.ErrorInfo.newBuilder()
-					.setCode(String.valueOf(commandResponse.getErrCode())).setInfo(String.valueOf(commandResponse.getErrInfo()))
-					.build();
-
-			CoreProto.TransportPackageData.Builder packageBuilder = CoreProto.TransportPackageData.newBuilder();
-
+					.setCode(String.valueOf(commandResponse.getErrCode()))
+					.setInfo(String.valueOf(commandResponse.getErrInfo())).build();
 			packageBuilder.setErr(errinfo).putAllHeader(new HashMap<Integer, String>());
 
 			if (commandResponse.getParams() != null) {
@@ -89,14 +87,14 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 			CoreProto.TransportPackageData resPackageData = packageBuilder.build();
 
-			ctx.channel().writeAndFlush(
-					new RedisCommand().add(1).add(commandResponse.getAction()).add(resPackageData.toByteArray()));
+			ctx.channel().writeAndFlush(new RedisCommand().add(CommandConst.VERSION).add(commandResponse.getAction())
+					.add(resPackageData.toByteArray()));
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("receive from client error.", e);
 		} finally {
 			ctx.channel().close();
 			System.out.println("关闭连接");
+			logger.info("close the connection");
 		}
 	}
 
