@@ -1,6 +1,6 @@
 package com.zaly.platform.storage.bean;
 
-import com.zaly.common.utils.GsonUtils;
+import com.akaxin.common.utils.GsonUtils;
 
 public class UserInfoBean {
 	private String userId;

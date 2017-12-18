@@ -6,7 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zaly.common.utils.GsonUtils;
+import com.akaxin.common.utils.GsonUtils;
 import com.zaly.platform.storage.bean.RealNameUserBean;
 import com.zaly.platform.storage.bean.UserInfoBean;
 import com.zaly.platform.storage.constant.UserInfoKey;
