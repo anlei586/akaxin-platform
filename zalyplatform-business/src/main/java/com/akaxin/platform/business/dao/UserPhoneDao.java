@@ -1,10 +1,13 @@
 package com.akaxin.platform.business.dao;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.zaly.platform.storage.api.IPhoneDao;
 import com.zaly.platform.storage.service.PhoneDaoService;
 
 public class UserPhoneDao {
-
+	private static final Logger logger = LoggerFactory.getLogger(UserPhoneDao.class);
 	private static UserPhoneDao instance = new UserPhoneDao();
 	private IPhoneDao phoneDao = new PhoneDaoService();
 
@@ -22,7 +25,6 @@ public class UserPhoneDao {
 		}
 		return result;
 	}
-	
 
 	public String getVerifyCode(String keyName) {
 		try {

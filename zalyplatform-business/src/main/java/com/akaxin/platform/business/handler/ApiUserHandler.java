@@ -31,7 +31,7 @@ public class ApiUserHandler extends AbstractCommonHandler<Command> {
 	 * 上传/更新用户个人信息
 	 */
 	public boolean upload(Command command) {
-		logger.info("====== api.user.upload ======");
+		logger.info("----- api.user.upload -----");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errCode = ErrorCode.ERROR;
@@ -110,7 +110,7 @@ public class ApiUserHandler extends AbstractCommonHandler<Command> {
 
 			logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode, bean.toString());
 
-			if (realVerifyCode.equals(verifyCode)) {
+			if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
 				if (UserInfoDao.getInstance().updateRealUserInfo(bean)) {
 					errorCode = ErrorCode.SUCCESS;
 				}

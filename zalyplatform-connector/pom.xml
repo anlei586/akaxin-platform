@@ -14,7 +14,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>com.zaly.platform.connector.main.BootStrap</mainClass>
+							<mainClass>com.akaxin.platform.connector.main.BootStrap</mainClass>
 						</manifest>
 					</archive>
 					<descriptorRefs>

@@ -82,7 +82,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 			if (commandResponse.getParams() != null) {
 				packageBuilder.setData(ByteString.copyFrom(commandResponse.getParams())).build();
-				System.out.println("commandResponse Size=" + commandResponse.getParams().length);
+				logger.info("commandResponse Size=" + commandResponse.getParams().length);
 			}
 
 			CoreProto.TransportPackageData resPackageData = packageBuilder.build();
@@ -100,12 +100,12 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
+		logger.error("netty server: exception caught.", cause);
 	}
 
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-
+		logger.info("netty server: user event triggered.");
 	}
 
 }
