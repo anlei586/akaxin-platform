@@ -2,8 +2,9 @@ package com.akaxin.platform.connector.netty;
 
 import java.util.concurrent.TimeUnit;
 
-import com.akaxin.common.command.Command;
-import com.akaxin.common.executor.AbstracteExecutor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.akaxin.platform.connector.codec.protocol.MessageDecoder;
 import com.akaxin.platform.connector.codec.protocol.MessageEncoder;
 import com.akaxin.platform.connector.handler.NettyInboundHandler;
@@ -23,8 +24,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
 public abstract class NettyServer {
-
-	private AbstracteExecutor<Command> executor;
+	private static Logger logger = LoggerFactory.getLogger(NettyServer.class);
 	private ServerBootstrap bootstrap;
 	private EventLoopGroup parentGroup;
 	private EventLoopGroup childGroup;
@@ -46,8 +46,6 @@ public abstract class NettyServer {
 		bootstrap.childOption(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT); // 动态缓冲区
 		bootstrap.handler(new LoggingHandler(LogLevel.INFO));
 		bootstrap.childHandler(new BimChannelInitializer());
-
-		executor = loadExecutor();
 	}
 
 	public void start(String address, int port) {
@@ -82,10 +80,9 @@ public abstract class NettyServer {
 			// ch.pipeline().addLast(new SslHandler(sslEngine));
 
 			ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50, TimeUnit.SECONDS));
-			ch.pipeline().addLast(new NettyInboundHandler(executor));
+			ch.pipeline().addLast(new NettyInboundHandler());
 		}
 
 	}
 
-	public abstract AbstracteExecutor<Command> loadExecutor();
 }

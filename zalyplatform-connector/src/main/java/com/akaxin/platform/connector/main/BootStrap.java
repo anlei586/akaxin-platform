@@ -3,9 +3,6 @@ package com.akaxin.platform.connector.main;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.akaxin.common.command.Command;
-import com.akaxin.common.executor.AbstracteExecutor;
-import com.akaxin.platform.business.impl.ExecutorImpl;
 import com.akaxin.platform.connector.netty.NettyServer;
 
 /**
@@ -25,12 +22,6 @@ public class BootStrap {
 		logger.info("Start Platform Server port:{}", port);
 
 		new NettyServer() {
-
-			@Override
-			public AbstracteExecutor<Command> loadExecutor() {
-				return new ExecutorImpl().loadExecutor().getExecutor();
-			}
-
 		}.start(ServerAddress.getLocalAddress(), port);
 
 	}
