@@ -12,10 +12,10 @@ import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.platform.operation.business.dao.TempSpaceDao;
+import com.akaxin.proto.platform.ApiTempDownloadProto;
+import com.akaxin.proto.platform.ApiTempUploadProto;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.zaly.proto.platform.ApiTempDownloadProto;
-import com.zaly.proto.platform.ApiTempUploadProto;
 
 /**
  * 

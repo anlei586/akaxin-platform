@@ -12,10 +12,10 @@ import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserPhoneDao;
+import com.akaxin.proto.platform.ApiUserRealNameProto;
+import com.akaxin.proto.platform.ApiUserUploadProto;
 import com.zaly.platform.storage.bean.RealNameUserBean;
 import com.zaly.platform.storage.bean.UserInfoBean;
-import com.zaly.proto.platform.ApiUserRealNameProto;
-import com.zaly.proto.platform.ApiUserUploadProto;
 
 /**
  * service:ApiUserInfo methods:
