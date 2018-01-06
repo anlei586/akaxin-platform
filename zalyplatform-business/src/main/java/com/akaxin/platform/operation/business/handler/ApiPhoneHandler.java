@@ -25,7 +25,7 @@ import com.zaly.platform.storage.bean.RealNameUserBean;
  * @since 2017.10.17
  *
  */
-public class ApiPhoneHandler extends AbstractCommonHandler<Command> {
+public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiPhoneHandler.class);
 
 	/**

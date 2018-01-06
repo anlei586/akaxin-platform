@@ -1,4 +1,4 @@
-package com.akaxin.platform.operation.business.utils;
+package com.akaxin.platform.operation.utils;
 
 public class HexUtils {
 

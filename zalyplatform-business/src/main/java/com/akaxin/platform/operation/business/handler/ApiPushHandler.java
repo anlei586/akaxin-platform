@@ -6,7 +6,7 @@ package com.akaxin.platform.operation.business.handler;
  * @since 2017.11.08 15:11:48
  * @param <Command>
  */
-public class ApiPushHandler<Command> extends AbstractCommonHandler<Command> {
+public class ApiPushHandler<Command> extends AbstractApiHandler<Command> {
 
 	public boolean handle(Command cmd) {
 		// TODO Auto-generated method stub

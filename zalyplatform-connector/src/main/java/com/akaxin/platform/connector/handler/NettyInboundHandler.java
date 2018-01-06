@@ -18,6 +18,11 @@ import com.zaly.proto.core.CoreProto;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+/**
+ * 
+ * @author Sam{@link an.guoyue254@gmail.com}
+ * @since 2017-11-06 12:32:10
+ */
 public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisCommand> {
 	private static final Logger logger = LoggerFactory.getLogger(NettyInboundHandler.class);
 
@@ -59,21 +64,21 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			command.setDeviceId(channelSession.getDeviceId());
 			command.setAction(action);
 			command.setChannelSession(channelSession);
+			command.setParams(packageData.getData().toByteArray());
 
 			if (RequestAction.IM.getName().equals(command.getRety())) {
 				logger.info("platform im request command={}", command.toString());
 
-				// im.platform.auth
+				new MesageService().doImRequest(command);
 
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
 				logger.info("platform api request command={}", command.toString());
-				
+
 				Map<Integer, String> header = packageData.getHeaderMap();
-				String siteSessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
+				String sessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
 
-				logger.info("api request sessionId  = " + siteSessionId);
+				logger.info("api request sessionId  = " + sessionId);
 
-				command.setParams(packageData.getData().toByteArray());
 				CommandResponse commandResponse = new MesageService().doApiRequest(command);
 				ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
 			} else {

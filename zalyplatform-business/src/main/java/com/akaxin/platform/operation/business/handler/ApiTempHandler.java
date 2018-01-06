@@ -23,7 +23,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * @since 2017.10.17
  *
  */
-public class ApiTempHandler extends AbstractCommonHandler<Command> {
+public class ApiTempHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiTempHandler.class);
 
 	public boolean upload(Command command) {

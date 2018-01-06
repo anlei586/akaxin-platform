@@ -24,7 +24,7 @@ import com.zaly.platform.storage.bean.UserInfoBean;
  * @since 2017.10.17
  *
  */
-public class ApiUserHandler extends AbstractCommonHandler<Command> {
+public class ApiUserHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiUserHandler.class);
 
 	/**
