@@ -26,8 +26,9 @@ public class ImHelloHandler extends AbstractImHandler<Command> {
 	@Override
 	public boolean handle(Command command) {
 		try {
+			logger.info("------hello action------ command={}", command.toString());
+
 			ChannelSession channelSession = command.getChannelSession();
-			logger.info("hello action command={}", command.toString());
 			helloResponse(channelSession.getChannel());
 			return true;
 		} catch (Exception e) {
@@ -37,6 +38,7 @@ public class ImHelloHandler extends AbstractImHandler<Command> {
 	}
 
 	private void helloResponse(Channel channel) {
+		logger.info("------ hello response ------");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		ImSiteHelloProto.ImSiteHelloResponse response = ImSiteHelloProto.ImSiteHelloResponse.newBuilder()

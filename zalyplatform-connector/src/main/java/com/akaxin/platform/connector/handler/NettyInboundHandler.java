@@ -5,6 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.akaxin.common.channel.ChannelManager;
 import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.channel.ChannelWriter;
 import com.akaxin.common.command.Command;
@@ -41,10 +42,12 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	 */
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		logger.info("client close the connection");
-		// ChannelSession channelSession =
-		// ctx.channel().attr(ParserConst.CHANNELSESSION).get();
-		// ChannelManager.getInstance().delChannel(channelSession.getUserId());
+		logger.info("close netty channel connection...client={}", ctx.channel().toString());
+		ChannelSession channelSession = ctx.channel().attr(ParserConst.CHANNELSESSION).get();
+		if (channelSession.getCtype() == 1) {
+			ChannelManager.delChannelSession(channelSession.getDeviceId());
+		}
+		logger.info("client close the connection. type={}", channelSession.getCtype());
 	}
 
 	@Override
@@ -80,7 +83,12 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 				logger.info("api request sessionId  = " + sessionId);
 
 				CommandResponse commandResponse = new MesageService().doApiRequest(command);
-				ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
+
+				if ("api.push.notification".equals(command.getAction())) {
+					ctx.close();
+				} else {
+					ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
+				}
 			} else {
 				logger.error("unknow request command = {}", command.toString());
 			}

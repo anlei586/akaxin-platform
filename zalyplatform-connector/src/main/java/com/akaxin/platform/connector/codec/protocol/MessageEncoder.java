@@ -31,9 +31,9 @@ public class MessageEncoder extends MessageToByteEncoder<RedisCommand> {
 
 			public void operationComplete(Future<? super Void> future) throws Exception {
 				if (future.isSuccess()) {
-					System.out.println("write to user success!");
+					logger.info("write to client success");
 				} else {
-					System.out.println("write to user fail");
+					logger.warn("write to client success");
 				}
 
 			}

@@ -20,8 +20,8 @@ public class ImOperateExecutor {
 
 	static {
 		AbstractHandlerChain<Command> imChain = new SimpleHandlerChain<Command>();
-		imChain.addHandler(new ImHelloHandler());
-		imChain.addHandler(new ImAuthHandler());
+//		imChain.addHandler(new ImHelloHandler());
+//		imChain.addHandler(new ImAuthHandler());
 
 		executor.addChain("im.platform.hello", new ImHelloHandler());
 		executor.addChain("im.platform.auth", new ImAuthHandler());

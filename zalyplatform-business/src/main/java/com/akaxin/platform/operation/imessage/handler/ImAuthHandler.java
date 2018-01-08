@@ -28,6 +28,7 @@ public class ImAuthHandler extends AbstractImHandler<Command> {
 	@Override
 	public boolean handle(Command command) {
 		try {
+			logger.info("------ auth handler ------");
 			ChannelSession channelSession = command.getChannelSession();
 			ImPlatformAuthProto.ImPlatformAuthRequest request = ImPlatformAuthProto.ImPlatformAuthRequest
 					.parseFrom(command.getParams());
@@ -50,7 +51,7 @@ public class ImAuthHandler extends AbstractImHandler<Command> {
 	}
 
 	private void authResponse(Channel channel, Command command, boolean result) {
-		logger.info("auth session response");
+		logger.info("----- auth response ------");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;

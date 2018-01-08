@@ -36,7 +36,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 	 * @param command
 	 * @return
 	 */
-	public CommandResponse login(Command command) {
+	public boolean login(Command command) {
 		logger.info("----------api.platform.login--------");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
@@ -103,12 +103,14 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 			errCode = ErrorCode.SUCCESS;
 			commandResponse.setParams(response.toByteArray());
 
+			errCode = ErrorCode.SUCCESS;
 			logger.info("------login platform finish------");
 		} catch (Exception e) {
 			commandResponse.setErrInfo("Login exception!");
 			logger.error("login exception.", e);
 		}
-		return commandResponse.setErrCode(errCode);
+		command.setResponse(commandResponse.setErrCode(errCode));
+		return false;
 	}
 
 }

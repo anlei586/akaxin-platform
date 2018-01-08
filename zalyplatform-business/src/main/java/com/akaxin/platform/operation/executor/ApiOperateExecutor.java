@@ -6,6 +6,7 @@ import com.akaxin.common.executor.SimpleExecutor;
 import com.akaxin.platform.operation.business.constant.RequestKeys;
 import com.akaxin.platform.operation.business.handler.ApiPhoneHandler;
 import com.akaxin.platform.operation.business.handler.ApiPlatformService;
+import com.akaxin.platform.operation.business.handler.ApiPushHandler;
 import com.akaxin.platform.operation.business.handler.ApiTempHandler;
 import com.akaxin.platform.operation.business.handler.ApiUserHandler;
 
@@ -22,6 +23,7 @@ public class ApiOperateExecutor {
 		executor.addChain(RequestKeys.API_USER.getName(), new ApiUserHandler());
 		executor.addChain(RequestKeys.API_PHONE.getName(), new ApiPhoneHandler());
 		executor.addChain(RequestKeys.API_TEMP_SPACE.getName(), new ApiTempHandler());
+		executor.addChain(RequestKeys.API_PUSH.getName(), new ApiPushHandler());
 	}
 
 	private ApiOperateExecutor() {

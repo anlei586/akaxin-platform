@@ -26,7 +26,7 @@ public class MesageService implements IMessage {
 		return new CommandResponse().setVersion(CommandConst.VERSION).setAction(CommandConst.ACTION_RES)
 				.setErrCode(ErrorCode.ERROR);
 	}
-
+	
 	public boolean doImRequest(Command command) {
 		logger.info("do im request in operation. command={}", command.toString());
 		try {

@@ -10,6 +10,8 @@ import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.RedisCommand;
 import com.akaxin.common.constant.CommandConst;
+import com.akaxin.proto.client.ImPtcPushProto;
+import com.google.protobuf.ByteString;
 import com.zaly.proto.core.CoreProto;
 
 /**
@@ -33,10 +35,17 @@ public class ImPingPongHandler extends AbstractImHandler<Command> {
 				pongPackageBuilder.putAllHeader(new HashMap<Integer, String>());
 				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
 						.add("im.ptc.pong").add(pongPackageBuilder.build().toByteArray()));
+
+				ImPtcPushProto.ImPtcPushRequest request = ImPtcPushProto.ImPtcPushRequest.newBuilder()
+						.setPushAlert("test im push").setPushBadge(1).setSiteServerName("test server").build();
+
+				pongPackageBuilder.setData(ByteString.copyFrom(request.toByteArray()));
+				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
+						.add("im.ptc.push").add(pongPackageBuilder.build().toByteArray()));
 			}
 			return true;
 		} catch (Exception e) {
-			logger.error("im auth error.", e);
+			logger.error("ping pong error.", e);
 		}
 		return false;
 	}
