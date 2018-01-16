@@ -2,6 +2,12 @@ package com.zaly.platform.storage.impl.redis;
 
 import redis.clients.jedis.Jedis;
 
+/**
+ * 手机验证码，读写操作
+ * 
+ * @author Sam{@link an.guoyue254@gmail.com}
+ * @since 2018-01-16 14:20:00
+ */
 public class RedisPhoneDao {
 	private static RedisPhoneDao instance = new RedisPhoneDao();
 

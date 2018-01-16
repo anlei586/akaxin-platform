@@ -1,5 +1,6 @@
 package com.akaxin.platform.connector.handler;
 
+import java.net.InetSocketAddress;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ import com.akaxin.common.command.RedisCommand;
 import com.akaxin.common.constant.RequestAction;
 import com.akaxin.platform.connector.codec.parser.ParserConst;
 import com.akaxin.platform.operation.service.MesageService;
-import com.zaly.proto.core.CoreProto;
+import com.akaxin.proto.core.CoreProto;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -32,9 +33,8 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	 */
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
 		ctx.channel().attr(ParserConst.CHANNELSESSION).set(new ChannelSession(ctx.channel()));
-		logger.info("client connect to platform");
+		logger.info("connect to platform client={}", ctx.channel().toString());
 	}
 
 	/**
@@ -42,18 +42,20 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	 */
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-		logger.info("close netty channel connection...client={}", ctx.channel().toString());
 		ChannelSession channelSession = ctx.channel().attr(ParserConst.CHANNELSESSION).get();
 		if (channelSession.getCtype() == 1) {
 			ChannelManager.delChannelSession(channelSession.getDeviceId());
 		}
-		logger.info("client close the connection. type={}", channelSession.getCtype());
+		logger.info("close netty channel connection...client={}", ctx.channel().toString());
 	}
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, RedisCommand redisCommand) throws Exception {
 		try {
-			logger.info("-------Receive data from client-------");
+			InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
+			String clientIP = insocket.getAddress().getHostAddress();
+			logger.info("netty server receive message from client={}", clientIP);
+
 			ChannelSession channelSession = ctx.channel().attr(ParserConst.CHANNELSESSION).get();
 
 			String version = redisCommand.getParameterByIndex(0);
@@ -71,7 +73,6 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 			if (RequestAction.IM.getName().equals(command.getRety())) {
 				logger.info("platform im request command={}", command.toString());
-
 				new MesageService().doImRequest(command);
 
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
@@ -83,12 +84,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 				logger.info("api request sessionId  = " + sessionId);
 
 				CommandResponse commandResponse = new MesageService().doApiRequest(command);
-
-				if ("api.push.notification".equals(command.getAction())) {
-					ctx.close();
-				} else {
-					ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
-				}
+				ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
 			} else {
 				logger.error("unknow request command = {}", command.toString());
 			}

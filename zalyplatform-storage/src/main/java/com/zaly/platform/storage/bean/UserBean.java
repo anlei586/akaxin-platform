@@ -2,13 +2,14 @@ package com.zaly.platform.storage.bean;
 
 import com.akaxin.common.utils.GsonUtils;
 
-public class UserInfoBean {
+public class UserBean {
 	private String userId;
 	private String userIdPrik;
 	private String userIdPubk;
 	private String userPhoto;
 	private String userName;
 	private String userPhoneId;
+	private String phoneRoaming;
 	private String clientType;
 	private String rom;
 	private String pushToken;
@@ -83,6 +84,14 @@ public class UserInfoBean {
 
 	public void setPushToken(String pushToken) {
 		this.pushToken = pushToken;
+	}
+
+	public String getPhoneRoaming() {
+		return phoneRoaming;
+	}
+
+	public void setPhoneRoaming(String phoneRoaming) {
+		this.phoneRoaming = phoneRoaming;
 	}
 
 	public String toString() {

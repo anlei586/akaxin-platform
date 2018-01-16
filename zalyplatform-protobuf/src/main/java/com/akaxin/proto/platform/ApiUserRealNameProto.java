@@ -107,6 +107,24 @@ public final class ApiUserRealNameProto {
      */
     com.google.protobuf.ByteString
         getPasswordBytes();
+
+    /**
+     * <pre>
+     *国际区号
+     * </pre>
+     *
+     * <code>optional string global_roaming = 6;</code>
+     */
+    java.lang.String getGlobalRoaming();
+    /**
+     * <pre>
+     *国际区号
+     * </pre>
+     *
+     * <code>optional string global_roaming = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getGlobalRoamingBytes();
   }
   /**
    * Protobuf type {@code platform.ApiUserRealNameRequest}
@@ -125,6 +143,7 @@ public final class ApiUserRealNameProto {
       phoneId_ = "";
       phoneVerifyCode_ = "";
       password_ = "";
+      globalRoaming_ = "";
     }
 
     @java.lang.Override
@@ -180,6 +199,12 @@ public final class ApiUserRealNameProto {
               java.lang.String s = input.readStringRequireUtf8();
 
               password_ = s;
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              globalRoaming_ = s;
               break;
             }
           }
@@ -415,6 +440,48 @@ public final class ApiUserRealNameProto {
       }
     }
 
+    public static final int GLOBAL_ROAMING_FIELD_NUMBER = 6;
+    private volatile java.lang.Object globalRoaming_;
+    /**
+     * <pre>
+     *国际区号
+     * </pre>
+     *
+     * <code>optional string global_roaming = 6;</code>
+     */
+    public java.lang.String getGlobalRoaming() {
+      java.lang.Object ref = globalRoaming_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        globalRoaming_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *国际区号
+     * </pre>
+     *
+     * <code>optional string global_roaming = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getGlobalRoamingBytes() {
+      java.lang.Object ref = globalRoaming_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        globalRoaming_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -442,6 +509,9 @@ public final class ApiUserRealNameProto {
       if (!getPasswordBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, password_);
       }
+      if (!getGlobalRoamingBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, globalRoaming_);
+      }
     }
 
     public int getSerializedSize() {
@@ -463,6 +533,9 @@ public final class ApiUserRealNameProto {
       }
       if (!getPasswordBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, password_);
+      }
+      if (!getGlobalRoamingBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, globalRoaming_);
       }
       memoizedSize = size;
       return size;
@@ -490,6 +563,8 @@ public final class ApiUserRealNameProto {
           .equals(other.getPhoneVerifyCode());
       result = result && getPassword()
           .equals(other.getPassword());
+      result = result && getGlobalRoaming()
+          .equals(other.getGlobalRoaming());
       return result;
     }
 
@@ -510,6 +585,8 @@ public final class ApiUserRealNameProto {
       hash = (53 * hash) + getPhoneVerifyCode().hashCode();
       hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
       hash = (53 * hash) + getPassword().hashCode();
+      hash = (37 * hash) + GLOBAL_ROAMING_FIELD_NUMBER;
+      hash = (53 * hash) + getGlobalRoaming().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -638,6 +715,8 @@ public final class ApiUserRealNameProto {
 
         password_ = "";
 
+        globalRoaming_ = "";
+
         return this;
       }
 
@@ -665,6 +744,7 @@ public final class ApiUserRealNameProto {
         result.phoneId_ = phoneId_;
         result.phoneVerifyCode_ = phoneVerifyCode_;
         result.password_ = password_;
+        result.globalRoaming_ = globalRoaming_;
         onBuilt();
         return result;
       }
@@ -724,6 +804,10 @@ public final class ApiUserRealNameProto {
         }
         if (!other.getPassword().isEmpty()) {
           password_ = other.password_;
+          onChanged();
+        }
+        if (!other.getGlobalRoaming().isEmpty()) {
+          globalRoaming_ = other.globalRoaming_;
           onChanged();
         }
         onChanged();
@@ -1196,6 +1280,95 @@ public final class ApiUserRealNameProto {
         onChanged();
         return this;
       }
+
+      private java.lang.Object globalRoaming_ = "";
+      /**
+       * <pre>
+       *国际区号
+       * </pre>
+       *
+       * <code>optional string global_roaming = 6;</code>
+       */
+      public java.lang.String getGlobalRoaming() {
+        java.lang.Object ref = globalRoaming_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          globalRoaming_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *国际区号
+       * </pre>
+       *
+       * <code>optional string global_roaming = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getGlobalRoamingBytes() {
+        java.lang.Object ref = globalRoaming_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          globalRoaming_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *国际区号
+       * </pre>
+       *
+       * <code>optional string global_roaming = 6;</code>
+       */
+      public Builder setGlobalRoaming(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        globalRoaming_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *国际区号
+       * </pre>
+       *
+       * <code>optional string global_roaming = 6;</code>
+       */
+      public Builder clearGlobalRoaming() {
+        
+        globalRoaming_ = getDefaultInstance().getGlobalRoaming();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *国际区号
+       * </pre>
+       *
+       * <code>optional string global_roaming = 6;</code>
+       */
+      public Builder setGlobalRoamingBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        globalRoaming_ = value;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1630,15 +1803,15 @@ public final class ApiUserRealNameProto {
   static {
     java.lang.String[] descriptorData = {
       "\n platform/api_user_realName.proto\022\010plat" +
-      "form\"\203\001\n\026ApiUserRealNameRequest\022\024\n\014user_" +
+      "form\"\233\001\n\026ApiUserRealNameRequest\022\024\n\014user_" +
       "id_prik\030\001 \001(\t\022\024\n\014user_id_pubk\030\002 \001(\t\022\020\n\010p" +
       "hone_id\030\003 \001(\t\022\031\n\021phone_verify_code\030\004 \001(\t" +
-      "\022\020\n\010password\030\005 \001(\t\"\031\n\027ApiUserRealNameRes" +
-      "ponse2i\n\026ApiUserRealNameService\022O\n\010realN" +
-      "ame\022 .platform.ApiUserRealNameRequest\032!." +
-      "platform.ApiUserRealNameResponseB1\n\031com." +
-      "akaxin.proto.platformB\024ApiUserRealNamePr" +
-      "otob\006proto3"
+      "\022\020\n\010password\030\005 \001(\t\022\026\n\016global_roaming\030\006 \001" +
+      "(\t\"\031\n\027ApiUserRealNameResponse2i\n\026ApiUser" +
+      "RealNameService\022O\n\010realName\022 .platform.A" +
+      "piUserRealNameRequest\032!.platform.ApiUser" +
+      "RealNameResponseB1\n\031com.akaxin.proto.pla" +
+      "tformB\024ApiUserRealNameProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1657,7 +1830,7 @@ public final class ApiUserRealNameProto {
     internal_static_platform_ApiUserRealNameRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_platform_ApiUserRealNameRequest_descriptor,
-        new java.lang.String[] { "UserIdPrik", "UserIdPubk", "PhoneId", "PhoneVerifyCode", "Password", });
+        new java.lang.String[] { "UserIdPrik", "UserIdPubk", "PhoneId", "PhoneVerifyCode", "Password", "GlobalRoaming", });
     internal_static_platform_ApiUserRealNameResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_platform_ApiUserRealNameResponse_fieldAccessorTable = new

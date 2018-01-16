@@ -2,7 +2,7 @@ package com.zaly.platform.storage.bean;
 
 import com.akaxin.common.utils.GsonUtils;
 
-public class RealNameUserBean extends UserInfoBean {
+public class UserRealNameBean extends UserBean {
 	public String password;
 
 	public String getPassword() {

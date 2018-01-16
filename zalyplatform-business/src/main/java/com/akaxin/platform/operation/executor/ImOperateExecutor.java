@@ -9,6 +9,7 @@ import com.akaxin.platform.operation.business.constant.RequestKeys;
 import com.akaxin.platform.operation.imessage.handler.ImAuthHandler;
 import com.akaxin.platform.operation.imessage.handler.ImHelloHandler;
 import com.akaxin.platform.operation.imessage.handler.ImPingPongHandler;
+import com.akaxin.platform.operation.imessage.handler.ImPtcPushHandler;
 
 /**
  * 
@@ -26,6 +27,7 @@ public class ImOperateExecutor {
 		executor.addChain("im.platform.hello", new ImHelloHandler());
 		executor.addChain("im.platform.auth", new ImAuthHandler());
 		executor.addChain("im.ctp.ping", new ImPingPongHandler());
+		executor.addChain("im.ptc.push", new ImPtcPushHandler());
 		executor.addChain(RequestKeys.IM_ACTION.getName(), imChain);
 	}
 

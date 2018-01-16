@@ -3,19 +3,20 @@ package com.zaly.platform.storage.service;
 import java.util.Map;
 
 import com.zaly.platform.storage.api.IUserInfoDao;
-import com.zaly.platform.storage.bean.RealNameUserBean;
-import com.zaly.platform.storage.bean.UserInfoBean;
+import com.zaly.platform.storage.bean.PushTokenBean;
+import com.zaly.platform.storage.bean.UserBean;
+import com.zaly.platform.storage.bean.UserRealNameBean;
 import com.zaly.platform.storage.impl.redis.RedisUserInfoDao;
 
 public class UserInfoDaoService implements IUserInfoDao {
 
 	@Override
-	public boolean saveUserInfo(UserInfoBean bean) {
+	public boolean saveUserInfo(UserBean bean) {
 		return RedisUserInfoDao.getInstance().saveUserInfo(bean);
 	}
 
 	@Override
-	public boolean updateRealUserInfo(RealNameUserBean bean) {
+	public boolean updateRealUserInfo(UserRealNameBean bean) {
 		return RedisUserInfoDao.getInstance().updateRealUser(bean);
 	}
 
@@ -27,6 +28,22 @@ public class UserInfoDaoService implements IUserInfoDao {
 	@Override
 	public Map<String, String> getUserInfoByUserId(String userID) {
 		return RedisUserInfoDao.getInstance().getUserInfoByUserId(userID);
+	}
+
+	@Override
+	public String getUserPhoneId(String userId) {
+		return RedisUserInfoDao.getInstance().getUserPhoneId(userId);
+	}
+
+	@Override
+	public String getPhoneGlobalRoaming(String phoneId) {
+		return RedisUserInfoDao.getInstance().getPhoneGlobalRoaming(phoneId);
+	}
+
+	@Override
+	public PushTokenBean getPushToken(String userId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

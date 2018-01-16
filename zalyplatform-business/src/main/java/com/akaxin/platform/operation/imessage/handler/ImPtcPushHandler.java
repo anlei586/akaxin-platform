@@ -11,9 +11,8 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.RedisCommand;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.proto.client.ImPtcPushProto;
-import com.akaxin.proto.platform.ApiPushNotificationProto;
+import com.akaxin.proto.core.CoreProto;
 import com.google.protobuf.ByteString;
-import com.zaly.proto.core.CoreProto;
 
 /**
  * 发送Push给客户端
@@ -33,24 +32,12 @@ public class ImPtcPushHandler extends AbstractImHandler<Command> {
 			ChannelSession channelSession = ChannelManager.getChannelSession(deviceId);
 
 			if (channelSession != null) {
-				ApiPushNotificationProto.ApiPushNotificationRequest apnr = ApiPushNotificationProto.ApiPushNotificationRequest
+				ImPtcPushProto.ImPtcPushRequest ptcPushRequest = ImPtcPushProto.ImPtcPushRequest
 						.parseFrom(command.getParams());
-
+				
 				CoreProto.TransportPackageData.Builder pushPackageBuilder = CoreProto.TransportPackageData.newBuilder();
 				pushPackageBuilder.putAllHeader(new HashMap<Integer, String>());
-
-				ImPtcPushProto.ImPtcPushRequest.Builder ipprBuilder = ImPtcPushProto.ImPtcPushRequest.newBuilder();
-
-				if (apnr.getUserId() != null) {
-
-				}
-				ipprBuilder.setPushAlert("test im push");
-				ipprBuilder.setPushBadge(apnr.getPushBadge());
-				if (apnr.getSiteServerName() != null) {
-					ipprBuilder.setSiteServerName(apnr.getSiteServerName());
-				}
-
-				pushPackageBuilder.setData(ByteString.copyFrom(ipprBuilder.build().toByteArray()));
+				pushPackageBuilder.setData(ByteString.copyFrom(ptcPushRequest.toByteArray()));
 				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
 						.add("im.ptc.push").add(pushPackageBuilder.build().toByteArray()));
 				return true;

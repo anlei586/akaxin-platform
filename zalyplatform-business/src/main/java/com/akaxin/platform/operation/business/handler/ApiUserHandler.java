@@ -10,22 +10,32 @@ import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.utils.ValidatorPattern;
+import com.akaxin.platform.operation.business.dao.PhoneCodeDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
-import com.akaxin.platform.operation.business.dao.UserPhoneDao;
+import com.akaxin.platform.operation.utils.PhoneCodeUtils;
 import com.akaxin.proto.platform.ApiUserRealNameProto;
 import com.akaxin.proto.platform.ApiUserUploadProto;
-import com.zaly.platform.storage.bean.RealNameUserBean;
-import com.zaly.platform.storage.bean.UserInfoBean;
+import com.zaly.platform.storage.bean.UserRealNameBean;
+import com.zaly.platform.storage.bean.UserBean;
 
 /**
  * service:ApiUserInfo methods:
  * 
- * @author Sam
+ * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2017.10.17
- *
  */
 public class ApiUserHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiUserHandler.class);
+
+	/**
+	 * 推送用户token给平台
+	 * 
+	 * @param command
+	 * @return
+	 */
+	public boolean pushToken(Command command) {
+		return upload(command);
+	}
 
 	/**
 	 * 上传/更新用户个人信息
@@ -42,7 +52,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 
 			String userId = HashCrypto.SHA1(userIdPubk);
 
-			UserInfoBean userBean = new UserInfoBean();
+			UserBean userBean = new UserBean();
 			userBean.setUserId(userId);
 			userBean.setUserIdPrik(request.getUserIdPrik());
 			userBean.setUserIdPubk(userIdPubk);
@@ -87,26 +97,25 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			String userId = HashCrypto.SHA1(userIdPubk);
 			String phoneId = request.getPhoneId();
 			String verifyCode = request.getPhoneVerifyCode();
-			String userPassword = request.getPassword();
-			String password = HashCrypto.MD5(userPassword);
+			String password = HashCrypto.MD5(request.getPassword());
 
-			RealNameUserBean bean = new RealNameUserBean();
+			UserRealNameBean bean = new UserRealNameBean();
 			bean.setUserId(userId);
 			bean.setUserIdPrik(userIdPrik);
 			bean.setUserIdPubk(userIdPubk);
 			bean.setUserPhoneId(phoneId);
 			bean.setPassword(password);
+			bean.setPhoneRoaming("+86");
 
 			if (!ValidatorPattern.isPhoneId(phoneId) || StringUtils.isEmpty(userIdPrik)
 					|| StringUtils.isEmpty(userIdPubk) || StringUtils.isEmpty(phoneId)
 					|| StringUtils.isEmpty(password)) {
-				commandResponse.setErrInfo("arguments error.");
 				command.setResponse(commandResponse.setErrCode(errorCode));
 				return false;
 			}
 
-			String redisKey = "phone_code_" + phoneId;
-			String realVerifyCode = UserPhoneDao.getInstance().getVerifyCode(redisKey);
+			String redisKey = PhoneCodeUtils.getPhoneVCKey(phoneId);
+			String realVerifyCode = PhoneCodeDao.getInstance().getPhoneCode(redisKey);
 
 			logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode, bean.toString());
 

@@ -11,8 +11,8 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.RedisCommand;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.proto.client.ImPtcPushProto;
+import com.akaxin.proto.core.CoreProto;
 import com.google.protobuf.ByteString;
-import com.zaly.proto.core.CoreProto;
 
 /**
  * ping && pong
