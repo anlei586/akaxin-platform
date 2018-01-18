@@ -2,9 +2,10 @@ package com.zaly.platform.storage.constant;
 
 public interface UserKey {
 	public String userId = "userId";
-	public String userPassword = "password";
 	public String userIdPrik = "userIdPrik";
 	public String userIdPubk = "userIdPubk";
+	public String deviceId = "deviceId";
+	public String deviceIdPubk = "deviceIdPubk";
 	public String userPhoto = "userPhoto";
 	public String userName = "userName";
 	public String userPhoneId = "userPhoneId";

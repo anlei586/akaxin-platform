@@ -13,9 +13,9 @@ import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.business.dao.PhoneCodeDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.utils.PhoneCodeUtils;
+import com.akaxin.proto.core.ClientProto;
+import com.akaxin.proto.platform.ApiUserPushTokenProto;
 import com.akaxin.proto.platform.ApiUserRealNameProto;
-import com.akaxin.proto.platform.ApiUserUploadProto;
-import com.zaly.platform.storage.bean.UserRealNameBean;
 import com.zaly.platform.storage.bean.UserBean;
 
 /**
@@ -27,56 +27,37 @@ import com.zaly.platform.storage.bean.UserBean;
 public class ApiUserHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiUserHandler.class);
 
-	/**
-	 * 推送用户token给平台
-	 * 
-	 * @param command
-	 * @return
-	 */
 	public boolean pushToken(Command command) {
-		return upload(command);
-	}
-
-	/**
-	 * 上传/更新用户个人信息
-	 */
-	public boolean upload(Command command) {
-		logger.info("----- api.user.upload -----");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
-				.setAction(CommandConst.ACTION_RES);
+		logger.info("----api.user.supplyToken command={}", command.toString());
+		CommandResponse commandResponse = new CommandResponse();
 		String errCode = ErrorCode.ERROR;
 		try {
-			ApiUserUploadProto.ApiUserUploadRequest request = ApiUserUploadProto.ApiUserUploadRequest
+			ApiUserPushTokenProto.ApiUserPushTokenRequest request = ApiUserPushTokenProto.ApiUserPushTokenRequest
 					.parseFrom(command.getParams());
-			String userIdPubk = request.getUserIdPubk();
+			String deviceId = command.getDeviceId();
+			ClientProto.ClientType clientType = request.getClientType();
+			String rom = request.getRom();
+			String pushToken = request.getPushToken();
 
-			String userId = HashCrypto.SHA1(userIdPubk);
+			logger.info("api.user.supplyToken request={}", request.toString());
 
 			UserBean userBean = new UserBean();
-			userBean.setUserId(userId);
-			userBean.setUserIdPrik(request.getUserIdPrik());
-			userBean.setUserIdPubk(userIdPubk);
-			userBean.setUserName(request.getUserName());
-			userBean.setUserPhoneId(request.getPhoneId());
-			if (StringUtils.isNotEmpty(request.getUserPhoto())) {
-				userBean.setUserPhoto(request.getUserPhoto());
-			}
-			userBean.setClientType(request.getClientType());
-			userBean.setPushToken(request.getPushToken());
-			userBean.setRom(request.getRom());
+			userBean.setUserId(command.getSiteUserId());
+			userBean.setClientType(clientType.getNumber());
+			userBean.setRom(rom);
+			userBean.setPushToken(pushToken);
 
 			logger.info("userInfoBean=" + userBean.toString());
 
-			if (UserInfoDao.getInstance().uploadUserInfo(userBean)) {
+			if (UserInfoDao.getInstance().saveUserInfo(userBean)) {
 				errCode = ErrorCode.SUCCESS;
 			}
-
+			return true;
 		} catch (Exception e) {
-			commandResponse.setErrInfo("api.user.upload exception!");
-			logger.error("upload user info error.", e);
+			logger.error("api.push token error", e);
 		}
-		command.setResponse(commandResponse.setErrCode(errCode));
-		return true;
+		commandResponse.setErrCode(errCode);
+		return false;
 	}
 
 	/**
@@ -97,19 +78,18 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			String userId = HashCrypto.SHA1(userIdPubk);
 			String phoneId = request.getPhoneId();
 			String verifyCode = request.getPhoneVerifyCode();
-			String password = HashCrypto.MD5(request.getPassword());
 
-			UserRealNameBean bean = new UserRealNameBean();
+			UserBean bean = new UserBean();
 			bean.setUserId(userId);
 			bean.setUserIdPrik(userIdPrik);
 			bean.setUserIdPubk(userIdPubk);
 			bean.setUserPhoneId(phoneId);
-			bean.setPassword(password);
 			bean.setPhoneRoaming("+86");
 
+			logger.info("phone verify code bean={}", bean.toString());
+
 			if (!ValidatorPattern.isPhoneId(phoneId) || StringUtils.isEmpty(userIdPrik)
-					|| StringUtils.isEmpty(userIdPubk) || StringUtils.isEmpty(phoneId)
-					|| StringUtils.isEmpty(password)) {
+					|| StringUtils.isEmpty(userIdPubk)) {
 				command.setResponse(commandResponse.setErrCode(errorCode));
 				return false;
 			}
@@ -120,7 +100,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode, bean.toString());
 
 			if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
-				if (UserInfoDao.getInstance().updateRealUserInfo(bean)) {
+				if (UserInfoDao.getInstance().updateRealNameInfo(bean)) {
 					errorCode = ErrorCode.SUCCESS;
 				}
 			} else {

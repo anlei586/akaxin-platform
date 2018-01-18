@@ -36,12 +36,12 @@ public class ImPingPongHandler extends AbstractImHandler<Command> {
 				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
 						.add("im.ptc.pong").add(pongPackageBuilder.build().toByteArray()));
 
-				ImPtcPushProto.ImPtcPushRequest request = ImPtcPushProto.ImPtcPushRequest.newBuilder()
-						.setPushAlert("test im push").setPushBadge(1).setSiteServerName("test server").build();
-
-				pongPackageBuilder.setData(ByteString.copyFrom(request.toByteArray()));
-				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
-						.add("im.ptc.push").add(pongPackageBuilder.build().toByteArray()));
+//				ImPtcPushProto.ImPtcPushRequest request = ImPtcPushProto.ImPtcPushRequest.newBuilder()
+//						.setPushAlert("test im push").setPushBadge(1).setSiteServerName("test server").build();
+//
+//				pongPackageBuilder.setData(ByteString.copyFrom(request.toByteArray()));
+//				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
+//						.add("im.ptc.push").add(pongPackageBuilder.build().toByteArray()));
 			}
 			return true;
 		} catch (Exception e) {

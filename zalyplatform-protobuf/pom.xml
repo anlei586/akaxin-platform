@@ -14,9 +14,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.zaly.proto</groupId>
+			<groupId>com.akaxin.proto</groupId>
 			<artifactId>openzaly-protobuf</artifactId>
-			<version>0.0.3-SNAPSHOT</version>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 	</dependencies>

@@ -5,7 +5,6 @@ import java.util.Map;
 import com.zaly.platform.storage.api.IUserInfoDao;
 import com.zaly.platform.storage.bean.PushTokenBean;
 import com.zaly.platform.storage.bean.UserBean;
-import com.zaly.platform.storage.bean.UserRealNameBean;
 import com.zaly.platform.storage.impl.redis.RedisUserInfoDao;
 
 public class UserInfoDaoService implements IUserInfoDao {
@@ -16,7 +15,12 @@ public class UserInfoDaoService implements IUserInfoDao {
 	}
 
 	@Override
-	public boolean updateRealUserInfo(UserRealNameBean bean) {
+	public boolean updateUserInfo(String key, Map<String, String> map) {
+		return RedisUserInfoDao.getInstance().updateUserInfo(key, map);
+	}
+
+	@Override
+	public boolean updateRealNameInfo(UserBean bean) {
 		return RedisUserInfoDao.getInstance().updateRealUser(bean);
 	}
 

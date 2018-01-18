@@ -3,6 +3,8 @@ package com.akaxin.platform.operation.business.handler;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -14,7 +16,11 @@ import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.crypto.RSACrypto;
+import com.akaxin.platform.operation.business.dao.SessionDao;
+import com.akaxin.platform.operation.business.dao.UserInfoDao;
+import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.proto.platform.ApiPlatformLoginProto;
+import com.zaly.platform.storage.constant.UserKey;
 
 /**
  * 
@@ -48,7 +54,6 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 			String userIdPubk = loginRequest.getUserIdPubk();
 			String userDeviceIdPubk = loginRequest.getUserDeviceIdPubk();
 			String userDeviceIdSign = loginRequest.getUserDeviceIdSign();
-			String userDeviceName = loginRequest.getUserDeviceName();
 			String userId = HashCrypto.SHA1(userIdPubk);
 
 			logger.info("user_id_pubk={}", userIdPubk);
@@ -75,35 +80,28 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 			} catch (Exception e) {
 				logger.error("test user device Pubk.", e);
 			}
-
-			// 判断用户，是否已经注册
-			// String siteUserId = SiteLoginDao.getInstance().getSiteUserId(userIdPubk);
-
+			// 随机生成sessionid
+			String sessionId = UUID.randomUUID().toString();
 			String deviceId = HashCrypto.MD5(userDeviceIdPubk);
 
-			logger.info("Login: Check User, userId={} deviceId={}", userId, deviceId);
+			String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
+			Map<String, String> sessionMap = new HashMap<String, String>();
+			sessionMap.put(UserKey.userId, userId);
+			sessionMap.put(UserKey.deviceId, deviceId);
 
-			String sessionId = UUID.randomUUID().toString();
+			if (SessionDao.getInstance().addSession(sessionKey, sessionMap)) {
 
-			// UserSessionBean sessionBean = new UserSessionBean();
-			// sessionBean.setLoginTime(System.currentTimeMillis());
-			// sessionBean.setSiteUserId(siteUserId);
-			// sessionBean.setOnline(true);
-			// sessionBean.setSessionId(sessionId);
-			// sessionBean.setDeviceId(deviceId);
-			// sessionBean.setLoginTime(System.currentTimeMillis());// 上次登陆(auth)时间
-			// // 登陆信息入库,保存session
-			// logger.info("Login:sessionId={}", sessionId);
-			// loginResult = loginResult &&
-			// SiteLoginDao.getInstance().saveUserSession(sessionBean);
-			// logger.info("Login:save session result={}", loginResult);
+				ApiPlatformLoginProto.ApiPlatformLoginResponse response = ApiPlatformLoginProto.ApiPlatformLoginResponse
+						.newBuilder().setUserId(userId).setSessionId(sessionId).build();
+				errCode = ErrorCode.SUCCESS;
+				commandResponse.setParams(response.toByteArray());
 
-			ApiPlatformLoginProto.ApiPlatformLoginResponse response = ApiPlatformLoginProto.ApiPlatformLoginResponse
-					.newBuilder().setUserId(userId).setSessionId(sessionId).build();
-			errCode = ErrorCode.SUCCESS;
-			commandResponse.setParams(response.toByteArray());
+				errCode = ErrorCode.SUCCESS;
+			}
 
-			errCode = ErrorCode.SUCCESS;
+			// 更新最新一次登陆的用户信息，用于发送push，最后登陆用户，支持接受push
+			UserInfoDao.getInstance().updateUserInfo(userId, sessionMap);
+
 			logger.info("------login platform finish------");
 		} catch (Exception e) {
 			commandResponse.setErrInfo("Login exception!");

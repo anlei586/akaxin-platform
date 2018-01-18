@@ -38,21 +38,21 @@ public final class ApiPhoneLoginProto {
 
     /**
      * <pre>
-     *用户手机登陆密码
+     *短信验证码
      * </pre>
      *
-     * <code>optional string password = 2;</code>
+     * <code>optional string phone_verify_code = 2;</code>
      */
-    java.lang.String getPassword();
+    java.lang.String getPhoneVerifyCode();
     /**
      * <pre>
-     *用户手机登陆密码
+     *短信验证码
      * </pre>
      *
-     * <code>optional string password = 2;</code>
+     * <code>optional string phone_verify_code = 2;</code>
      */
     com.google.protobuf.ByteString
-        getPasswordBytes();
+        getPhoneVerifyCodeBytes();
   }
   /**
    * Protobuf type {@code platform.ApiPhoneLoginRequest}
@@ -67,7 +67,7 @@ public final class ApiPhoneLoginProto {
     }
     private ApiPhoneLoginRequest() {
       phoneId_ = "";
-      password_ = "";
+      phoneVerifyCode_ = "";
     }
 
     @java.lang.Override
@@ -104,7 +104,7 @@ public final class ApiPhoneLoginProto {
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              password_ = s;
+              phoneVerifyCode_ = s;
               break;
             }
           }
@@ -172,42 +172,42 @@ public final class ApiPhoneLoginProto {
       }
     }
 
-    public static final int PASSWORD_FIELD_NUMBER = 2;
-    private volatile java.lang.Object password_;
+    public static final int PHONE_VERIFY_CODE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object phoneVerifyCode_;
     /**
      * <pre>
-     *用户手机登陆密码
+     *短信验证码
      * </pre>
      *
-     * <code>optional string password = 2;</code>
+     * <code>optional string phone_verify_code = 2;</code>
      */
-    public java.lang.String getPassword() {
-      java.lang.Object ref = password_;
+    public java.lang.String getPhoneVerifyCode() {
+      java.lang.Object ref = phoneVerifyCode_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        password_ = s;
+        phoneVerifyCode_ = s;
         return s;
       }
     }
     /**
      * <pre>
-     *用户手机登陆密码
+     *短信验证码
      * </pre>
      *
-     * <code>optional string password = 2;</code>
+     * <code>optional string phone_verify_code = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getPasswordBytes() {
-      java.lang.Object ref = password_;
+        getPhoneVerifyCodeBytes() {
+      java.lang.Object ref = phoneVerifyCode_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        password_ = b;
+        phoneVerifyCode_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -229,8 +229,8 @@ public final class ApiPhoneLoginProto {
       if (!getPhoneIdBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, phoneId_);
       }
-      if (!getPasswordBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, password_);
+      if (!getPhoneVerifyCodeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, phoneVerifyCode_);
       }
     }
 
@@ -242,8 +242,8 @@ public final class ApiPhoneLoginProto {
       if (!getPhoneIdBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, phoneId_);
       }
-      if (!getPasswordBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, password_);
+      if (!getPhoneVerifyCodeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, phoneVerifyCode_);
       }
       memoizedSize = size;
       return size;
@@ -263,8 +263,8 @@ public final class ApiPhoneLoginProto {
       boolean result = true;
       result = result && getPhoneId()
           .equals(other.getPhoneId());
-      result = result && getPassword()
-          .equals(other.getPassword());
+      result = result && getPhoneVerifyCode()
+          .equals(other.getPhoneVerifyCode());
       return result;
     }
 
@@ -277,8 +277,8 @@ public final class ApiPhoneLoginProto {
       hash = (19 * hash) + getDescriptorForType().hashCode();
       hash = (37 * hash) + PHONE_ID_FIELD_NUMBER;
       hash = (53 * hash) + getPhoneId().hashCode();
-      hash = (37 * hash) + PASSWORD_FIELD_NUMBER;
-      hash = (53 * hash) + getPassword().hashCode();
+      hash = (37 * hash) + PHONE_VERIFY_CODE_FIELD_NUMBER;
+      hash = (53 * hash) + getPhoneVerifyCode().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -399,7 +399,7 @@ public final class ApiPhoneLoginProto {
         super.clear();
         phoneId_ = "";
 
-        password_ = "";
+        phoneVerifyCode_ = "";
 
         return this;
       }
@@ -424,7 +424,7 @@ public final class ApiPhoneLoginProto {
       public com.akaxin.proto.platform.ApiPhoneLoginProto.ApiPhoneLoginRequest buildPartial() {
         com.akaxin.proto.platform.ApiPhoneLoginProto.ApiPhoneLoginRequest result = new com.akaxin.proto.platform.ApiPhoneLoginProto.ApiPhoneLoginRequest(this);
         result.phoneId_ = phoneId_;
-        result.password_ = password_;
+        result.phoneVerifyCode_ = phoneVerifyCode_;
         onBuilt();
         return result;
       }
@@ -470,8 +470,8 @@ public final class ApiPhoneLoginProto {
           phoneId_ = other.phoneId_;
           onChanged();
         }
-        if (!other.getPassword().isEmpty()) {
-          password_ = other.password_;
+        if (!other.getPhoneVerifyCode().isEmpty()) {
+          phoneVerifyCode_ = other.phoneVerifyCode_;
           onChanged();
         }
         onChanged();
@@ -589,21 +589,21 @@ public final class ApiPhoneLoginProto {
         return this;
       }
 
-      private java.lang.Object password_ = "";
+      private java.lang.Object phoneVerifyCode_ = "";
       /**
        * <pre>
-       *用户手机登陆密码
+       *短信验证码
        * </pre>
        *
-       * <code>optional string password = 2;</code>
+       * <code>optional string phone_verify_code = 2;</code>
        */
-      public java.lang.String getPassword() {
-        java.lang.Object ref = password_;
+      public java.lang.String getPhoneVerifyCode() {
+        java.lang.Object ref = phoneVerifyCode_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          password_ = s;
+          phoneVerifyCode_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -611,19 +611,19 @@ public final class ApiPhoneLoginProto {
       }
       /**
        * <pre>
-       *用户手机登陆密码
+       *短信验证码
        * </pre>
        *
-       * <code>optional string password = 2;</code>
+       * <code>optional string phone_verify_code = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getPasswordBytes() {
-        java.lang.Object ref = password_;
+          getPhoneVerifyCodeBytes() {
+        java.lang.Object ref = phoneVerifyCode_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          password_ = b;
+          phoneVerifyCode_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -631,49 +631,49 @@ public final class ApiPhoneLoginProto {
       }
       /**
        * <pre>
-       *用户手机登陆密码
+       *短信验证码
        * </pre>
        *
-       * <code>optional string password = 2;</code>
+       * <code>optional string phone_verify_code = 2;</code>
        */
-      public Builder setPassword(
+      public Builder setPhoneVerifyCode(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        password_ = value;
+        phoneVerifyCode_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       *用户手机登陆密码
+       *短信验证码
        * </pre>
        *
-       * <code>optional string password = 2;</code>
+       * <code>optional string phone_verify_code = 2;</code>
        */
-      public Builder clearPassword() {
+      public Builder clearPhoneVerifyCode() {
         
-        password_ = getDefaultInstance().getPassword();
+        phoneVerifyCode_ = getDefaultInstance().getPhoneVerifyCode();
         onChanged();
         return this;
       }
       /**
        * <pre>
-       *用户手机登陆密码
+       *短信验证码
        * </pre>
        *
-       * <code>optional string password = 2;</code>
+       * <code>optional string phone_verify_code = 2;</code>
        */
-      public Builder setPasswordBytes(
+      public Builder setPhoneVerifyCodeBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        password_ = value;
+        phoneVerifyCode_ = value;
         onChanged();
         return this;
       }
@@ -1458,14 +1458,14 @@ public final class ApiPhoneLoginProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\036platform/api_phone_login.proto\022\010platfo" +
-      "rm\":\n\024ApiPhoneLoginRequest\022\020\n\010phone_id\030\001" +
-      " \001(\t\022\020\n\010password\030\002 \001(\t\"C\n\025ApiPhoneLoginR" +
-      "esponse\022\024\n\014user_id_prik\030\001 \001(\t\022\024\n\014user_id" +
-      "_pubk\030\002 \001(\t2`\n\024ApiPhoneLoginService\022H\n\005l" +
-      "ogin\022\036.platform.ApiPhoneLoginRequest\032\037.p" +
-      "latform.ApiPhoneLoginResponseB/\n\031com.aka" +
-      "xin.proto.platformB\022ApiPhoneLoginProtob\006" +
-      "proto3"
+      "rm\"C\n\024ApiPhoneLoginRequest\022\020\n\010phone_id\030\001" +
+      " \001(\t\022\031\n\021phone_verify_code\030\002 \001(\t\"C\n\025ApiPh" +
+      "oneLoginResponse\022\024\n\014user_id_prik\030\001 \001(\t\022\024" +
+      "\n\014user_id_pubk\030\002 \001(\t2`\n\024ApiPhoneLoginSer" +
+      "vice\022H\n\005login\022\036.platform.ApiPhoneLoginRe" +
+      "quest\032\037.platform.ApiPhoneLoginResponseB/" +
+      "\n\031com.akaxin.proto.platformB\022ApiPhoneLog" +
+      "inProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1484,7 +1484,7 @@ public final class ApiPhoneLoginProto {
     internal_static_platform_ApiPhoneLoginRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_platform_ApiPhoneLoginRequest_descriptor,
-        new java.lang.String[] { "PhoneId", "Password", });
+        new java.lang.String[] { "PhoneId", "PhoneVerifyCode", });
     internal_static_platform_ApiPhoneLoginResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_platform_ApiPhoneLoginResponse_fieldAccessorTable = new

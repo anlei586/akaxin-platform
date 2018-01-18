@@ -1,7 +1,6 @@
 package com.akaxin.platform.connector.handler;
 
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +69,9 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			command.setAction(action);
 			command.setChannelSession(channelSession);
 			command.setParams(packageData.getData().toByteArray());
+			command.setHeader(packageData.getHeaderMap());
+
+			logger.info("client request command={}", command.toString());
 
 			if (RequestAction.IM.getName().equals(command.getRety())) {
 				logger.info("platform im request command={}", command.toString());
@@ -77,12 +79,6 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
 				logger.info("platform api request command={}", command.toString());
-
-				Map<Integer, String> header = packageData.getHeaderMap();
-				String sessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
-
-				logger.info("api request sessionId  = " + sessionId);
-
 				CommandResponse commandResponse = new MesageService().doApiRequest(command);
 				ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
 			} else {

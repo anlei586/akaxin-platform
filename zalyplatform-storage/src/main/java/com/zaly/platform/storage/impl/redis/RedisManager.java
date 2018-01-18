@@ -6,6 +6,8 @@ public class RedisManager {
 	private static Jedis userInfoJedis;
 	private static Jedis phoneJedis;
 	private static Jedis tempJedis;
+	private static Jedis sessionJedis;
+	private static Jedis userTokenJedis;
 
 	public static Jedis getUserInfoJedis() {
 		if (userInfoJedis == null) {
@@ -26,5 +28,19 @@ public class RedisManager {
 			tempJedis = new Jedis("localhost", 6379);
 		}
 		return tempJedis;
+	}
+
+	public static Jedis getSessionJedis() {
+		if (sessionJedis == null) {
+			sessionJedis = new Jedis("localhost", 6379);
+		}
+		return sessionJedis;
+	}
+
+	public static Jedis getUserTokenJedis() {
+		if (userTokenJedis == null) {
+			userTokenJedis = new Jedis("localhost", 6379);
+		}
+		return userTokenJedis;
 	}
 }

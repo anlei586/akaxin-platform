@@ -10,7 +10,6 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
-import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.utils.GsonUtils;
 import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.business.dao.PhoneCodeDao;
@@ -21,7 +20,7 @@ import com.akaxin.proto.platform.ApiPhoneConfirmCodeProto;
 import com.akaxin.proto.platform.ApiPhoneLoginProto;
 import com.akaxin.proto.platform.ApiPhoneVerifyCodeProto;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.zaly.platform.storage.bean.UserRealNameBean;
+import com.zaly.platform.storage.bean.UserBean;
 
 /**
  * 平台：用户手机验证码申请，以及手机号登陆
@@ -71,6 +70,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	}
 
 	/**
+	 * 使用手机号，配合手机验证码登陆
 	 * 
 	 * @param command
 	 * 
@@ -82,25 +82,27 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 		try {
 			ApiPhoneLoginProto.ApiPhoneLoginRequest request = ApiPhoneLoginProto.ApiPhoneLoginRequest
 					.parseFrom(command.getParams());
-
 			String phoneId = request.getPhoneId();
-			String password = request.getPassword();
-			logger.info("Phone Login  request phoneid={},password={}", phoneId, password);
+			String phoneVerifyCode = request.getPhoneVerifyCode();
 
-			if (!ValidatorPattern.isPhoneId(phoneId) || StringUtils.isEmpty(password)) {
+			logger.info("Phone Login  request phoneid={},vc={}", phoneId, phoneVerifyCode);
+
+			if (!ValidatorPattern.isPhoneId(phoneId) || StringUtils.isEmpty(phoneVerifyCode)) {
 				command.setResponse(commandRespone.setErrCode(errorCode));
 				return false;
 			}
 
-			UserRealNameBean userBean = UserInfoDao.getInstance().getRealUserInfo(phoneId);
+			String vc_key = PhoneCodeUtils.getPhoneVCKey(phoneId);
+			String realVerifyCode = PhoneCodeDao.getInstance().getPhoneCode(vc_key);
+			logger.info("vc1={} vc2={}", phoneVerifyCode, realVerifyCode);
+
+			if (!phoneVerifyCode.equals(realVerifyCode)) {
+				command.setResponse(commandRespone.setErrCode(errorCode));
+				return false;
+			}
+
+			UserBean userBean = UserInfoDao.getInstance().getRealNameInfo(phoneId);
 			logger.info("phone login userBean={}", GsonUtils.toJson(userBean));
-			String realPasswordId = userBean.getPassword();
-			String verifyPasswordId = HashCrypto.MD5(password);
-
-			if (!verifyPasswordId.equals(realPasswordId)) {
-				command.setResponse(commandRespone.setErrCode(errorCode));
-				return false;
-			}
 
 			ApiPhoneLoginProto.ApiPhoneLoginResponse response = ApiPhoneLoginProto.ApiPhoneLoginResponse.newBuilder()
 					.setUserIdPrik(String.valueOf(userBean.getUserIdPrik()))

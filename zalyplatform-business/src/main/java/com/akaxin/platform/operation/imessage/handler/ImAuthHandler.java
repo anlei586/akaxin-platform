@@ -1,5 +1,8 @@
 package com.akaxin.platform.operation.imessage.handler;
 
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +14,10 @@ import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.utils.ServerAddressUtils;
+import com.akaxin.platform.operation.business.dao.SessionDao;
+import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.proto.platform.ImPlatformAuthProto;
+import com.zaly.platform.storage.constant.UserKey;
 
 import io.netty.channel.Channel;
 
@@ -27,6 +33,7 @@ public class ImAuthHandler extends AbstractImHandler<Command> {
 
 	@Override
 	public boolean handle(Command command) {
+		boolean result = false;
 		try {
 			logger.info("------ auth handler ------");
 			ChannelSession channelSession = command.getChannelSession();
@@ -37,13 +44,23 @@ public class ImAuthHandler extends AbstractImHandler<Command> {
 
 			logger.info("auth action command={}", command.toString());
 
-			channelSession.setCtype(1); // 长连接
-			channelSession.setUserId(siteUserId);
-			channelSession.setDeviceId(sessionId);
-			ChannelManager.addChannelSession(sessionId, channelSession);
+			String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
+			Map<String, String> map = SessionDao.getInstance().getSessionMap(sessionKey);
 
-			authResponse(channelSession.getChannel(), command, true);
-			return true;
+			String userId = map.get(UserKey.userId);
+			String deviceId = map.get(UserKey.deviceId);
+
+			logger.info("auth userId={} deviceId={}", userId, deviceId);
+
+			if (StringUtils.isNotBlank(userId) && userId.equals(siteUserId) && StringUtils.isNotBlank(deviceId)) {
+				channelSession.setCtype(1); // 长连接
+				channelSession.setUserId(siteUserId);
+				channelSession.setDeviceId(deviceId);
+				ChannelManager.addChannelSession(deviceId, channelSession);
+				result = true;
+			}
+			logger.info("auth result = {},sessionSize={}", result, ChannelManager.getChannelSessionSize());
+			authResponse(channelSession.getChannel(), command, result);
 		} catch (Exception e) {
 			logger.error("im auth error.", e);
 		}

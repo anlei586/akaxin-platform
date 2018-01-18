@@ -10,7 +10,7 @@ public class UserBean {
 	private String userName;
 	private String userPhoneId;
 	private String phoneRoaming;
-	private String clientType;
+	private int clientType;
 	private String rom;
 	private String pushToken;
 
@@ -62,11 +62,11 @@ public class UserBean {
 		this.userPhoneId = userPhoneId;
 	}
 
-	public String getClientType() {
+	public int getClientType() {
 		return clientType;
 	}
 
-	public void setClientType(String clientType) {
+	public void setClientType(int clientType) {
 		this.clientType = clientType;
 	}
 

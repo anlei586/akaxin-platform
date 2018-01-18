@@ -5,10 +5,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.zaly.platform.storage.api.IUserInfoDao;
 import com.zaly.platform.storage.bean.PushTokenBean;
 import com.zaly.platform.storage.bean.UserBean;
-import com.zaly.platform.storage.bean.UserRealNameBean;
 import com.zaly.platform.storage.constant.UserKey;
 import com.zaly.platform.storage.service.UserInfoDaoService;
 
@@ -26,30 +26,39 @@ public class UserInfoDao {
 		return instance;
 	}
 
-	public boolean uploadUserInfo(UserBean userBean) {
+	public boolean saveUserInfo(UserBean userBean) {
 		try {
 			return userDao.saveUserInfo(userBean);
+		} catch (Exception e) {
+			logger.error("save user info error.", e);
+		}
+		return false;
+	}
+
+	public boolean updateUserInfo(String userId, Map<String, String> map) {
+		try {
+			String key = RedisKeyUtils.getUserInfoKey(userId);
+			return userDao.updateUserInfo(key, map);
 		} catch (Exception e) {
 			logger.error("update user info error.", e);
 		}
 		return false;
 	}
 
-	public boolean updateRealUserInfo(UserRealNameBean userBean) {
+	public boolean updateRealNameInfo(UserBean userBean) {
 		try {
-			return userDao.updateRealUserInfo(userBean);
+			return userDao.updateRealNameInfo(userBean);
 		} catch (Exception e) {
 			logger.error("update rean user info error.", e);
 		}
 		return false;
 	}
 
-	public UserRealNameBean getRealUserInfo(String phoneId) {
-		UserRealNameBean userBean = new UserRealNameBean();
+	public UserBean getRealNameInfo(String phoneId) {
+		UserBean userBean = new UserBean();
 		try {
 			Map<String, String> phoneMap = userDao.getPhoneInfoByPhone(phoneId);
 			userBean.setUserId(phoneMap.get(UserKey.userId));
-			userBean.setPassword(phoneMap.get(UserKey.userPassword));
 
 			Map<String, String> userInfoMap = userDao.getUserInfoByUserId(userBean.getUserId());
 
