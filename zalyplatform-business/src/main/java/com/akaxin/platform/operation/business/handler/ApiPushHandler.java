@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
+import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
@@ -13,6 +14,7 @@ import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.proto.client.ImPtcPushProto;
 import com.akaxin.proto.core.ClientProto;
+import com.akaxin.proto.core.CoreProto;
 import com.akaxin.proto.core.PushProto;
 import com.akaxin.proto.platform.ApiPushAuthProto;
 import com.akaxin.proto.platform.ApiPushNotificationProto;
@@ -82,62 +84,82 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean notification(Command command) {
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+				.setAction(CommandConst.ACTION_RES);
+		String errCode = ErrorCode.SUCCESS;
 		try {
 			Command pushCommand = null;
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
 					.parseFrom(command.getParams());
-			String userId = request.getUserId();
 			logger.info("api.push.notification request={}", request.toString());
 
-			String pushToken = UserInfoDao.getInstance().getPushToken(userId);
-			ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
+			CoreProto.MsgType pushType = request.getPushType();
+			PushProto.Notification notification = request.getNotification();
+			String userId = notification.getUserId();
+			String userToken = notification.getUserToken();
+			String siteServer = notification.getSiteServer();
 
-			logger.info("api.push.notification pushToken={} clientType={}", pushToken, clientType);
+			command.setResponse(commandResponse.setErrCode(errCode));
 
-			if (StringUtils.isNotBlank(pushToken)) {
-				switch (clientType) {
-				case IOS:
-					logger.info("ios push ......");
-					break;
-				case ANDROID:
-				case ANDROID_HUAWEI:
-				case ANDROID_OPPO:
-				case ANDROID_XIAOMI:
-					pushCommand = buildPushCommand(request);
-					break;
-				default:
-					logger.error("unknow client type:{}", clientType);
-					break;
-				}
+			if (StringUtils.isBlank(userId) || StringUtils.isBlank(userToken) || StringUtils.isBlank(siteServer)) {
+				logger.info("request parameter error.request={}", request.toString());
+				return false;
 			}
-			logger.info("build im push command={}", command.toString());
-			if (pushCommand != null) {
-				String deviceId = UserInfoDao.getInstance().getLatestDeviceId(userId);
-				pushCommand.setDeviceId(deviceId);
-				logger.info("im push to client pushcommand={}", pushCommand.toString());
-				return ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);
+
+			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(userId);
+			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
+					siteServer);
+			// 如果用户令牌相同，则相等（授权校验方式）
+			if (userToken.equals(userToken2)) {
+				String pushToken = UserInfoDao.getInstance().getPushToken(userId);
+				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
+
+				logger.info("api.push.notification pushToken={} clientType={}", pushToken, clientType);
+
+				if (StringUtils.isNotBlank(pushToken)) {
+					switch (clientType) {
+					case IOS:
+						logger.info("ios push ......");
+						break;
+					case ANDROID:
+					case ANDROID_HUAWEI:
+					case ANDROID_OPPO:
+					case ANDROID_XIAOMI:
+						pushCommand = buildPushCommand(pushType, notification);
+						pushCommand.setDeviceId(deviceId);
+						break;
+					default:
+						logger.error("unknow client type:{}", clientType);
+						break;
+					}
+				}
+
+				logger.info("build im push command={}", command.toString());
+				if (pushCommand != null) {
+					logger.info("im push to client pushcommand={}", pushCommand.toString());
+					return ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);
+				}
+
 			}
 		} catch (Exception e) {
 			logger.error("api push notification error.", e);
 		}
+
 		return false;
 	}
 
-	private Command buildPushCommand(ApiPushNotificationProto.ApiPushNotificationRequest apnRequest) {
-		String siteServer = apnRequest.getSiteServer();// 192.168.0.1:2021
-		String userId = apnRequest.getUserId();
-		String pushTitle = apnRequest.getPushTitle();
-		String alertText = apnRequest.getPushAlert();
-
-		// int pushBadge = apnRequest.getPushBadge();
-		PushProto.PushType pushType = apnRequest.getType();
+	private Command buildPushCommand(CoreProto.MsgType pushType, PushProto.Notification notification) {
+		String siteServer = notification.getSiteServer();// 192.168.0.1:2021
+		String pushTitle = notification.getPushTitle();
+		String alertText = notification.getPushAlert();
 
 		switch (pushType) {
-		case U2_MESSAGE:
+		case TEXT:
 			alertText = "你收到一条阿卡信消息";
-		case GROUP_MESSAGE:
-			alertText = "你收到一条阿卡信群消息";
+		case SECRET_TEXT:
+			alertText = "【绝密】你收到一条绝密消息";
 		default:
+			alertText = "你收到一条阿卡信消息";
 			break;
 		}
 		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();

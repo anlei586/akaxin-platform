@@ -1456,14 +1456,14 @@ public final class ApiPushAuthProto {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\034platform/api_push_auth.proto\022\004site\032\017co" +
-      "re/push.proto\"d\n\022ApiPushAuthRequest\022\024\n\014s" +
-      "ite_address\030\001 \001(\t\022\021\n\tsite_port\030\002 \001(\t\022\021\n\t" +
-      "site_name\030\003 \001(\t\022\022\n\nuser_token\030\004 \001(\t\"\025\n\023A" +
-      "piPushAuthResponse2U\n\026ApiPushAuthSiteSer" +
-      "vice\022;\n\004auth\022\030.site.ApiPushAuthRequest\032\031" +
-      ".site.ApiPushAuthResponseB-\n\031com.akaxin." +
-      "proto.platformB\020ApiPushAuthProtob\006proto3"
+      "\n\034platform/api_push_auth.proto\022\004site\"d\n\022" +
+      "ApiPushAuthRequest\022\024\n\014site_address\030\001 \001(\t" +
+      "\022\021\n\tsite_port\030\002 \001(\t\022\021\n\tsite_name\030\003 \001(\t\022\022" +
+      "\n\nuser_token\030\004 \001(\t\"\025\n\023ApiPushAuthRespons" +
+      "e2U\n\026ApiPushAuthSiteService\022;\n\004auth\022\030.si" +
+      "te.ApiPushAuthRequest\032\031.site.ApiPushAuth" +
+      "ResponseB-\n\031com.akaxin.proto.platformB\020A" +
+      "piPushAuthProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1476,7 +1476,6 @@ public final class ApiPushAuthProto {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          com.akaxin.proto.core.PushProto.getDescriptor(),
         }, assigner);
     internal_static_site_ApiPushAuthRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -1490,7 +1489,6 @@ public final class ApiPushAuthProto {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_site_ApiPushAuthResponse_descriptor,
         new java.lang.String[] { });
-    com.akaxin.proto.core.PushProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)
