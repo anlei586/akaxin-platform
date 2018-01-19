@@ -16,8 +16,7 @@ import com.akaxin.proto.core.ClientProto;
 import com.akaxin.proto.core.PushProto;
 import com.akaxin.proto.platform.ApiPushAuthProto;
 import com.akaxin.proto.platform.ApiPushNotificationProto;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.zaly.platform.storage.bean.PushTokenBean;
+import com.zaly.platform.storage.constant.UserKey;
 
 /**
  * 站点通过api请求（api.push.notification）请求平台给用户发送push
@@ -30,7 +29,10 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiPushHandler.class);
 
 	/**
+	 * <pre>
 	 * 用户点击登陆站点，允许站点发送push认证
+	 * client->platform
+	 * </pre>
 	 * 
 	 * @param command
 	 * @return
@@ -42,21 +44,22 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		try {
 			ApiPushAuthProto.ApiPushAuthRequest request = ApiPushAuthProto.ApiPushAuthRequest
 					.parseFrom(command.getParams());
-			String siteUserId = command.getSiteUserId();
+			String userId = command.getSiteUserId();
 			String deviceId = command.getDeviceId();
 			String siteAddress = request.getSiteAddress();
 			String port = request.getSitePort();
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
 
-			logger.info("api.push.auth command={}", command.toString());
 			// 判断参数
+			logger.info("api.push.auth command={}", command.toString());
 
 			// 存库
 			String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
 			String tokenField = siteAddress + port;
 			logger.info("add user token,key={},tokenField={}", redisKey, tokenField);
 			if (UserTokenDao.getInstance().addUserToken(redisKey, tokenField, userToken)) {
+				UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
 				errorCode = ErrorCode.SUCCESS;
 				return true;
 			}
@@ -70,6 +73,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 	/**
 	 * <pre>
+	 *  site - > platform
 	 * 	action:
 	 * 		api.push.notification
 	 * </pre>
@@ -85,11 +89,12 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String userId = request.getUserId();
 			logger.info("api.push.notification request={}", request.toString());
 
-			PushTokenBean bean = UserInfoDao.getInstance().getPushToken(userId);
+			String pushToken = UserInfoDao.getInstance().getPushToken(userId);
+			ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
 
-			if (bean != null && StringUtils.isNumeric(bean.getClientType())) {
-				ClientProto.ClientType clientType = ClientProto.ClientType
-						.forNumber(Integer.valueOf(bean.getClientType()));
+			logger.info("api.push.notification pushToken={} clientType={}", pushToken, clientType);
+
+			if (StringUtils.isNotBlank(pushToken)) {
 				switch (clientType) {
 				case IOS:
 					logger.info("ios push ......");
@@ -107,12 +112,12 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			}
 			logger.info("build im push command={}", command.toString());
 			if (pushCommand != null) {
-
-				pushCommand.setDeviceId("");
-
+				String deviceId = UserInfoDao.getInstance().getLatestDeviceId(userId);
+				pushCommand.setDeviceId(deviceId);
+				logger.info("im push to client pushcommand={}", pushCommand.toString());
 				return ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);
 			}
-		} catch (InvalidProtocolBufferException e) {
+		} catch (Exception e) {
 			logger.error("api push notification error.", e);
 		}
 		return false;

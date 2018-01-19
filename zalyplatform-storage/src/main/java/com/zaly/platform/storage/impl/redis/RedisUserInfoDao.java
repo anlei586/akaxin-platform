@@ -16,6 +16,12 @@ import com.zaly.platform.storage.constant.UserKey;
 import redis.clients.jedis.Jedis;
 
 /**
+ * <pre>
+ * 用户信息包括两部分(均为hash结构)
+ * 		1.用户基本资料信息user_id,user_id_prik,user_id_pubk
+ * 		2.用户实名绑定手机号
+ * 
+ * </pre>
  * 
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2017.11.1
@@ -27,6 +33,17 @@ public class RedisUserInfoDao {
 
 	public static RedisUserInfoDao getInstance() {
 		return instance;
+	}
+
+	public boolean hset(String key, String field, String value) {
+		logger.info("hset user key={},field={},value={}", key, field, value);
+		jedis.hset(key, field, value);
+		return false;
+	}
+
+	public String hget(String key, String field) {
+		logger.info("hget user key={},field={}", key, field);
+		return jedis.hget(key, field);
 	}
 
 	public boolean saveUserInfo(UserBean bean) {

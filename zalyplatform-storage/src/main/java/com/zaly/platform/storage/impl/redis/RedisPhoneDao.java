@@ -17,11 +17,11 @@ public class RedisPhoneDao {
 		return instance;
 	}
 
-	public boolean setStringValue(String phondId, String value, int expireTime) {
+	public boolean setStringValue(String key, String value, int expireTime) {
 		long result = 0;
-		String setResult = jedis.set(phondId, value);
+		String setResult = jedis.set(key, value);
 		if ("OK".equalsIgnoreCase(setResult)) {
-			result = jedis.expire(phondId, expireTime);
+			result = jedis.expire(key, expireTime);
 		}
 		return result == 1;
 	}

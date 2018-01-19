@@ -2,12 +2,15 @@ package com.zaly.platform.storage.api;
 
 import java.util.Map;
 
-import com.zaly.platform.storage.bean.PushTokenBean;
 import com.zaly.platform.storage.bean.UserBean;
 
 public interface IUserInfoDao {
+	public boolean hset(String key, String field, String value);
+
+	public String hget(String key, String field);
+
 	public boolean saveUserInfo(UserBean bean);
-	
+
 	boolean updateUserInfo(String key, Map<String, String> map);
 
 	public boolean updateRealNameInfo(UserBean bean);
@@ -19,7 +22,5 @@ public interface IUserInfoDao {
 	public String getUserPhoneId(String userId);
 
 	public String getPhoneGlobalRoaming(String phoneId);
-
-	public PushTokenBean getPushToken(String userId);
 
 }

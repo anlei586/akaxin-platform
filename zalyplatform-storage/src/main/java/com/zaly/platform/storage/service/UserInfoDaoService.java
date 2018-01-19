@@ -3,11 +3,20 @@ package com.zaly.platform.storage.service;
 import java.util.Map;
 
 import com.zaly.platform.storage.api.IUserInfoDao;
-import com.zaly.platform.storage.bean.PushTokenBean;
 import com.zaly.platform.storage.bean.UserBean;
 import com.zaly.platform.storage.impl.redis.RedisUserInfoDao;
 
 public class UserInfoDaoService implements IUserInfoDao {
+
+	@Override
+	public boolean hset(String key, String field, String value) {
+		return RedisUserInfoDao.getInstance().hset(key, field, value);
+	}
+
+	@Override
+	public String hget(String key, String field) {
+		return RedisUserInfoDao.getInstance().hget(key, field);
+	}
 
 	@Override
 	public boolean saveUserInfo(UserBean bean) {
@@ -42,12 +51,6 @@ public class UserInfoDaoService implements IUserInfoDao {
 	@Override
 	public String getPhoneGlobalRoaming(String phoneId) {
 		return RedisUserInfoDao.getInstance().getPhoneGlobalRoaming(phoneId);
-	}
-
-	@Override
-	public PushTokenBean getPushToken(String userId) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

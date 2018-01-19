@@ -27,14 +27,14 @@ public class ImPtcPushHandler extends AbstractImHandler<Command> {
 	@Override
 	public boolean handle(Command command) {
 		try {
-			logger.error("---------api.ptc.push----------");
+			logger.info("---------api.ptc.push----------");
 			String deviceId = command.getDeviceId();
 			ChannelSession channelSession = ChannelManager.getChannelSession(deviceId);
-
+			logger.info("im ptc push command={}", command.toString());
 			if (channelSession != null) {
 				ImPtcPushProto.ImPtcPushRequest ptcPushRequest = ImPtcPushProto.ImPtcPushRequest
 						.parseFrom(command.getParams());
-				
+
 				CoreProto.TransportPackageData.Builder pushPackageBuilder = CoreProto.TransportPackageData.newBuilder();
 				pushPackageBuilder.putAllHeader(new HashMap<Integer, String>());
 				pushPackageBuilder.setData(ByteString.copyFrom(ptcPushRequest.toByteArray()));

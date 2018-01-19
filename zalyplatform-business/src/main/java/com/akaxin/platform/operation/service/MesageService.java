@@ -22,21 +22,28 @@ public class MesageService implements IMessage {
 	private static final Logger logger = LoggerFactory.getLogger(MesageService.class);
 
 	public CommandResponse doApiRequest(Command command) {
-		logger.info("platform api request command={}", command.toString());
+		logger.info("doplatform api request command={}", command.toString());
 		try {
-			Map<Integer, String> header = command.getHeader();
-			String sessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
-			String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
-			Map<String, String> map = SessionDao.getInstance().getSessionMap(sessionKey);
-			logger.info("api auth sessionId={} map={}", sessionId, map);
-			String userId = map.get(UserKey.userId);
-			String deviceId = map.get(UserKey.deviceId);
-			if (map != null && StringUtils.isNotBlank(userId) && StringUtils.isNotBlank(deviceId)) {
-				command.setSiteUserId(userId);
-				command.setDeviceId(deviceId);
-				logger.info("api request doApiRequest command={}", command.toString());
+			String action = command.getAction();
+
+			if ("api.platform.login".equals(action)) {
 				ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 				return command.getResponse();
+			} else {
+				Map<Integer, String> header = command.getHeader();
+				String sessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
+				String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
+				Map<String, String> map = SessionDao.getInstance().getSessionMap(sessionKey);
+				logger.info("api auth sessionId={} map={}", sessionId, map);
+				String userId = map.get(UserKey.userId);
+				String deviceId = map.get(UserKey.deviceId);
+				if (map != null && StringUtils.isNotBlank(userId) && StringUtils.isNotBlank(deviceId)) {
+					command.setSiteUserId(userId);
+					command.setDeviceId(deviceId);
+					logger.info("api request doApiRequest command={}", command.toString());
+					ApiOperateExecutor.getExecutor().execute(command.getService(), command);
+					return command.getResponse();
+				}
 			}
 		} catch (Exception e) {
 			logger.error("platform api request error.", e);

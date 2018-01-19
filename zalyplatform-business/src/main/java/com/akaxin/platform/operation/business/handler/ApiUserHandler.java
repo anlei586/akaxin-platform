@@ -10,9 +10,8 @@ import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.utils.ValidatorPattern;
-import com.akaxin.platform.operation.business.dao.PhoneCodeDao;
+import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
-import com.akaxin.platform.operation.utils.PhoneCodeUtils;
 import com.akaxin.proto.core.ClientProto;
 import com.akaxin.proto.platform.ApiUserPushTokenProto;
 import com.akaxin.proto.platform.ApiUserRealNameProto;
@@ -94,9 +93,8 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 				return false;
 			}
 
-			String redisKey = PhoneCodeUtils.getPhoneVCKey(phoneId);
-			String realVerifyCode = PhoneCodeDao.getInstance().getPhoneCode(redisKey);
-
+			String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
+			
 			logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode, bean.toString());
 
 			if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
