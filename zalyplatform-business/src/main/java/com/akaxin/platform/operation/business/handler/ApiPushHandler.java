@@ -54,7 +54,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String userToken = request.getUserToken();
 
 			// 判断参数
-			logger.info("api.push.auth command={}", command.toString());
+			logger.info("user:{} login site:{} {}:{}", userId, name, siteAddress, port);
 
 			// 存库
 			String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
@@ -69,7 +69,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		} catch (Exception e) {
 			logger.error("api.push.auth error", e);
 		}
-		commandResponse.setErrCode(errorCode);
+		command.setResponse(commandResponse.setErrCode(errorCode));
 		return false;
 	}
 

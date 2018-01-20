@@ -8,10 +8,12 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
+import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
+import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.proto.core.ClientProto;
 import com.akaxin.proto.platform.ApiUserPushTokenProto;
 import com.akaxin.proto.platform.ApiUserRealNameProto;
@@ -27,18 +29,17 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiUserHandler.class);
 
 	public boolean pushToken(Command command) {
-		logger.info("----api.user.supplyToken command={}", command.toString());
+		logger.info("----api.user.pushToken command={}", command.toString());
 		CommandResponse commandResponse = new CommandResponse();
 		String errCode = ErrorCode.ERROR;
 		try {
 			ApiUserPushTokenProto.ApiUserPushTokenRequest request = ApiUserPushTokenProto.ApiUserPushTokenRequest
 					.parseFrom(command.getParams());
-			String deviceId = command.getDeviceId();
 			ClientProto.ClientType clientType = request.getClientType();
 			String rom = request.getRom();
 			String pushToken = request.getPushToken();
 
-			logger.info("api.user.supplyToken request={}", request.toString());
+			logger.info("api.user.pushToken request={}", request.toString());
 
 			UserBean userBean = new UserBean();
 			userBean.setUserId(command.getSiteUserId());
@@ -51,12 +52,12 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			if (UserInfoDao.getInstance().saveUserInfo(userBean)) {
 				errCode = ErrorCode.SUCCESS;
 			}
-			return true;
+
 		} catch (Exception e) {
 			logger.error("api.push token error", e);
 		}
-		commandResponse.setErrCode(errCode);
-		return false;
+		command.setResponse(commandResponse.setErrCode(errCode));
+		return true;
 	}
 
 	/**
@@ -67,7 +68,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 		logger.info("------------api.user.realName-----------");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
 				.setAction(CommandConst.ACTION_RES);
-		String errorCode = ErrorCode.ERROR;
+		ErrorCode2 errorCode = ErrorCode2.ERROR;
 		try {
 			ApiUserRealNameProto.ApiUserRealNameRequest request = ApiUserRealNameProto.ApiUserRealNameRequest
 					.parseFrom(command.getParams());
@@ -89,28 +90,30 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 
 			if (!ValidatorPattern.isPhoneId(phoneId) || StringUtils.isEmpty(userIdPrik)
 					|| StringUtils.isEmpty(userIdPubk)) {
-				command.setResponse(commandResponse.setErrCode(errorCode));
+				errorCode = ErrorCode2.ERROR_PARAMETER;
+				command.setResponse(commandResponse.setErrCode2(errorCode));
 				return false;
 			}
 
-			String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
-			
-			logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode, bean.toString());
-
-			if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
-				if (UserInfoDao.getInstance().updateRealNameInfo(bean)) {
-					errorCode = ErrorCode.SUCCESS;
+			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+			if (!UserInfoDao.getInstance().existPhoneId(phoneId)) {
+				String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
+				logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode, bean.toString());
+				if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
+					if (UserInfoDao.getInstance().updateRealNameInfo(bean)) {
+						errorCode = ErrorCode2.SUCCESS;
+					}
+				} else {
+					errorCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
 				}
 			} else {
-				commandResponse.setErrInfo("verify phone code error.");
+				errorCode = ErrorCode2.ERROR2_PHONE_EXIST;
 			}
-
 		} catch (Exception e) {
-			commandResponse.setErrInfo("api.user.realName exception");
+			errorCode = ErrorCode2.ERROR_SYSTEMERROR;
 			logger.error("api.user.realName error.", e);
 		}
-
-		command.setResponse(commandResponse.setErrCode(errorCode));
+		command.setResponse(commandResponse.setErrCode2(errorCode));
 		return true;
 	}
 

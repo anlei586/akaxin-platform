@@ -133,20 +133,15 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 			String phoneId = UserInfoDao.getInstance().getUserPhoneId(userId);
 
 			if (ValidatorPattern.isPhoneId(phoneId)) {
-				String phoneIdWithGR = "";
-				String phoneGlobalRoaming = UserInfoDao.getInstance().getPhoneGlobalRoaming(phoneId);
-				if (StringUtils.isNotBlank(phoneGlobalRoaming)) {
-					phoneIdWithGR = phoneGlobalRoaming + " " + phoneId;
-				}
 				String phoneToken = UUID.randomUUID().toString();
 
-				logger.info("userId={},phoneId={},phoneCode={}", userId, phoneId, phoneToken);
+				logger.info("userId={},phoneId={},phoneToken={}", userId, phoneId, phoneToken);
 				// 随机UUID
-				if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneToken, phoneIdWithGR, EXPIRE_TIME)) {
+				if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneToken, phoneId, EXPIRE_TIME)) {
 					ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse.Builder responseBuilder = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse
 							.newBuilder();
 					responseBuilder.setPhoneId(phoneId);
-					responseBuilder.setGlobalRoaming(phoneGlobalRoaming);
+					responseBuilder.setGlobalRoaming("+86");
 					responseBuilder.setPhoneToken(phoneToken);
 					commandRespone.setParams(responseBuilder.build().toByteArray());
 					errorCode = ErrorCode.SUCCESS;
@@ -180,9 +175,9 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 
 			logger.info("api.phone.confimCode phoneCode={} phoneId={}", phoneToken, phoneId);
 
-			if (StringUtils.isNotBlank(phoneId)) {
+			if (ValidatorPattern.isPhoneId(phoneId)) {
 				ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse response = ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse
-						.newBuilder().setPhoneId(phoneId).build();
+						.newBuilder().setPhoneId(phoneId).setGlobalRoaming("+86").build();
 				commandRespone.setParams(response.toByteArray());
 				errorCode = ErrorCode.SUCCESS;
 			}

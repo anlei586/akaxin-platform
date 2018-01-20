@@ -2,6 +2,7 @@ package com.akaxin.platform.operation.business.dao;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,4 +136,18 @@ public class UserInfoDao {
 		return ClientType.UNKNOW;
 	}
 
+	// 检测手机号是否已经被实名绑定
+	public boolean existPhoneId(String key) {
+		if (StringUtils.isBlank(key)) {
+			return false;
+		}
+		Map<String, String> phoneMap = userDao.getPhoneInfoByPhone(key);
+		if (phoneMap != null) {
+			String userId = phoneMap.get(UserKey.userId);
+			if (StringUtils.isNotBlank(userId) && key.equals(userDao.getUserPhoneId(userId))) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

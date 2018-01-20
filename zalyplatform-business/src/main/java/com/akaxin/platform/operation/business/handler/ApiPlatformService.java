@@ -57,6 +57,8 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 			String userId = HashCrypto.SHA1(userIdPubk);
 
 			logger.info("user_id_pubk={}", userIdPubk);
+			logger.info("device_id_pubk={}", userDeviceIdPubk);
+			logger.info("device_sign={}", userDeviceIdSign);
 
 			// 验证登陆信息合法性
 			// 登陆之前，涉及到使用用户公私钥验证用户本人
