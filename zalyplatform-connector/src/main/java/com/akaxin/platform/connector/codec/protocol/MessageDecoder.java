@@ -13,7 +13,7 @@ import io.netty.handler.codec.ReplayingDecoder;
  * 解码器,使用ReplayingDecoder，每一个deccode必须是
  * 
  * @author Sam
- * @since 2017.09.27
+ * @since 2017.10.27
  *
  */
 public class MessageDecoder extends ReplayingDecoder<ReplaySignal> {
@@ -26,9 +26,7 @@ public class MessageDecoder extends ReplayingDecoder<ReplaySignal> {
 
 	@Override
 	public void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-		// receive data from client
 		parser.readAndOut(ctx.channel(), in, out, this);
-
 	}
 
 	@Override

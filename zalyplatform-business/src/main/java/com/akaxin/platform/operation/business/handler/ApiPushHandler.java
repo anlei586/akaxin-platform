@@ -58,9 +58,9 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 			// 存库
 			String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
-			String tokenField = siteAddress + port;
-			logger.info("add user token,key={},tokenField={}", redisKey, tokenField);
-			if (UserTokenDao.getInstance().addUserToken(redisKey, tokenField, userToken)) {
+			String siteServer = siteAddress + ":" + port;
+			logger.info("add user token,key:{},field:{},value:{}", redisKey, siteServer, userToken);
+			if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
 				UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
 				errorCode = ErrorCode.SUCCESS;
 				return true;
@@ -96,9 +96,10 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			CoreProto.MsgType pushType = request.getPushType();
 			PushProto.Notification notification = request.getNotification();
 			String userId = notification.getUserId();
-			String userToken = notification.getUserToken();
 			String siteServer = notification.getSiteServer();
+			String userToken = notification.getUserToken();
 
+			logger.info("api.push.notification userId:{} siteServer:{} userToken:{}", userId, siteServer, userToken);
 			command.setResponse(commandResponse.setErrCode(errCode));
 
 			if (StringUtils.isBlank(userId) || StringUtils.isBlank(userToken) || StringUtils.isBlank(siteServer)) {
@@ -163,11 +164,11 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			break;
 		}
 		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();
+		ippRequest.setSiteServer(siteServer);
 		ippRequest.setPushTitle(pushTitle);
 		ippRequest.setPushAlert(alertText);
 		ippRequest.setPushBadge(1);
-		ippRequest.setSiteServerAddress(siteServer);
-		ippRequest.setPushSound("");
+		ippRequest.setPushSound("");// 使用系统默认
 		ippRequest.setPushJump("[tof|1|]");// [goto|message{group}|param][http|1|param]
 
 		Command command = new Command();

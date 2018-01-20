@@ -58,10 +58,13 @@ public class MesageService implements IMessage {
 		logger.info("do im request in operation. command={}", command.toString());
 		try {
 			String action = command.getAction();
-			if (!"im.platform.hello".equals(action) || !"im.platform.auth".equals("")) {
-
+			if (!"im.platform.hello".equals(action) || !"im.platform.auth".equals(action)) {
+				// 需要做auth验证
+				// #TODO
+				return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
+			} else {
+				return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
 			}
-			return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
 		} catch (Exception e) {
 			logger.error("do im request error", e);
 		}

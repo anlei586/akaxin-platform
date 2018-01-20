@@ -33,7 +33,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		ctx.channel().attr(ParserConst.CHANNELSESSION).set(new ChannelSession(ctx.channel()));
-		logger.info("connect to platform client={}", ctx.channel().toString());
+		// logger.info("connect to platform client={}", ctx.channel().toString());
 	}
 
 	/**
@@ -53,8 +53,6 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 		try {
 			InetSocketAddress insocket = (InetSocketAddress) ctx.channel().remoteAddress();
 			String clientIP = insocket.getAddress().getHostAddress();
-			logger.info("netty server receive message from client={}", clientIP);
-
 			ChannelSession channelSession = ctx.channel().attr(ParserConst.CHANNELSESSION).get();
 
 			String version = redisCommand.getParameterByIndex(0);
@@ -71,14 +69,13 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			command.setParams(packageData.getData().toByteArray());
 			command.setHeader(packageData.getHeaderMap());
 
-			logger.info("client request command={}", command.toString());
+			if (!"ping".equals(command.getMethod())) {
+				logger.info("client id:{} request command:{}", clientIP, command.toString());
+			}
 
 			if (RequestAction.IM.getName().equals(command.getRety())) {
-				logger.info("platform im request command={}", command.toString());
 				new MesageService().doImRequest(command);
-
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
-				logger.info("platform api request command={}", command.toString());
 				CommandResponse commandResponse = new MesageService().doApiRequest(command);
 				ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
 			} else {
@@ -93,7 +90,6 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		logger.error("netty server: exception caught.", cause);
-		logger.error("netty server: exception message={}.", cause.getMessage());
 	}
 
 	@Override
