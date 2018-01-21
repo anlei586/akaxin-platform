@@ -111,31 +111,33 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
 					siteServer);
 			// 如果用户令牌相同，则相等（授权校验方式）
-			if (userToken.equals(userToken2)) {
-				String pushToken = UserInfoDao.getInstance().getPushToken(userId);
+			logger.info("api.push.notification check site_user_token:{} platform_user_token:{}", userToken, userToken2);
+			// if (userToken.equals(userToken2)) {
+			if (true) {
 				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
 
-				logger.info("api.push.notification pushToken={} clientType={}", pushToken, clientType);
+				logger.info("api.push.notification clientType={}", clientType);
 
-				if (StringUtils.isNotBlank(pushToken)) {
-					switch (clientType) {
-					case IOS:
+				switch (clientType) {
+				case IOS:
+					String pushToken = UserInfoDao.getInstance().getPushToken(userId);
+					if (StringUtils.isNotBlank(pushToken)) {
 						logger.info("ios push ......");
-						break;
-					case ANDROID:
-					case ANDROID_HUAWEI:
-					case ANDROID_OPPO:
-					case ANDROID_XIAOMI:
-						pushCommand = buildPushCommand(pushType, notification);
-						pushCommand.setDeviceId(deviceId);
-						break;
-					default:
-						logger.error("unknow client type:{}", clientType);
-						break;
 					}
+					break;
+				case ANDROID_HUAWEI:
+				case ANDROID_OPPO:
+				case ANDROID_XIAOMI:
+				case ANDROID:
+					pushCommand = buildPushCommand(pushType, notification);
+					pushCommand.setDeviceId(deviceId);
+					logger.info("andorid push command={}", pushCommand.toString());
+					break;
+				default:
+					logger.error("unknow client type:{}", clientType);
+					break;
 				}
 
-				logger.info("build im push command={}", command.toString());
 				if (pushCommand != null) {
 					logger.info("im push to client pushcommand={}", pushCommand.toString());
 					return ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);

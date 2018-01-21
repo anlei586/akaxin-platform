@@ -10,9 +10,7 @@ import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.RedisCommand;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.proto.client.ImPtcPushProto;
 import com.akaxin.proto.core.CoreProto;
-import com.google.protobuf.ByteString;
 
 /**
  * ping && pong
@@ -36,13 +34,13 @@ public class ImPingPongHandler extends AbstractImHandler<Command> {
 				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
 						.add("im.ptc.pong").add(pongPackageBuilder.build().toByteArray()));
 
-				ImPtcPushProto.ImPtcPushRequest request = ImPtcPushProto.ImPtcPushRequest.newBuilder()
-						.setPushAlert("你收到一条阿卡信消息").setPushBadge(1).setSiteServer("demo.akaxin.com:2021")
-						.setPushTitle("北京时报").build();
-
-				pongPackageBuilder.setData(ByteString.copyFrom(request.toByteArray()));
-				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
-						.add("im.ptc.push").add(pongPackageBuilder.build().toByteArray()));
+//				ImPtcPushProto.ImPtcPushRequest request = ImPtcPushProto.ImPtcPushRequest.newBuilder()
+//						.setPushAlert("你收到一条阿卡信消息").setPushBadge(1).setSiteServer("demo.akaxin.com:2021")
+//						.setPushTitle("北京时报").build();
+//
+//				pongPackageBuilder.setData(ByteString.copyFrom(request.toByteArray()));
+//				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
+//						.add("im.ptc.push").add(pongPackageBuilder.build().toByteArray()));
 			}
 			return true;
 		} catch (Exception e) {

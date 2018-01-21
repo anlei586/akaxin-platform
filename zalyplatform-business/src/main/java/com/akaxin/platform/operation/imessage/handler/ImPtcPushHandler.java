@@ -2,6 +2,7 @@ package com.akaxin.platform.operation.imessage.handler;
 
 import java.util.HashMap;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,10 @@ public class ImPtcPushHandler extends AbstractImHandler<Command> {
 		try {
 			logger.info("---------api.ptc.push----------");
 			String deviceId = command.getDeviceId();
+			if (StringUtils.isEmpty(deviceId)) {
+				logger.error("im.ptc.push without deviceId={}", deviceId);
+				return false;
+			}
 			ChannelSession channelSession = ChannelManager.getChannelSession(deviceId);
 			logger.info("im ptc push command={}", command.toString());
 			if (channelSession != null) {

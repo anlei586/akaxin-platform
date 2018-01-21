@@ -116,7 +116,7 @@ public class UserInfoDao {
 
 	public String getLatestDeviceId(String userId) {
 		try {
-			String redisKey = RedisKeyUtils.getUserIdKey(userId);
+			String redisKey = RedisKeyUtils.getUserInfoKey(userId);
 			return userDao.hget(redisKey, UserKey.deviceId);
 		} catch (Exception e) {
 			logger.error("get push token info error", e);
@@ -126,10 +126,12 @@ public class UserInfoDao {
 
 	public ClientProto.ClientType getClientType(String userId) {
 		try {
-			String redisKey = RedisKeyUtils.getUserIdKey(userId);
+			String redisKey = RedisKeyUtils.getUserInfoKey(userId);
 			String type = userDao.hget(redisKey, UserKey.clientType);
-			ClientProto.ClientType clientType = ClientProto.ClientType.forNumber(Integer.valueOf(type));
-			return clientType;
+			if (StringUtils.isNumeric(type)) {
+				ClientProto.ClientType clientType = ClientProto.ClientType.forNumber(Integer.valueOf(type));
+				return clientType;
+			}
 		} catch (NumberFormatException e) {
 			logger.error("get client type error.", e);
 		}

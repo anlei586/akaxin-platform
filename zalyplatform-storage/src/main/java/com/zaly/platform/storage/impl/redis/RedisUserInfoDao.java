@@ -58,11 +58,17 @@ public class RedisUserInfoDao {
 		if (bean.getClientType() > 0) {
 			userMap.put(UserKey.clientType, bean.getClientType() + "");
 		}
-		if (ValidatorPattern.isPhoneId(bean.getUserPhoneId())) {
-			userMap.put(UserKey.userPhoneId, bean.getUserPhoneId());
+		if (ValidatorPattern.isPhoneId(bean.getPhoneId())) {
+			userMap.put(UserKey.userPhoneId, bean.getPhoneId());
 		}
 		if (StringUtils.isNotBlank(bean.getPushToken())) {
 			userMap.put(UserKey.pushToken, bean.getPushToken());
+		}
+		if (StringUtils.isNotBlank(bean.getRom())) {
+			userMap.put(UserKey.rom, bean.getRom());
+		}
+		if (StringUtils.isNotBlank(bean.getDeviceId())) {
+			userMap.put(UserKey.deviceId, bean.getDeviceId());
 		}
 
 		logger.info("userINfoMap={}", GsonUtils.toJson(userMap));
@@ -88,7 +94,7 @@ public class RedisUserInfoDao {
 		Map<String, String> phoneMap = new HashMap<String, String>();
 		phoneMap.put(UserKey.userId, bean.getUserId());
 		phoneMap.put(UserKey.phoneRoaming, bean.getPhoneRoaming());
-		if (!"OK".equalsIgnoreCase(jedis.hmset(bean.getUserPhoneId(), phoneMap))) {
+		if (!"OK".equalsIgnoreCase(jedis.hmset(bean.getPhoneId(), phoneMap))) {
 			return false;
 		}
 		return saveUserInfo(bean);

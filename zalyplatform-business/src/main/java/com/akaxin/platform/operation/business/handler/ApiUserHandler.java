@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.utils.ValidatorPattern;
@@ -30,33 +29,38 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 
 	public boolean pushToken(Command command) {
 		logger.info("----api.user.pushToken command={}", command.toString());
-		CommandResponse commandResponse = new CommandResponse();
-		String errCode = ErrorCode.ERROR;
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+				.setAction(CommandConst.ACTION_RES);
+		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			ApiUserPushTokenProto.ApiUserPushTokenRequest request = ApiUserPushTokenProto.ApiUserPushTokenRequest
 					.parseFrom(command.getParams());
 			ClientProto.ClientType clientType = request.getClientType();
 			String rom = request.getRom();
 			String pushToken = request.getPushToken();
+			String deviceId = command.getDeviceId();
 
-			logger.info("api.user.pushToken request={}", request.toString());
+			logger.info("api.user.pushToken deviceId={} request={}", deviceId, request.toString());
 
 			UserBean userBean = new UserBean();
 			userBean.setUserId(command.getSiteUserId());
 			userBean.setClientType(clientType.getNumber());
 			userBean.setRom(rom);
 			userBean.setPushToken(pushToken);
+			userBean.setDeviceId(deviceId);
 
 			logger.info("userInfoBean=" + userBean.toString());
 
 			if (UserInfoDao.getInstance().saveUserInfo(userBean)) {
-				errCode = ErrorCode.SUCCESS;
+				errCode = ErrorCode2.SUCCESS;
+			} else {
+				errCode = ErrorCode2.ERROR2_USER_SAVE_PUSHTOKEN;
 			}
 
 		} catch (Exception e) {
 			logger.error("api.push token error", e);
 		}
-		command.setResponse(commandResponse.setErrCode(errCode));
+		command.setResponse(commandResponse.setErrCode2(errCode));
 		return true;
 	}
 
@@ -83,7 +87,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			bean.setUserId(userId);
 			bean.setUserIdPrik(userIdPrik);
 			bean.setUserIdPubk(userIdPubk);
-			bean.setUserPhoneId(phoneId);
+			bean.setPhoneId(phoneId);
 			bean.setPhoneRoaming("+86");
 
 			logger.info("phone verify code bean={}", bean.toString());

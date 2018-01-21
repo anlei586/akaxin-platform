@@ -33,7 +33,6 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		ctx.channel().attr(ParserConst.CHANNELSESSION).set(new ChannelSession(ctx.channel()));
-		// logger.info("connect to platform client={}", ctx.channel().toString());
 	}
 
 	/**

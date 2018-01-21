@@ -6,9 +6,8 @@ public class UserBean {
 	private String userId;
 	private String userIdPrik;
 	private String userIdPubk;
-	private String userPhoto;
-	private String userName;
-	private String userPhoneId;
+	private String deviceId;
+	private String phoneId;
 	private String phoneRoaming;
 	private int clientType;
 	private String rom;
@@ -38,28 +37,20 @@ public class UserBean {
 		this.userIdPubk = userIdPubk;
 	}
 
-	public String getUserPhoto() {
-		return userPhoto;
+	public String getDeviceId() {
+		return deviceId;
 	}
 
-	public void setUserPhoto(String userPhoto) {
-		this.userPhoto = userPhoto;
+	public void setDeviceId(String deviceId) {
+		this.deviceId = deviceId;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getPhoneId() {
+		return phoneId;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getUserPhoneId() {
-		return userPhoneId;
-	}
-
-	public void setUserPhoneId(String userPhoneId) {
-		this.userPhoneId = userPhoneId;
+	public void setPhoneId(String phoneId) {
+		this.phoneId = phoneId;
 	}
 
 	public int getClientType() {
