@@ -5,22 +5,21 @@ import java.util.Map;
 import com.zaly.platform.storage.bean.UserBean;
 
 public interface IUserInfoDao {
+	// common
 	public boolean hset(String key, String field, String value);
 
 	public String hget(String key, String field);
 
-	public boolean saveUserInfo(UserBean bean);
+	// user
+	public boolean saveUserInfo(String key, UserBean bean);
 
 	boolean updateUserInfo(String key, Map<String, String> map);
 
-	public boolean updateRealNameInfo(UserBean bean);
+	Map<String, String> getUserInfoMap(String key);
 
-	Map<String, String> getPhoneInfoByPhone(String phoneId);
+	// phone
+	public boolean updatePhoneInfo(String key, UserBean bean);
 
-	Map<String, String> getUserInfoByUserId(String userID);
-
-	public String getUserPhoneId(String userId);
-
-	public String getPhoneGlobalRoaming(String phoneId);
+	Map<String, String> getPhoneInfoMap(String key);
 
 }

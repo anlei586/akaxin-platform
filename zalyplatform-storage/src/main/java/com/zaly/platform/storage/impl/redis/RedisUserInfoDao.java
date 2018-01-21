@@ -46,9 +46,8 @@ public class RedisUserInfoDao {
 		return jedis.hget(key, field);
 	}
 
-	public boolean saveUserInfo(UserBean bean) {
+	public boolean saveUserInfo(String key, UserBean bean) {
 		Map<String, String> userMap = new HashMap<String, String>();
-		String key = bean.getUserId();
 		if (bean.getUserIdPrik() != null) {
 			userMap.put(UserKey.userIdPrik, bean.getUserIdPrik());
 		}
@@ -73,10 +72,11 @@ public class RedisUserInfoDao {
 
 		logger.info("userINfoMap={}", GsonUtils.toJson(userMap));
 
-		if ("OK".equalsIgnoreCase(jedis.hmset(key, userMap))) {
-			return true;
+		if (userMap.size() > 0) {
+			if ("OK".equalsIgnoreCase(jedis.hmset(key, userMap))) {
+				return true;
+			}
 		}
-
 		return false;
 	}
 
@@ -90,36 +90,35 @@ public class RedisUserInfoDao {
 		return result;
 	}
 
-	public boolean updateRealUser(UserBean bean) {
+	public Map<String, String> getUserInfoMap(String key) {
+		return jedis.hgetAll(key);
+	}
+
+	public PushTokenBean getUserPushInfo(String key) {
+		PushTokenBean bean = new PushTokenBean();
+		bean.setClientType(jedis.hget(key, UserKey.clientType));
+		bean.setPushToken(jedis.hget(key, UserKey.pushToken));
+		return bean;
+	}
+
+	// phone hmap
+	public boolean updatePhoneInfo(String phoneKey, UserBean bean) {
 		Map<String, String> phoneMap = new HashMap<String, String>();
 		phoneMap.put(UserKey.userId, bean.getUserId());
 		phoneMap.put(UserKey.phoneRoaming, bean.getPhoneRoaming());
-		if (!"OK".equalsIgnoreCase(jedis.hmset(bean.getPhoneId(), phoneMap))) {
+		if (!"OK".equalsIgnoreCase(jedis.hmset(phoneKey, phoneMap))) {
 			return false;
 		}
-		return saveUserInfo(bean);
+		String userKey = "user_id_" + bean.getUserId();
+		return saveUserInfo(userKey, bean);
 	}
 
-	public Map<String, String> getPhoneInfoByPhone(String phoneId) {
-		return jedis.hgetAll(phoneId);
+	public Map<String, String> getPhoneInfoMap(String key) {
+		return jedis.hgetAll(key);
 	}
 
-	public Map<String, String> getUserInfoByUserId(String userID) {
-		return jedis.hgetAll(userID);
+	public String getPhoneField(String key, String field) {
+		return jedis.hget(key, UserKey.userPhoneId);
 	}
 
-	public String getUserPhoneId(String userId) {
-		return jedis.hget(userId, UserKey.userPhoneId);
-	}
-
-	public String getPhoneGlobalRoaming(String phoneId) {
-		return jedis.hget(phoneId, UserKey.phoneRoaming);
-	}
-
-	public PushTokenBean getUserPushInfo(String userId) {
-		PushTokenBean bean = new PushTokenBean();
-		bean.setClientType(jedis.hget(userId, UserKey.clientType));
-		bean.setPushToken(jedis.hget(userId, UserKey.pushToken));
-		return bean;
-	}
 }

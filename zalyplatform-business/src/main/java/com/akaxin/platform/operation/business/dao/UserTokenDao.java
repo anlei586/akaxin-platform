@@ -50,7 +50,7 @@ public class UserTokenDao {
 		try {
 			return userTokenDao.getUserTokenValue(key, field);
 		} catch (Exception e) {
-			logger.error("get session map error.", e);
+			logger.error("get user token error.", e);
 		}
 		return null;
 	}

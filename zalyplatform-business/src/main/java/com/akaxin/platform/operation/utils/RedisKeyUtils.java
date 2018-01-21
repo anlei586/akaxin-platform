@@ -2,10 +2,6 @@ package com.akaxin.platform.operation.utils;
 
 public class RedisKeyUtils {
 
-	public static String getUserInfoKey(String userId) {
-		return userId;
-	}
-
 	// 用户个人信息
 	public static String getUserIdKey(String userId) {
 		return "user_id_" + userId;

@@ -13,7 +13,9 @@ public class RedisSessionDao {
 	private Jedis jedis = RedisManager.getSessionJedis();
 
 	public boolean addSession(String key, Map<String, String> map) {
-		if ("OK".equalsIgnoreCase(jedis.hmset(key, map))) {
+		String result = jedis.hmset(key, map);
+		logger.info("hmset session key:{} map:{}", key, map);
+		if ("OK".equalsIgnoreCase(result)) {
 			return true;
 		}
 		return false;

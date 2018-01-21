@@ -98,7 +98,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 				return false;
 			}
 
-			UserBean userBean = UserInfoDao.getInstance().getRealNameInfo(phoneId);
+			UserBean userBean = UserInfoDao.getInstance().getRealNameUserInfo(phoneId);
 			logger.info("phone login userBean={}", GsonUtils.toJson(userBean));
 
 			ApiPhoneLoginProto.ApiPhoneLoginResponse response = ApiPhoneLoginProto.ApiPhoneLoginResponse.newBuilder()

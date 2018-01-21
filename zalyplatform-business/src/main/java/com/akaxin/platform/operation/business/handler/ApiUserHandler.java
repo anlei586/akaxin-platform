@@ -12,7 +12,6 @@ import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
-import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.proto.core.ClientProto;
 import com.akaxin.proto.platform.ApiUserPushTokenProto;
 import com.akaxin.proto.platform.ApiUserRealNameProto;
@@ -99,12 +98,11 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 				return false;
 			}
 
-			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
 			if (!UserInfoDao.getInstance().existPhoneId(phoneId)) {
 				String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
 				logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode, bean.toString());
 				if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
-					if (UserInfoDao.getInstance().updateRealNameInfo(bean)) {
+					if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
 						errorCode = ErrorCode2.SUCCESS;
 					}
 				} else {

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.proto.core.ClientProto;
 import com.akaxin.proto.core.ClientProto.ClientType;
@@ -30,7 +31,10 @@ public class UserInfoDao {
 
 	public boolean saveUserInfo(UserBean userBean) {
 		try {
-			return userDao.saveUserInfo(userBean);
+			if (userBean != null && StringUtils.isNotBlank(userBean.getUserId())) {
+				String redisKey = RedisKeyUtils.getUserIdKey(userBean.getUserId());
+				return userDao.saveUserInfo(redisKey, userBean);
+			}
 		} catch (Exception e) {
 			logger.error("save user info error.", e);
 		}
@@ -39,8 +43,10 @@ public class UserInfoDao {
 
 	public boolean updateUserInfo(String userId, Map<String, String> map) {
 		try {
-			String key = RedisKeyUtils.getUserInfoKey(userId);
-			return userDao.updateUserInfo(key, map);
+			if (StringUtils.isNotBlank(userId) && map != null) {
+				String key = RedisKeyUtils.getUserIdKey(userId);
+				return userDao.updateUserInfo(key, map);
+			}
 		} catch (Exception e) {
 			logger.error("update user info error.", e);
 		}
@@ -49,7 +55,7 @@ public class UserInfoDao {
 
 	public boolean updateUserField(String userId, String field, String value) {
 		try {
-			String redisKey = RedisKeyUtils.getUserInfoKey(userId);
+			String redisKey = RedisKeyUtils.getUserIdKey(userId);
 			return userDao.hset(redisKey, field, value);
 		} catch (Exception e) {
 			logger.error("update user info error.", e);
@@ -57,22 +63,27 @@ public class UserInfoDao {
 		return false;
 	}
 
-	public boolean updateRealNameInfo(UserBean userBean) {
+	public boolean updatePhoneInfo(UserBean userBean) {
 		try {
-			return userDao.updateRealNameInfo(userBean);
+			if (userBean != null && StringUtils.isNotBlank(userBean.getPhoneId())) {
+				String redisKey = RedisKeyUtils.getUserPhoneKey(userBean.getPhoneId());
+				return userDao.updatePhoneInfo(redisKey, userBean);
+			}
 		} catch (Exception e) {
 			logger.error("update rean user info error.", e);
 		}
 		return false;
 	}
 
-	public UserBean getRealNameInfo(String phoneId) {
+	public UserBean getRealNameUserInfo(String phoneId) {
 		UserBean userBean = new UserBean();
 		try {
-			Map<String, String> phoneMap = userDao.getPhoneInfoByPhone(phoneId);
+			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+			Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
 			userBean.setUserId(phoneMap.get(UserKey.userId));
 
-			Map<String, String> userInfoMap = userDao.getUserInfoByUserId(userBean.getUserId());
+			String userKey = RedisKeyUtils.getUserIdKey(userBean.getUserId());
+			Map<String, String> userInfoMap = userDao.getUserInfoMap(userKey);
 
 			userBean.setUserIdPrik(userInfoMap.get(UserKey.userIdPrik));
 			userBean.setUserIdPubk(userInfoMap.get(UserKey.userIdPubk));
@@ -88,16 +99,19 @@ public class UserInfoDao {
 	 */
 	public String getUserPhoneId(String userId) {
 		try {
-			return userDao.getUserPhoneId(userId);
+			String userKey = RedisKeyUtils.getUserIdKey(userId);
+			return userDao.hget(userKey, UserKey.userPhoneId);
 		} catch (Exception e) {
 			logger.error("get phone id error.userIdf=" + userId, e);
 		}
 		return null;
 	}
 
+	// 获取手机国际区号
 	public String getPhoneGlobalRoaming(String phoneId) {
 		try {
-			return userDao.getPhoneGlobalRoaming(phoneId);
+			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+			return userDao.hget(phoneKey, UserKey.phoneRoaming);
 		} catch (Exception e) {
 			logger.error("get phone global roaming error.phoneId=" + phoneId, e);
 		}
@@ -116,7 +130,7 @@ public class UserInfoDao {
 
 	public String getLatestDeviceId(String userId) {
 		try {
-			String redisKey = RedisKeyUtils.getUserInfoKey(userId);
+			String redisKey = RedisKeyUtils.getUserIdKey(userId);
 			return userDao.hget(redisKey, UserKey.deviceId);
 		} catch (Exception e) {
 			logger.error("get push token info error", e);
@@ -126,28 +140,30 @@ public class UserInfoDao {
 
 	public ClientProto.ClientType getClientType(String userId) {
 		try {
-			String redisKey = RedisKeyUtils.getUserInfoKey(userId);
+			String redisKey = RedisKeyUtils.getUserIdKey(userId);
 			String type = userDao.hget(redisKey, UserKey.clientType);
 			if (StringUtils.isNumeric(type)) {
 				ClientProto.ClientType clientType = ClientProto.ClientType.forNumber(Integer.valueOf(type));
 				return clientType;
 			}
-		} catch (NumberFormatException e) {
+		} catch (Exception e) {
 			logger.error("get client type error.", e);
 		}
 		return ClientType.UNKNOW;
 	}
 
 	// 检测手机号是否已经被实名绑定
-	public boolean existPhoneId(String key) {
-		if (StringUtils.isBlank(key)) {
+	public boolean existPhoneId(String phoneId) {
+		if (!ValidatorPattern.isPhoneId(phoneId)) {
 			return false;
 		}
-		Map<String, String> phoneMap = userDao.getPhoneInfoByPhone(key);
+		String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+		Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
 		if (phoneMap != null) {
 			String userId = phoneMap.get(UserKey.userId);
-			if (StringUtils.isNotBlank(userId) && key.equals(userDao.getUserPhoneId(userId))) {
-				return true;
+			if (StringUtils.isNotBlank(userId)) {
+				String userKey = RedisKeyUtils.getUserIdKey(userId);
+				return phoneId.equals(userDao.hget(userKey, UserKey.userId));
 			}
 		}
 		return false;

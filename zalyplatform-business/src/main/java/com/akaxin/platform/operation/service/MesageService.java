@@ -27,13 +27,16 @@ public class MesageService implements IMessage {
 			String action = command.getAction();
 
 			if ("api.platform.login".equals(action) || "api.push.notification".equals(action)
-					|| "api.phone.confirmToken".equals(action)) {
+					|| "api.phone.confirmToken".equals(action) || "api.phone.login".equals(action)
+					|| "api.phone.verifyCode".equals(action) || "api.temp.download".equals(action)
+					|| "api.temp.upload".equals(action)) {
 				ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 				return command.getResponse();
 			} else {
 				Map<Integer, String> header = command.getHeader();
 				String sessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
 				String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
+				logger.info("api auth sessionKey={}", sessionKey);
 				Map<String, String> map = SessionDao.getInstance().getSessionMap(sessionKey);
 				logger.info("api auth sessionId={} map={}", sessionId, map);
 				String userId = map.get(UserKey.userId);

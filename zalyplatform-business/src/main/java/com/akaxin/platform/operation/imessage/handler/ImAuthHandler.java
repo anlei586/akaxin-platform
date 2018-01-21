@@ -45,6 +45,8 @@ public class ImAuthHandler extends AbstractImHandler<Command> {
 			logger.info("auth action command={}", command.toString());
 
 			String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
+			logger.info("auth action session redis key={}", sessionKey);
+
 			Map<String, String> map = SessionDao.getInstance().getSessionMap(sessionKey);
 
 			String userId = map.get(UserKey.userId);

@@ -90,9 +90,8 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 			Map<String, String> sessionMap = new HashMap<String, String>();
 			sessionMap.put(UserKey.userId, userId);
 			sessionMap.put(UserKey.deviceId, deviceId);
-
+			
 			if (SessionDao.getInstance().addSession(sessionKey, sessionMap)) {
-
 				ApiPlatformLoginProto.ApiPlatformLoginResponse response = ApiPlatformLoginProto.ApiPlatformLoginResponse
 						.newBuilder().setUserId(userId).setSessionId(sessionId).build();
 				errCode = ErrorCode.SUCCESS;
@@ -103,7 +102,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 
 			// 更新最新一次登陆的用户信息，用于发送push，最后登陆用户，支持接受push
 			UserInfoDao.getInstance().updateUserInfo(userId, sessionMap);
-
+			
 			logger.info("------login platform finish------");
 		} catch (Exception e) {
 			commandResponse.setErrInfo("Login exception!");

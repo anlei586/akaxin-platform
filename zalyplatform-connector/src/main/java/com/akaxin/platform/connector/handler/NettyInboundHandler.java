@@ -89,6 +89,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
 		logger.error("netty server: exception caught.", cause);
+		logger.error("netty server: exception caught.", cause);
 	}
 
 	@Override
