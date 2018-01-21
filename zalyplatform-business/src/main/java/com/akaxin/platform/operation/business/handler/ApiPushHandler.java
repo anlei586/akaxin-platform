@@ -41,7 +41,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 */
 	public boolean auth(Command command) {
 		logger.info("api.push.auth command={}", command.toString());
-		CommandResponse commandResponse = new CommandResponse();
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		try {
 			ApiPushAuthProto.ApiPushAuthRequest request = ApiPushAuthProto.ApiPushAuthRequest
