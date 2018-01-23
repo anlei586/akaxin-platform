@@ -33,7 +33,7 @@ import com.zaly.platform.storage.bean.UserBean;
  */
 public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiPhoneHandler.class);
-
+	
 	private static final int EXPIRE_TIME = 60 * 5;
 
 	/**

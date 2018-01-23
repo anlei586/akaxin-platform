@@ -13,8 +13,8 @@ public class RedisKeyUtils {
 	}
 
 	// hash结构
-	public static String getSessionKey(String sessionId) {
-		return "user_session_" + sessionId;
+	public static String getSessionKey(String userId) {
+		return "user_session_" + userId;
 	}
 
 	// 用户令牌

@@ -5,6 +5,8 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.zaly.platform.storage.constant.SessionConst;
+
 import redis.clients.jedis.Jedis;
 
 public class RedisSessionDao {
@@ -16,6 +18,7 @@ public class RedisSessionDao {
 		String result = jedis.hmset(key, map);
 		logger.info("hmset session key:{} map:{}", key, map);
 		if ("OK".equalsIgnoreCase(result)) {
+			jedis.expire(key, SessionConst.SESSION_EXPIRE_TIME);
 			return true;
 		}
 		return false;

@@ -56,24 +56,6 @@ public final class ApiPlatformLoginProto {
 
     /**
      * <pre>
-     *用户设备签名
-     * </pre>
-     *
-     * <code>optional string user_device_id_sign = 3;</code>
-     */
-    java.lang.String getUserDeviceIdSign();
-    /**
-     * <pre>
-     *用户设备签名
-     * </pre>
-     *
-     * <code>optional string user_device_id_sign = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getUserDeviceIdSignBytes();
-
-    /**
-     * <pre>
      *用户设备名称
      * </pre>
      *
@@ -89,6 +71,42 @@ public final class ApiPlatformLoginProto {
      */
     com.google.protobuf.ByteString
         getUserDeviceNameBytes();
+
+    /**
+     * <pre>
+     *用户身份公钥签名，证明公钥所属权，需要base64encode。
+     * </pre>
+     *
+     * <code>optional string user_id_sign_base64 = 5;</code>
+     */
+    java.lang.String getUserIdSignBase64();
+    /**
+     * <pre>
+     *用户身份公钥签名，证明公钥所属权，需要base64encode。
+     * </pre>
+     *
+     * <code>optional string user_id_sign_base64 = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getUserIdSignBase64Bytes();
+
+    /**
+     * <pre>
+     *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+     * </pre>
+     *
+     * <code>optional string user_device_id_sign_base64 = 6;</code>
+     */
+    java.lang.String getUserDeviceIdSignBase64();
+    /**
+     * <pre>
+     *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+     * </pre>
+     *
+     * <code>optional string user_device_id_sign_base64 = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getUserDeviceIdSignBase64Bytes();
   }
   /**
    * Protobuf type {@code site.ApiPlatformLoginRequest}
@@ -104,8 +122,9 @@ public final class ApiPlatformLoginProto {
     private ApiPlatformLoginRequest() {
       userIdPubk_ = "";
       userDeviceIdPubk_ = "";
-      userDeviceIdSign_ = "";
       userDeviceName_ = "";
+      userIdSignBase64_ = "";
+      userDeviceIdSignBase64_ = "";
     }
 
     @java.lang.Override
@@ -145,16 +164,22 @@ public final class ApiPlatformLoginProto {
               userDeviceIdPubk_ = s;
               break;
             }
-            case 26: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              userDeviceIdSign_ = s;
-              break;
-            }
             case 34: {
               java.lang.String s = input.readStringRequireUtf8();
 
               userDeviceName_ = s;
+              break;
+            }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              userIdSignBase64_ = s;
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              userDeviceIdSignBase64_ = s;
               break;
             }
           }
@@ -264,48 +289,6 @@ public final class ApiPlatformLoginProto {
       }
     }
 
-    public static final int USER_DEVICE_ID_SIGN_FIELD_NUMBER = 3;
-    private volatile java.lang.Object userDeviceIdSign_;
-    /**
-     * <pre>
-     *用户设备签名
-     * </pre>
-     *
-     * <code>optional string user_device_id_sign = 3;</code>
-     */
-    public java.lang.String getUserDeviceIdSign() {
-      java.lang.Object ref = userDeviceIdSign_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        userDeviceIdSign_ = s;
-        return s;
-      }
-    }
-    /**
-     * <pre>
-     *用户设备签名
-     * </pre>
-     *
-     * <code>optional string user_device_id_sign = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getUserDeviceIdSignBytes() {
-      java.lang.Object ref = userDeviceIdSign_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        userDeviceIdSign_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
     public static final int USER_DEVICE_NAME_FIELD_NUMBER = 4;
     private volatile java.lang.Object userDeviceName_;
     /**
@@ -348,6 +331,90 @@ public final class ApiPlatformLoginProto {
       }
     }
 
+    public static final int USER_ID_SIGN_BASE64_FIELD_NUMBER = 5;
+    private volatile java.lang.Object userIdSignBase64_;
+    /**
+     * <pre>
+     *用户身份公钥签名，证明公钥所属权，需要base64encode。
+     * </pre>
+     *
+     * <code>optional string user_id_sign_base64 = 5;</code>
+     */
+    public java.lang.String getUserIdSignBase64() {
+      java.lang.Object ref = userIdSignBase64_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        userIdSignBase64_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *用户身份公钥签名，证明公钥所属权，需要base64encode。
+     * </pre>
+     *
+     * <code>optional string user_id_sign_base64 = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUserIdSignBase64Bytes() {
+      java.lang.Object ref = userIdSignBase64_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        userIdSignBase64_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int USER_DEVICE_ID_SIGN_BASE64_FIELD_NUMBER = 6;
+    private volatile java.lang.Object userDeviceIdSignBase64_;
+    /**
+     * <pre>
+     *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+     * </pre>
+     *
+     * <code>optional string user_device_id_sign_base64 = 6;</code>
+     */
+    public java.lang.String getUserDeviceIdSignBase64() {
+      java.lang.Object ref = userDeviceIdSignBase64_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        userDeviceIdSignBase64_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+     * </pre>
+     *
+     * <code>optional string user_device_id_sign_base64 = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getUserDeviceIdSignBase64Bytes() {
+      java.lang.Object ref = userDeviceIdSignBase64_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        userDeviceIdSignBase64_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -366,11 +433,14 @@ public final class ApiPlatformLoginProto {
       if (!getUserDeviceIdPubkBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, userDeviceIdPubk_);
       }
-      if (!getUserDeviceIdSignBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, userDeviceIdSign_);
-      }
       if (!getUserDeviceNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, userDeviceName_);
+      }
+      if (!getUserIdSignBase64Bytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, userIdSignBase64_);
+      }
+      if (!getUserDeviceIdSignBase64Bytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, userDeviceIdSignBase64_);
       }
     }
 
@@ -385,11 +455,14 @@ public final class ApiPlatformLoginProto {
       if (!getUserDeviceIdPubkBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, userDeviceIdPubk_);
       }
-      if (!getUserDeviceIdSignBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, userDeviceIdSign_);
-      }
       if (!getUserDeviceNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, userDeviceName_);
+      }
+      if (!getUserIdSignBase64Bytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, userIdSignBase64_);
+      }
+      if (!getUserDeviceIdSignBase64Bytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, userDeviceIdSignBase64_);
       }
       memoizedSize = size;
       return size;
@@ -411,10 +484,12 @@ public final class ApiPlatformLoginProto {
           .equals(other.getUserIdPubk());
       result = result && getUserDeviceIdPubk()
           .equals(other.getUserDeviceIdPubk());
-      result = result && getUserDeviceIdSign()
-          .equals(other.getUserDeviceIdSign());
       result = result && getUserDeviceName()
           .equals(other.getUserDeviceName());
+      result = result && getUserIdSignBase64()
+          .equals(other.getUserIdSignBase64());
+      result = result && getUserDeviceIdSignBase64()
+          .equals(other.getUserDeviceIdSignBase64());
       return result;
     }
 
@@ -429,10 +504,12 @@ public final class ApiPlatformLoginProto {
       hash = (53 * hash) + getUserIdPubk().hashCode();
       hash = (37 * hash) + USER_DEVICE_ID_PUBK_FIELD_NUMBER;
       hash = (53 * hash) + getUserDeviceIdPubk().hashCode();
-      hash = (37 * hash) + USER_DEVICE_ID_SIGN_FIELD_NUMBER;
-      hash = (53 * hash) + getUserDeviceIdSign().hashCode();
       hash = (37 * hash) + USER_DEVICE_NAME_FIELD_NUMBER;
       hash = (53 * hash) + getUserDeviceName().hashCode();
+      hash = (37 * hash) + USER_ID_SIGN_BASE64_FIELD_NUMBER;
+      hash = (53 * hash) + getUserIdSignBase64().hashCode();
+      hash = (37 * hash) + USER_DEVICE_ID_SIGN_BASE64_FIELD_NUMBER;
+      hash = (53 * hash) + getUserDeviceIdSignBase64().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -555,9 +632,11 @@ public final class ApiPlatformLoginProto {
 
         userDeviceIdPubk_ = "";
 
-        userDeviceIdSign_ = "";
-
         userDeviceName_ = "";
+
+        userIdSignBase64_ = "";
+
+        userDeviceIdSignBase64_ = "";
 
         return this;
       }
@@ -583,8 +662,9 @@ public final class ApiPlatformLoginProto {
         com.akaxin.proto.platform.ApiPlatformLoginProto.ApiPlatformLoginRequest result = new com.akaxin.proto.platform.ApiPlatformLoginProto.ApiPlatformLoginRequest(this);
         result.userIdPubk_ = userIdPubk_;
         result.userDeviceIdPubk_ = userDeviceIdPubk_;
-        result.userDeviceIdSign_ = userDeviceIdSign_;
         result.userDeviceName_ = userDeviceName_;
+        result.userIdSignBase64_ = userIdSignBase64_;
+        result.userDeviceIdSignBase64_ = userDeviceIdSignBase64_;
         onBuilt();
         return result;
       }
@@ -634,12 +714,16 @@ public final class ApiPlatformLoginProto {
           userDeviceIdPubk_ = other.userDeviceIdPubk_;
           onChanged();
         }
-        if (!other.getUserDeviceIdSign().isEmpty()) {
-          userDeviceIdSign_ = other.userDeviceIdSign_;
-          onChanged();
-        }
         if (!other.getUserDeviceName().isEmpty()) {
           userDeviceName_ = other.userDeviceName_;
+          onChanged();
+        }
+        if (!other.getUserIdSignBase64().isEmpty()) {
+          userIdSignBase64_ = other.userIdSignBase64_;
+          onChanged();
+        }
+        if (!other.getUserDeviceIdSignBase64().isEmpty()) {
+          userDeviceIdSignBase64_ = other.userDeviceIdSignBase64_;
           onChanged();
         }
         onChanged();
@@ -846,95 +930,6 @@ public final class ApiPlatformLoginProto {
         return this;
       }
 
-      private java.lang.Object userDeviceIdSign_ = "";
-      /**
-       * <pre>
-       *用户设备签名
-       * </pre>
-       *
-       * <code>optional string user_device_id_sign = 3;</code>
-       */
-      public java.lang.String getUserDeviceIdSign() {
-        java.lang.Object ref = userDeviceIdSign_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          userDeviceIdSign_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <pre>
-       *用户设备签名
-       * </pre>
-       *
-       * <code>optional string user_device_id_sign = 3;</code>
-       */
-      public com.google.protobuf.ByteString
-          getUserDeviceIdSignBytes() {
-        java.lang.Object ref = userDeviceIdSign_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          userDeviceIdSign_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <pre>
-       *用户设备签名
-       * </pre>
-       *
-       * <code>optional string user_device_id_sign = 3;</code>
-       */
-      public Builder setUserDeviceIdSign(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        userDeviceIdSign_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       *用户设备签名
-       * </pre>
-       *
-       * <code>optional string user_device_id_sign = 3;</code>
-       */
-      public Builder clearUserDeviceIdSign() {
-        
-        userDeviceIdSign_ = getDefaultInstance().getUserDeviceIdSign();
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       *用户设备签名
-       * </pre>
-       *
-       * <code>optional string user_device_id_sign = 3;</code>
-       */
-      public Builder setUserDeviceIdSignBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        userDeviceIdSign_ = value;
-        onChanged();
-        return this;
-      }
-
       private java.lang.Object userDeviceName_ = "";
       /**
        * <pre>
@@ -1020,6 +1015,184 @@ public final class ApiPlatformLoginProto {
   checkByteStringIsUtf8(value);
         
         userDeviceName_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object userIdSignBase64_ = "";
+      /**
+       * <pre>
+       *用户身份公钥签名，证明公钥所属权，需要base64encode。
+       * </pre>
+       *
+       * <code>optional string user_id_sign_base64 = 5;</code>
+       */
+      public java.lang.String getUserIdSignBase64() {
+        java.lang.Object ref = userIdSignBase64_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          userIdSignBase64_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *用户身份公钥签名，证明公钥所属权，需要base64encode。
+       * </pre>
+       *
+       * <code>optional string user_id_sign_base64 = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getUserIdSignBase64Bytes() {
+        java.lang.Object ref = userIdSignBase64_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          userIdSignBase64_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *用户身份公钥签名，证明公钥所属权，需要base64encode。
+       * </pre>
+       *
+       * <code>optional string user_id_sign_base64 = 5;</code>
+       */
+      public Builder setUserIdSignBase64(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        userIdSignBase64_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *用户身份公钥签名，证明公钥所属权，需要base64encode。
+       * </pre>
+       *
+       * <code>optional string user_id_sign_base64 = 5;</code>
+       */
+      public Builder clearUserIdSignBase64() {
+        
+        userIdSignBase64_ = getDefaultInstance().getUserIdSignBase64();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *用户身份公钥签名，证明公钥所属权，需要base64encode。
+       * </pre>
+       *
+       * <code>optional string user_id_sign_base64 = 5;</code>
+       */
+      public Builder setUserIdSignBase64Bytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        userIdSignBase64_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object userDeviceIdSignBase64_ = "";
+      /**
+       * <pre>
+       *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+       * </pre>
+       *
+       * <code>optional string user_device_id_sign_base64 = 6;</code>
+       */
+      public java.lang.String getUserDeviceIdSignBase64() {
+        java.lang.Object ref = userDeviceIdSignBase64_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          userDeviceIdSignBase64_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+       * </pre>
+       *
+       * <code>optional string user_device_id_sign_base64 = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getUserDeviceIdSignBase64Bytes() {
+        java.lang.Object ref = userDeviceIdSignBase64_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          userDeviceIdSignBase64_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+       * </pre>
+       *
+       * <code>optional string user_device_id_sign_base64 = 6;</code>
+       */
+      public Builder setUserDeviceIdSignBase64(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        userDeviceIdSignBase64_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+       * </pre>
+       *
+       * <code>optional string user_device_id_sign_base64 = 6;</code>
+       */
+      public Builder clearUserDeviceIdSignBase64() {
+        
+        userDeviceIdSignBase64_ = getDefaultInstance().getUserDeviceIdSignBase64();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *使用user_id_prik对用户的user_device_id_pubk签名，证明这个设备是这个用户的。
+       * </pre>
+       *
+       * <code>optional string user_device_id_sign_base64 = 6;</code>
+       */
+      public Builder setUserDeviceIdSignBase64Bytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        userDeviceIdSignBase64_ = value;
         onChanged();
         return this;
       }
@@ -1804,15 +1977,16 @@ public final class ApiPlatformLoginProto {
   static {
     java.lang.String[] descriptorData = {
       "\n!platform/api_platform_login.proto\022\004sit" +
-      "e\"\203\001\n\027ApiPlatformLoginRequest\022\024\n\014user_id" +
+      "e\"\247\001\n\027ApiPlatformLoginRequest\022\024\n\014user_id" +
       "_pubk\030\001 \001(\t\022\033\n\023user_device_id_pubk\030\002 \001(\t" +
-      "\022\033\n\023user_device_id_sign\030\003 \001(\t\022\030\n\020user_de" +
-      "vice_name\030\004 \001(\t\"?\n\030ApiPlatformLoginRespo" +
-      "nse\022\022\n\nsession_id\030\001 \001(\t\022\017\n\007user_id\030\002 \001(\t" +
-      "2a\n\027ApiPlatformLoginService\022F\n\005login\022\035.s" +
-      "ite.ApiPlatformLoginRequest\032\036.site.ApiPl" +
-      "atformLoginResponseB2\n\031com.akaxin.proto." +
-      "platformB\025ApiPlatformLoginProtob\006proto3"
+      "\022\030\n\020user_device_name\030\004 \001(\t\022\033\n\023user_id_si" +
+      "gn_base64\030\005 \001(\t\022\"\n\032user_device_id_sign_b" +
+      "ase64\030\006 \001(\t\"?\n\030ApiPlatformLoginResponse\022" +
+      "\022\n\nsession_id\030\001 \001(\t\022\017\n\007user_id\030\002 \001(\t2a\n\027" +
+      "ApiPlatformLoginService\022F\n\005login\022\035.site." +
+      "ApiPlatformLoginRequest\032\036.site.ApiPlatfo" +
+      "rmLoginResponseB2\n\031com.akaxin.proto.plat",
+      "formB\025ApiPlatformLoginProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1831,7 +2005,7 @@ public final class ApiPlatformLoginProto {
     internal_static_site_ApiPlatformLoginRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_site_ApiPlatformLoginRequest_descriptor,
-        new java.lang.String[] { "UserIdPubk", "UserDeviceIdPubk", "UserDeviceIdSign", "UserDeviceName", });
+        new java.lang.String[] { "UserIdPubk", "UserDeviceIdPubk", "UserDeviceName", "UserIdSignBase64", "UserDeviceIdSignBase64", });
     internal_static_site_ApiPlatformLoginResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_site_ApiPlatformLoginResponse_fieldAccessorTable = new

@@ -1,5 +1,7 @@
 package com.akaxin.platform.operation.business.handler;
 
+import java.util.Base64;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,8 @@ import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
+import com.akaxin.platform.operation.push.apns.ApnsPackage;
+import com.akaxin.platform.operation.push.apns.PushNotificationService;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.proto.client.ImPtcPushProto;
 import com.akaxin.proto.core.ClientProto;
@@ -54,9 +58,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
 
-			// 判断参数
-			logger.info("user:{} login site:{} {}:{}", userId, name, siteAddress, port);
-
+			logger.info("user:{} login site:{} {}:{} {}", userId, name, siteAddress, port, userToken);
+			logger.info("api.push.auth request={}", request.toString());
 			// 存库
 			String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
 			String siteServer = siteAddress + ":" + port;
@@ -99,6 +102,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String userId = notification.getUserId();
 			String siteServer = notification.getSiteServer();
 			String userToken = notification.getUserToken();
+			String title = notification.getPushTitle();
 
 			logger.info("api.push.notification userId:{} siteServer:{} userToken:{}", userId, siteServer, userToken);
 			command.setResponse(commandResponse.setErrCode(errCode));
@@ -122,8 +126,14 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				switch (clientType) {
 				case IOS:
 					String pushToken = UserInfoDao.getInstance().getPushToken(userId);
+					logger.info("ios push ......pushToken={}", pushToken);
 					if (StringUtils.isNotBlank(pushToken)) {
-						logger.info("ios push ......");
+						ApnsPackage apnsPack = new ApnsPackage();
+						apnsPack.setToken(pushToken);
+						apnsPack.setBadge(1);
+						apnsPack.setTitle(title);
+						apnsPack.setBody("你有一条新消息");
+						PushNotificationService.getInstance().apnsPushNotification(apnsPack);
 					}
 					break;
 				case ANDROID_HUAWEI:
