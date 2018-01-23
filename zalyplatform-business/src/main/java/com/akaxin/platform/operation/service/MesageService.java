@@ -53,7 +53,7 @@ public class MesageService implements IMessage {
 			logger.error("platform api request error.", e);
 		}
 
-		return new CommandResponse().setVersion(CommandConst.VERSION).setAction(CommandConst.ACTION_RES)
+		return new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES)
 				.setErrCode(ErrorCode.ERROR);
 	}
 

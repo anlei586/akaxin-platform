@@ -39,10 +39,10 @@ public class ImHelloHandler extends AbstractImHandler<Command> {
 
 	private void helloResponse(Channel channel) {
 		logger.info("------ hello response ------");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		ImSiteHelloProto.ImSiteHelloResponse response = ImSiteHelloProto.ImSiteHelloResponse.newBuilder()
-				.setSiteVersion(CommandConst.SITE_VERSION).build();
+				.setSiteVersion(CommandConst.PROTOCOL_VERSION).build();
 		commandResponse.setErrCode(ErrorCode.SUCCESS);
 		commandResponse.setParams(response.toByteArray());
 		ChannelWriter.write(channel, commandResponse);

@@ -28,7 +28,7 @@ public class ApiTempHandler extends AbstractApiHandler<Command> {
 
 	public boolean upload(Command command) {
 		logger.info("-----api.tmp.upload-----");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		try {
@@ -56,7 +56,7 @@ public class ApiTempHandler extends AbstractApiHandler<Command> {
 
 	public boolean download(Command command) {
 		logger.info("------api.tmp.download-----");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		try {

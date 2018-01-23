@@ -10,10 +10,13 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
+import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.utils.GsonUtils;
 import com.akaxin.common.utils.ValidatorPattern;
+import com.akaxin.platform.operation.bean.SmsResult;
 import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
+import com.akaxin.platform.operation.sms.SmsSender;
 import com.akaxin.proto.platform.ApiPhoneApplyTokenProto;
 import com.akaxin.proto.platform.ApiPhoneConfirmTokenProto;
 import com.akaxin.proto.platform.ApiPhoneLoginProto;
@@ -31,7 +34,7 @@ import com.zaly.platform.storage.bean.UserBean;
 public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiPhoneHandler.class);
 
-	private static final int EXPIRE_TIME = 60;
+	private static final int EXPIRE_TIME = 60 * 5;
 
 	/**
 	 * 用户申请发送验证码VC<br>
@@ -39,31 +42,32 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 */
 	public boolean verifyCode(Command command) {
 		logger.info("------api.phone.verify------");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
-				.setAction(CommandConst.ACTION_RES);
-		String errorCode = ErrorCode.ERROR;
+		CommandResponse commandResponse = new CommandResponse();
+		ErrorCode2 errorCode = ErrorCode2.ERROR;
 		try {
 			ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeRequest request = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeRequest
 					.parseFrom(command.getParams());
 			String phoneId = request.getPhoneId();
-			// 这随机生成一个6位数验证码
-			// int phoneVC = (int)((Math.random() * 9 + 1) * 100000);
-			String phoneVC = "201024";
-
+			// 这随机生成一个4位数验证码
+			String phoneVC = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
 			if (PhoneVCTokenDao.getInstance().setPhoneVC(phoneId, phoneVC + "", EXPIRE_TIME)) {
-				ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse response = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse
-						.newBuilder().setExpireTime(EXPIRE_TIME).build();
-				commandResponse.setParams(response.toByteArray());
-				errorCode = ErrorCode.SUCCESS;
+				SmsResult smsResult = SmsSender.send(phoneId, phoneVC, EXPIRE_TIME / 60);
+				if (smsResult != null && smsResult.isSuccess()) {
+					ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse response = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse
+							.newBuilder().setExpireTime(EXPIRE_TIME).build();
+					commandResponse.setParams(response.toByteArray());
+					errorCode = ErrorCode2.SUCCESS;
+				} else {
+					errorCode = ErrorCode2.ERROR2_PHONE_GETVERIFYCODE;
+				}
 			} else {
-				commandResponse.setErrInfo("verify code error.");
+				errorCode = ErrorCode2.ERROR2_PHONE_GETVERIFYCODE;
 			}
-
 		} catch (InvalidProtocolBufferException e) {
-			commandResponse.setErrInfo("phone verify code error");
+			errorCode = ErrorCode2.ERROR_UNSUPPORT_PROTOCOL;
 			logger.error("phone verify code error.", e);
 		}
-		command.setResponse(commandResponse.setErrCode(errorCode));
+		command.setResponse(commandResponse.setErrCode2(errorCode));
 		return false;
 	}
 
@@ -74,7 +78,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 * 
 	 */
 	public boolean login(Command command) {
-		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		try {
@@ -123,7 +127,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean applyToken(Command command) {
-		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		try {
@@ -163,7 +167,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean confirmToken(Command command) {
-		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		try {

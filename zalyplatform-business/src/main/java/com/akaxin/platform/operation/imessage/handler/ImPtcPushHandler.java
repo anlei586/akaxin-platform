@@ -43,7 +43,7 @@ public class ImPtcPushHandler extends AbstractImHandler<Command> {
 				CoreProto.TransportPackageData.Builder pushPackageBuilder = CoreProto.TransportPackageData.newBuilder();
 				pushPackageBuilder.putAllHeader(new HashMap<Integer, String>());
 				pushPackageBuilder.setData(ByteString.copyFrom(ptcPushRequest.toByteArray()));
-				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
+				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.PROTOCOL_VERSION)
 						.add("im.ptc.push").add(pushPackageBuilder.build().toByteArray()));
 				return true;
 			}

@@ -71,7 +71,7 @@ public class ImAuthHandler extends AbstractImHandler<Command> {
 
 	private void authResponse(Channel channel, Command command, boolean result) {
 		logger.info("----- auth response ------");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		if (result) {

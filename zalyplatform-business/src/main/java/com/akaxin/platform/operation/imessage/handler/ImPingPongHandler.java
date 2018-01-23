@@ -31,7 +31,7 @@ public class ImPingPongHandler extends AbstractImHandler<Command> {
 			if (ChannelManager.getChannelSession(deviceId) != null) {
 				CoreProto.TransportPackageData.Builder pongPackageBuilder = CoreProto.TransportPackageData.newBuilder();
 				pongPackageBuilder.putAllHeader(new HashMap<Integer, String>());
-				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
+				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.PROTOCOL_VERSION)
 						.add("im.ptc.pong").add(pongPackageBuilder.build().toByteArray()));
 
 //				ImPtcPushProto.ImPtcPushRequest request = ImPtcPushProto.ImPtcPushRequest.newBuilder()

@@ -44,7 +44,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 	 */
 	public boolean login(Command command) {
 		logger.info("----------api.platform.login--------");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errCode = ErrorCode.ERROR;
 		try {
@@ -65,7 +65,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 			// 使用user_device_id_sign验证user_device_id_pubk合法性
 			// #TODO RSA 处理
 			/**
-			 * deviceSign = RSA(SHA1(device_id_pubk),user_id_prik)
+			 * deviceSign = Base64(RSA(SHA1(device_id_pubk),user_id_prik))
 			 */
 			try {
 				String sha1edDeviceIdPubk1 = HashCrypto.SHA1(userDeviceIdPubk);// sha1(devicePubk)

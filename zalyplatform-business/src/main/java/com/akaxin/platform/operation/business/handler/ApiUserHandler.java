@@ -28,7 +28,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 
 	public boolean pushToken(Command command) {
 		logger.info("----api.user.pushToken command={}", command.toString());
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
@@ -69,7 +69,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 	 */
 	public boolean realName(Command command) {
 		logger.info("------------api.user.realName-----------");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errorCode = ErrorCode2.ERROR;
 		try {

@@ -41,7 +41,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 */
 	public boolean auth(Command command) {
 		logger.info("api.push.auth command={}", command.toString());
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		try {
@@ -85,7 +85,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean notification(Command command) {
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.VERSION)
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errCode = ErrorCode.SUCCESS;
 		try {

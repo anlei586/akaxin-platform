@@ -116,7 +116,7 @@ public class RedisUserInfoDao {
 	public Map<String, String> getPhoneInfoMap(String key) {
 		return jedis.hgetAll(key);
 	}
-
+	
 	public String getPhoneField(String key, String field) {
 		return jedis.hget(key, UserKey.userPhoneId);
 	}

@@ -1,6 +1,8 @@
 package com.akaxin.platform.connector.handler;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +13,7 @@ import com.akaxin.common.channel.ChannelWriter;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.command.RedisCommand;
+import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.RequestAction;
 import com.akaxin.platform.connector.codec.parser.ParserConst;
 import com.akaxin.platform.operation.service.MesageService;
@@ -76,6 +79,10 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 				new MesageService().doImRequest(command);
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
 				CommandResponse commandResponse = new MesageService().doApiRequest(command);
+				if (commandResponse == null) {
+					commandResponse = new CommandResponse();
+				}
+				commandResponse.setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES);
 				ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
 			} else {
 				logger.error("unknow request command = {}", command.toString());
@@ -88,7 +95,6 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		logger.error("netty server: exception caught.", cause);
 		logger.error("netty server: exception caught.", cause);
 	}
 
