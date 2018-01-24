@@ -5,7 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zaly.platform.storage.service.UserTokenDaoService;
+import com.akaxin.platform.storage.service.UserTokenDaoService;
 
 /**
  * 客户端授权用户凭证

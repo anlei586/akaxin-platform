@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
+import com.akaxin.platform.storage.api.IUserInfoDao;
+import com.akaxin.platform.storage.bean.UserBean;
+import com.akaxin.platform.storage.constant.UserKey;
+import com.akaxin.platform.storage.service.UserInfoDaoService;
 import com.akaxin.proto.core.ClientProto;
 import com.akaxin.proto.core.ClientProto.ClientType;
-import com.zaly.platform.storage.api.IUserInfoDao;
-import com.zaly.platform.storage.bean.UserBean;
-import com.zaly.platform.storage.constant.UserKey;
-import com.zaly.platform.storage.service.UserInfoDaoService;
 
 /**
  * 

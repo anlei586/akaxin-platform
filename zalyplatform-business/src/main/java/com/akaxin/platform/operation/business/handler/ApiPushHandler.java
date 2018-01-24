@@ -16,13 +16,13 @@ import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushNotificationService;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
+import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.client.ImPtcPushProto;
 import com.akaxin.proto.core.ClientProto;
 import com.akaxin.proto.core.CoreProto;
 import com.akaxin.proto.core.PushProto;
 import com.akaxin.proto.platform.ApiPushAuthProto;
 import com.akaxin.proto.platform.ApiPushNotificationProto;
-import com.zaly.platform.storage.constant.UserKey;
 
 /**
  * 站点通过api请求（api.push.notification）请求平台给用户发送push
@@ -67,14 +67,13 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
 				UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
 				errorCode = ErrorCode.SUCCESS;
-				return true;
 			}
 
 		} catch (Exception e) {
 			logger.error("api.push.auth error", e);
 		}
 		command.setResponse(commandResponse.setErrCode(errorCode));
-		return false;
+		return true;
 	}
 
 	/**

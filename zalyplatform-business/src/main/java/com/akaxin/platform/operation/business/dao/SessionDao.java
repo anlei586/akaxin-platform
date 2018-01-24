@@ -5,7 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.zaly.platform.storage.service.SessionDaoService;
+import com.akaxin.platform.storage.service.SessionDaoService;
 
 /**
  * 用户登陆会生成sessionid，并且用户每次api请求，会通过sessionid验证请求的合法性

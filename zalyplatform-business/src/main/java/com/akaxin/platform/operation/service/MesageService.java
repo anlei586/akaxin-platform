@@ -15,8 +15,8 @@ import com.akaxin.platform.operation.business.dao.SessionDao;
 import com.akaxin.platform.operation.executor.ApiOperateExecutor;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
+import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.core.CoreProto;
-import com.zaly.platform.storage.constant.UserKey;
 
 public class MesageService implements IMessage {
 	private static final Logger logger = LoggerFactory.getLogger(MesageService.class);

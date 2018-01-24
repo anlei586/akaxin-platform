@@ -1,7 +1,7 @@
 package com.akaxin.platform.operation.business.dao;
 
-import com.zaly.platform.storage.api.ITempSpaceDao;
-import com.zaly.platform.storage.service.TempSpaceDaoService;
+import com.akaxin.platform.storage.api.ITempSpaceDao;
+import com.akaxin.platform.storage.service.TempSpaceDaoService;
 
 public class TempSpaceDao {
 

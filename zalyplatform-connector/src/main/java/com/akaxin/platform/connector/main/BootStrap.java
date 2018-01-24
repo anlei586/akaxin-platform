@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.akaxin.platform.connector.netty.NettyServer;
+import com.akaxin.platform.operation.push.apns.APNsPushManager;
 
 /**
  * 
@@ -20,6 +21,8 @@ public class BootStrap {
 			port = Integer.valueOf(args[0]);
 		}
 		logger.info("Start Platform Server port:{}", port);
+
+		APNsPushManager.getInstance().start();
 
 		new NettyServer() {
 		}.start(ServerAddress.getLocalAddress(), port);

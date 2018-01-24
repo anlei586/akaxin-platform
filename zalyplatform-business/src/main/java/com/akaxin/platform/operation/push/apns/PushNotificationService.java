@@ -51,10 +51,10 @@ public class PushNotificationService {
 			IApnsHttp2Client apnsHttp2Client = APNsPushManager.getInstance().getApnsClient(isSandboxEnv);
 			Future<IApnsPushNotificationResponse<IApnsPushNotification>> response = apnsHttp2Client
 					.pushMessageAsync(apnsToken, payload);
-			logger.info("send payload response={}", response.get().getApnsPushNotification());
+			logger.info("send payload response={}", response.get());
 			return true;
 		} catch (Exception e) {
-			logger.error("send payload error");
+			logger.error("send payload error", e);
 		}
 		return false;
 	}

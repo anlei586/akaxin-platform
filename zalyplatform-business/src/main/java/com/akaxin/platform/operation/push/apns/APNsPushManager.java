@@ -16,24 +16,15 @@ import com.akaxin.apns.constant.ApnsHttp2Config;
 public class APNsPushManager {
 	private static final Logger logger = LoggerFactory.getLogger(APNsPushManager.class);
 	private static final String AKAXIN_PUSH_NAME = "AKAXIN_PUSH";
-	private static final String APPLE_CERT_FILE = "momo-push-certificates.p12";
-	private static final String SAMBOX_APPLE_CERT_FILE = "momo-push-certificates-sandbox.p12";
-	private static final int PRODUCT_MAX_CONN = 8;
-	private static final int DEVELOP_MAX_CONN = 1;
+	private static final String PRODUCT_APPLE_CERT_FILE = "akaxin-push-certificates.p12";
+	private static final String SANDBOX_APPLE_CERT_FILE = "akaxin-sandbox-certificates.p12";
+	private static final int PRODUCT_MAX_CONN = 4;
+	private static final int DEVELOP_MAX_CONN = 2;
 
 	private static final String PASSWD = "thinkpad";
 	private static APNsPushManager instance;
 	private static IApnsHttp2Client apnsHttp2Client;
 	private static IApnsHttp2Client sandboxApnsHttp2Client;
-
-	static {
-		try {
-			apnsHttp2Client = SingletonHolder.getApnsHttp2Client();
-			sandboxApnsHttp2Client = SingletonHolder.getSandboxApnsHttp2Client();
-		} catch (Exception e) {
-			logger.error("create apns client error");
-		}
-	}
 
 	private APNsPushManager() {
 
@@ -47,7 +38,13 @@ public class APNsPushManager {
 	}
 
 	public void start() {
-
+		try {
+//			apnsHttp2Client = SingletonHolder.getApnsHttp2Client();
+			sandboxApnsHttp2Client = SingletonHolder.getSandboxApnsHttp2Client();
+			logger.info("start apns client client={} sandboxClient={}", apnsHttp2Client, sandboxApnsHttp2Client);
+		} catch (Exception e) {
+			logger.error("create apns client error", e);
+		}
 	}
 
 	public IApnsHttp2Client getApnsClient(boolean isSandboxEnv) {
@@ -67,7 +64,6 @@ public class APNsPushManager {
 					apnsHttp2Config.setSandboxEnvironment(isSandboxEnv);
 					apnsHttp2Config.setPassword(password);
 					apnsHttp2Config.setPoolSize(maxApnsConnections);
-
 					client = new ApnsHttp2Client(apnsHttp2Config);
 				} catch (Exception e) {
 					logger.error("build APNs Linked error", e);
@@ -78,11 +74,11 @@ public class APNsPushManager {
 		}
 
 		public static IApnsHttp2Client getApnsHttp2Client() {
-			return buildApnsHttp2Client(APPLE_CERT_FILE, PASSWD, PRODUCT_MAX_CONN, false);
+			return buildApnsHttp2Client(PRODUCT_APPLE_CERT_FILE, PASSWD, PRODUCT_MAX_CONN, false);
 		}
 
 		public static IApnsHttp2Client getSandboxApnsHttp2Client() {
-			return buildApnsHttp2Client(SAMBOX_APPLE_CERT_FILE, PASSWD, DEVELOP_MAX_CONN, true);
+			return buildApnsHttp2Client(SANDBOX_APPLE_CERT_FILE, PASSWD, DEVELOP_MAX_CONN, true);
 		}
 
 	}

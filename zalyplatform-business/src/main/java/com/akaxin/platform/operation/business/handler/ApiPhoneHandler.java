@@ -17,12 +17,12 @@ import com.akaxin.platform.operation.bean.SmsResult;
 import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.sms.SmsSender;
+import com.akaxin.platform.storage.bean.UserBean;
 import com.akaxin.proto.platform.ApiPhoneApplyTokenProto;
 import com.akaxin.proto.platform.ApiPhoneConfirmTokenProto;
 import com.akaxin.proto.platform.ApiPhoneLoginProto;
 import com.akaxin.proto.platform.ApiPhoneVerifyCodeProto;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.zaly.platform.storage.bean.UserBean;
 
 /**
  * 平台：用户手机验证码申请，以及手机号登陆
