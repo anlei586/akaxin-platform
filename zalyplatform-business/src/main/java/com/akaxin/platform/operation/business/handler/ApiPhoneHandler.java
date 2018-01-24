@@ -33,7 +33,7 @@ import com.zaly.platform.storage.bean.UserBean;
  */
 public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiPhoneHandler.class);
-	
+
 	private static final int EXPIRE_TIME = 60 * 5;
 
 	/**
@@ -54,7 +54,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 				SmsResult smsResult = SmsSender.send(phoneId, phoneVC, EXPIRE_TIME / 60);
 				if (smsResult != null && smsResult.isSuccess()) {
 					ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse response = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse
-							.newBuilder().setExpireTime(EXPIRE_TIME).build();
+							.newBuilder().setExpireTime(60).build();
 					commandResponse.setParams(response.toByteArray());
 					errorCode = ErrorCode2.SUCCESS;
 				} else {
