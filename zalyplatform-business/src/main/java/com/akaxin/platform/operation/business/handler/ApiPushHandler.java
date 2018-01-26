@@ -1,7 +1,5 @@
 package com.akaxin.platform.operation.business.handler;
 
-import java.util.Base64;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode;
+import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
@@ -44,10 +42,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean auth(Command command) {
-		logger.info("api.push.auth command={}", command.toString());
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
-		String errorCode = ErrorCode.ERROR;
+		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
+		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			ApiPushAuthProto.ApiPushAuthRequest request = ApiPushAuthProto.ApiPushAuthRequest
 					.parseFrom(command.getParams());
@@ -57,23 +53,27 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String port = request.getSitePort();
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
+			logger.info("api.push.auth command={} request={}", command.toString(), request.toString());
 
-			logger.info("user:{} login site:{} {}:{} {}", userId, name, siteAddress, port, userToken);
-			logger.info("api.push.auth request={}", request.toString());
-			// 存库
-			String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
-			String siteServer = siteAddress + ":" + port;
-			logger.info("add user token,key:{},field:{},value:{}", redisKey, siteServer, userToken);
-			if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
-				UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
-				errorCode = ErrorCode.SUCCESS;
+			if (StringUtils.isNoneEmpty(userId, deviceId, siteAddress, port, userToken)) {
+				// 存库
+				String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
+				String siteServer = siteAddress + ":" + port;
+				logger.info("add user token,key:{},field:{},value:{}", redisKey, siteServer, userToken);
+				if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
+					UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
+					errCode = ErrorCode2.SUCCESS;
+				}
+			} else {
+				errCode = ErrorCode2.ERROR_PARAMETER;
 			}
-
 		} catch (Exception e) {
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			logger.error("api.push.auth error", e);
 		}
-		command.setResponse(commandResponse.setErrCode(errorCode));
-		return true;
+		command.setResponse(commandResponse.setErrCode2(errCode));
+		logger.info("api.push.auth result={}", errCode.toString());
+		return errCode.isSuccess();
 	}
 
 	/**
@@ -87,24 +87,20 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean notification(Command command) {
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
-		String errCode = ErrorCode.SUCCESS;
+		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
+		ErrorCode2 errCode = ErrorCode2.SUCCESS;
+		command.setResponse(commandResponse.setErrCode2(errCode));
 		try {
 			Command pushCommand = null;
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
 					.parseFrom(command.getParams());
-			logger.info("api.push.notification request={}", request.toString());
-
 			CoreProto.MsgType pushType = request.getPushType();
 			PushProto.Notification notification = request.getNotification();
 			String userId = notification.getUserId();
 			String siteServer = notification.getSiteServer();
 			String userToken = notification.getUserToken();
 			String title = notification.getPushTitle();
-
-			logger.info("api.push.notification userId:{} siteServer:{} userToken:{}", userId, siteServer, userToken);
-			command.setResponse(commandResponse.setErrCode(errCode));
+			logger.info("api.push.notification command={} request={}", command.toString(), request.toString());
 
 			if (StringUtils.isBlank(userId) || StringUtils.isBlank(userToken) || StringUtils.isBlank(siteServer)) {
 				logger.info("request parameter error.request={}", request.toString());
@@ -157,7 +153,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		} catch (Exception e) {
 			logger.error("api push notification error.", e);
 		}
-
+		logger.info("api.push.notification result={}", errCode.toString());
 		return false;
 	}
 

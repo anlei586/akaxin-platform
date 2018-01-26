@@ -50,9 +50,9 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 			String phoneId = request.getPhoneId();
 			// 这随机生成一个4位数验证码
 			String phoneVC = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
-			if (PhoneVCTokenDao.getInstance().setPhoneVC(phoneId, phoneVC + "", EXPIRE_TIME)) {
-				SmsResult smsResult = SmsSender.send(phoneId, phoneVC, EXPIRE_TIME / 60);
-				if (smsResult != null && smsResult.isSuccess()) {
+			SmsResult smsResult = SmsSender.send(phoneId, phoneVC, EXPIRE_TIME / 60);
+			if (smsResult != null && smsResult.isSuccess()) {
+				if (PhoneVCTokenDao.getInstance().setPhoneVC(phoneId, phoneVC + "", EXPIRE_TIME)) {
 					ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse response = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse
 							.newBuilder().setExpireTime(60).build();
 					commandResponse.setParams(response.toByteArray());
@@ -78,45 +78,40 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 * 
 	 */
 	public boolean login(Command command) {
-		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
-		String errorCode = ErrorCode.ERROR;
+		CommandResponse commandRespone = new CommandResponse().setAction(CommandConst.ACTION_RES);
+		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			ApiPhoneLoginProto.ApiPhoneLoginRequest request = ApiPhoneLoginProto.ApiPhoneLoginRequest
 					.parseFrom(command.getParams());
 			String phoneId = request.getPhoneId();
 			String phoneVC = request.getPhoneVerifyCode();
+			logger.info("api.phone.login  command={} request={}", command.toString(), request.toString());
 
-			logger.info("Phone Login  request phoneid={},vc={}", phoneId, phoneVC);
+			if (ValidatorPattern.isPhoneId(phoneId) && StringUtils.isNotBlank(phoneVC)) {
+				String realPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
+				logger.info("vc1={} vc2={}", phoneVC, realPhoneVC);
 
-			if (!ValidatorPattern.isPhoneId(phoneId) || StringUtils.isEmpty(phoneVC)) {
-				command.setResponse(commandRespone.setErrCode(errorCode));
-				return false;
+				if (phoneVC.equals(realPhoneVC)) {
+					UserBean userBean = UserInfoDao.getInstance().getRealNameUserInfo(phoneId);
+					logger.info("phone login userBean={}", GsonUtils.toJson(userBean));
+
+					ApiPhoneLoginProto.ApiPhoneLoginResponse response = ApiPhoneLoginProto.ApiPhoneLoginResponse
+							.newBuilder().setUserIdPrik(String.valueOf(userBean.getUserIdPrik()))
+							.setUserIdPubk(String.valueOf(userBean.getUserIdPubk())).build();
+					commandRespone.setParams(response.toByteArray());
+					errCode = ErrorCode2.SUCCESS;
+				} else {
+					errCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
+				}
+			} else {
+				errCode = ErrorCode2.ERROR_PARAMETER;
 			}
-
-			String realPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
-			logger.info("vc1={} vc2={}", phoneVC, realPhoneVC);
-
-			if (!phoneVC.equals(realPhoneVC)) {
-				command.setResponse(commandRespone.setErrCode(errorCode));
-				return false;
-			}
-
-			UserBean userBean = UserInfoDao.getInstance().getRealNameUserInfo(phoneId);
-			logger.info("phone login userBean={}", GsonUtils.toJson(userBean));
-
-			ApiPhoneLoginProto.ApiPhoneLoginResponse response = ApiPhoneLoginProto.ApiPhoneLoginResponse.newBuilder()
-					.setUserIdPrik(String.valueOf(userBean.getUserIdPrik()))
-					.setUserIdPubk(String.valueOf(userBean.getUserIdPubk())).build();
-
-			commandRespone.setParams(response.toByteArray());
-			errorCode = ErrorCode.SUCCESS;
-
-		} catch (InvalidProtocolBufferException e) {
-			commandRespone.setErrInfo("phone login error");
-			logger.error("phone login error.", e);
+		} catch (Exception e) {
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			logger.error("api.phone.login error.", e);
 		}
-		command.setResponse(commandRespone.setErrCode(errorCode));
+		command.setResponse(commandRespone.setErrCode2(errCode));
+		logger.info("api.phone.login result={}", errCode.toString());
 		return false;
 	}
 
@@ -127,15 +122,14 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean applyToken(Command command) {
-		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
+		CommandResponse commandRespone = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
 		try {
 			ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest request = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest
 					.parseFrom(command.getParams());
 			String userId = request.getUserId();
 			String phoneId = UserInfoDao.getInstance().getUserPhoneId(userId);
-
+			
 			if (ValidatorPattern.isPhoneId(phoneId)) {
 				String phoneToken = UUID.randomUUID().toString();
 

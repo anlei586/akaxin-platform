@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.crypto.RSACrypto;
+import com.akaxin.common.utils.UserIdUtils;
 import com.akaxin.platform.operation.business.dao.SessionDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
@@ -43,69 +45,71 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean login(Command command) {
-		logger.info("api.platform.login");
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
+		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			ApiPlatformLoginProto.ApiPlatformLoginRequest loginRequest = ApiPlatformLoginProto.ApiPlatformLoginRequest
 					.parseFrom(command.getParams());
-
 			String userIdPubk = loginRequest.getUserIdPubk();
 			String userIdSignBase64 = loginRequest.getUserIdSignBase64();
 			String userDeviceIdPubk = loginRequest.getUserDeviceIdPubk();
 			String userDeviceIdSignBase64 = loginRequest.getUserDeviceIdSignBase64();
-			String userId = HashCrypto.SHA1(userIdPubk);
-
+			logger.info("api.platform.login command={} request={}", command.toString(), loginRequest.toString());
 			logger.info("user_id_pubk={}", userIdPubk);
 			logger.info("userIdSignBase64={}", userIdSignBase64);
 			logger.info("device_id_pubk={}", userDeviceIdPubk);
 			logger.info("userDeviceIdSignBase64={}", userDeviceIdSignBase64);
 
-			PublicKey userPubKey = RSACrypto.getRSAPubKeyFromPem(userIdPubk);// 个人身份公钥，解密Sign签名，解密Key
-			Signature userSign = Signature.getInstance("SHA512withRSA");
-			userSign.initVerify(userPubKey);
-			userSign.update(userIdPubk.getBytes());// 原文
-			boolean userSignResult = userSign.verify(Base64.getDecoder().decode(userIdSignBase64));
-			logger.info("userSignResult={}", userSignResult);
-			if (userSignResult) {
-				Signature userDeviceSign = Signature.getInstance("SHA512withRSA");
-				userDeviceSign.initVerify(userPubKey);
-				userDeviceSign.update(userDeviceIdPubk.getBytes());// 原文
-				userSignResult = userDeviceSign.verify(Base64.getDecoder().decode(userDeviceIdSignBase64));
-			}
-			logger.info("deviceSignResult={}", userSignResult);
+			if (StringUtils.isNoneEmpty(userIdPubk, userIdSignBase64, userDeviceIdPubk, userDeviceIdSignBase64)) {
+				String userId = UserIdUtils.getV1GlobalUserId(userIdPubk);
+				logger.info("globalUserId={}", userId);
 
-			if (userSignResult) {
-				// 随机生成sessionid
-				String sessionId = UUID.randomUUID().toString();
-				String deviceId = HashCrypto.MD5(userDeviceIdPubk);
-
-				String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
-				Map<String, String> sessionMap = new HashMap<String, String>();
-				sessionMap.put(UserKey.userId, userId);
-				sessionMap.put(UserKey.deviceId, deviceId);
-
-				if (SessionDao.getInstance().addSession(sessionKey, sessionMap)) {
-					ApiPlatformLoginProto.ApiPlatformLoginResponse response = ApiPlatformLoginProto.ApiPlatformLoginResponse
-							.newBuilder().setUserId(userId).setSessionId(sessionId).build();
-					commandResponse.setParams(response.toByteArray());
-					errCode = ErrorCode2.SUCCESS;
+				PublicKey userPubKey = RSACrypto.getRSAPubKeyFromPem(userIdPubk);// 个人身份公钥，解密Sign签名，解密Key
+				Signature userSign = Signature.getInstance("SHA512withRSA");
+				userSign.initVerify(userPubKey);
+				userSign.update(userIdPubk.getBytes());// 原文
+				boolean userSignResult = userSign.verify(Base64.getDecoder().decode(userIdSignBase64));
+				logger.info("userSignResult={}", userSignResult);
+				if (userSignResult) {
+					Signature userDeviceSign = Signature.getInstance("SHA512withRSA");
+					userDeviceSign.initVerify(userPubKey);
+					userDeviceSign.update(userDeviceIdPubk.getBytes());// 原文
+					userSignResult = userDeviceSign.verify(Base64.getDecoder().decode(userDeviceIdSignBase64));
 				}
+				logger.info("deviceSignResult={}", userSignResult);
 
-				// 更新最新一次登陆的用户信息，用于发送push，最后登陆用户，支持接受push
-				UserInfoDao.getInstance().updateUserInfo(userId, sessionMap);
+				if (userSignResult) {
+					// 随机生成sessionid
+					String sessionId = UUID.randomUUID().toString();
+					String deviceId = HashCrypto.MD5(userDeviceIdPubk);
+
+					String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
+					Map<String, String> sessionMap = new HashMap<String, String>();
+					sessionMap.put(UserKey.userId, userId);
+					sessionMap.put(UserKey.deviceId, deviceId);
+
+					if (SessionDao.getInstance().addSession(sessionKey, sessionMap)) {
+						ApiPlatformLoginProto.ApiPlatformLoginResponse response = ApiPlatformLoginProto.ApiPlatformLoginResponse
+								.newBuilder().setUserId(userId).setSessionId(sessionId).build();
+						commandResponse.setParams(response.toByteArray());
+						errCode = ErrorCode2.SUCCESS;
+					}
+
+					// 更新最新一次登陆的用户信息，用于发送push，最后登陆用户，支持接受push
+					UserInfoDao.getInstance().updateUserInfo(userId, sessionMap);
+				} else {
+					errCode = ErrorCode2.ERROR2_LOGGIN_ERRORSIGN;
+				}
 			} else {
-				errCode = ErrorCode2.ERROR2_LOGGIN_ERRORSIGN;
+				errCode = ErrorCode2.ERROR_PARAMETER;// 参数错误
 			}
-			logger.info("------login platform finish------");
 		} catch (Exception e) {
-			commandResponse.setErrInfo("Login exception!");
-			logger.error("login exception.", e);
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			logger.error("api.platform.login exception.", e);
 		}
-		logger.info("api.platform.login result={}", errCode.toString());
 		command.setResponse(commandResponse.setErrCode2(errCode));
-		return true;
+		logger.info("api.platform.login result={}", errCode.toString());
+		return errCode.isSuccess();
 	}
 
 }

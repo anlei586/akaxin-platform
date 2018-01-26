@@ -1,8 +1,6 @@
 package com.akaxin.platform.connector.handler;
 
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
