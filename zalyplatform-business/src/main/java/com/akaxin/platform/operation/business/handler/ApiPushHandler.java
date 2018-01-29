@@ -112,8 +112,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 					siteServer);
 			// 如果用户令牌相同，则相等（授权校验方式）
 			logger.info("api.push.notification check site_user_token:{} platform_user_token:{}", userToken, userToken2);
-			// if (userToken.equals(userToken2)) {
-			if (true) {
+			if (userToken.equals(userToken2)) {
 				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
 
 				logger.info("api.push.notification clientType={}", clientType);
@@ -126,7 +125,11 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 						ApnsPackage apnsPack = new ApnsPackage();
 						apnsPack.setToken(pushToken);
 						apnsPack.setBadge(1);
-						apnsPack.setTitle(title);
+						if (StringUtils.isNotBlank(siteServer)) {
+							apnsPack.setTitle(title + " " + siteServer);
+						} else {
+							apnsPack.setTitle(title);
+						}
 						apnsPack.setBody("你有一条新消息");
 						PushNotificationService.getInstance().apnsPushNotification(apnsPack);
 					}
@@ -173,10 +176,13 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		}
 		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();
 		ippRequest.setSiteServer(siteServer);
+		if (StringUtils.isNotBlank(siteServer)) {
+			pushTitle = pushTitle + " " + siteServer;
+		}
 		ippRequest.setPushTitle(pushTitle);
 		ippRequest.setPushAlert(alertText);
 		ippRequest.setPushBadge(1);
-		ippRequest.setPushSound("");// 使用系统默认
+		ippRequest.setPushSound("sms-received1.caf");// 使用系统默认
 		ippRequest.setPushJump("[tof|1|]");// [goto|message{group}|param][http|1|param]
 
 		Command command = new Command();

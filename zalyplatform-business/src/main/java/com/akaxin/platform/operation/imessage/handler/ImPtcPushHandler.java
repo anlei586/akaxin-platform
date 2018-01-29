@@ -28,7 +28,7 @@ public class ImPtcPushHandler extends AbstractImHandler<Command> {
 	@Override
 	public boolean handle(Command command) {
 		try {
-			logger.info("---------api.ptc.push----------");
+			logger.info("---------im.ptc.push----------");
 			String deviceId = command.getDeviceId();
 			if (StringUtils.isEmpty(deviceId)) {
 				logger.error("im.ptc.push without deviceId={}", deviceId);
@@ -46,6 +46,8 @@ public class ImPtcPushHandler extends AbstractImHandler<Command> {
 				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.PROTOCOL_VERSION)
 						.add("im.ptc.push").add(pushPackageBuilder.build().toByteArray()));
 				return true;
+			} else {
+				logger.info("im.ptc.push fail,user is offline command={}", command.toString());
 			}
 		} catch (Exception e) {
 			logger.error("im ptc push error", e);
