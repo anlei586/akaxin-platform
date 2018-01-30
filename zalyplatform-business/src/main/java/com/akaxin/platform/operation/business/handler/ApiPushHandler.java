@@ -8,6 +8,7 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.platform.operation.business.constant.PushText;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
@@ -96,30 +97,32 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 					.parseFrom(command.getParams());
 			CoreProto.MsgType pushType = request.getPushType();
 			PushProto.Notification notification = request.getNotification();
-			String userId = notification.getUserId();
 			String siteServer = notification.getSiteServer();
+			String userId = notification.getUserId();
 			String userToken = notification.getUserToken();
 			String title = notification.getPushTitle();
+			String pushFrom = notification.getPushFromId();
+			String pushFromName = notification.getPushFromName();
 			logger.info("api.push.notification command={} request={}", command.toString(), request.toString());
 
-			if (StringUtils.isBlank(userId) || StringUtils.isBlank(userToken) || StringUtils.isBlank(siteServer)) {
+			if (StringUtils.isAnyBlank(userId, userToken, siteServer)) {
 				logger.info("request parameter error.request={}", request.toString());
 				return false;
 			}
-
+			// 获取最新一次登陆的用户设备ID
 			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(userId);
+			// 获取最新登陆（auth）设备对应的用户令牌（usertoken）
 			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
 					siteServer);
 			// 如果用户令牌相同，则相等（授权校验方式）
 			logger.info("api.push.notification check site_user_token:{} platform_user_token:{}", userToken, userToken2);
-			// if (userToken.equals(userToken2)) {
-			if (true) {
+			if (userToken.equals(userToken2)) {
 				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
-
 				logger.info("api.push.notification clientType={}", clientType);
 
 				switch (clientType) {
 				case IOS:
+					// pushtoken，用户每次打开客户端通过api.push.pushToken上传
 					String pushToken = UserInfoDao.getInstance().getPushToken(userId);
 					logger.info("ios push ......pushToken={}", pushToken);
 					if (StringUtils.isNotBlank(pushToken)) {
@@ -131,7 +134,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 						} else {
 							apnsPack.setTitle(title);
 						}
-						apnsPack.setBody("你有一条新消息");
+						apnsPack.setBody(getAlterText(pushType));
 						PushNotificationService.getInstance().apnsPushNotification(apnsPack);
 					}
 					break;
@@ -164,17 +167,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	private Command buildPushCommand(CoreProto.MsgType pushType, PushProto.Notification notification) {
 		String siteServer = notification.getSiteServer();// 192.168.0.1:2021
 		String pushTitle = notification.getPushTitle();
-		String alertText = notification.getPushAlert();
+		String alertText = getAlterText(pushType);
 
-		switch (pushType) {
-		case TEXT:
-			alertText = "你收到一条阿卡信消息";
-		case SECRET_TEXT:
-			alertText = "【绝密】你收到一条绝密消息";
-		default:
-			alertText = "你收到一条阿卡信消息";
-			break;
-		}
 		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();
 		ippRequest.setSiteServer(siteServer);
 		if (StringUtils.isNotBlank(siteServer)) {
@@ -191,6 +185,26 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		command.setParams(ippRequest.build().toByteArray());
 		logger.info("build push command={}", command.toString());
 		return command;
+	}
+
+	private String getAlterText(CoreProto.MsgType pushType) {
+		switch (pushType) {
+		case TEXT:
+			return PushText.TEXT;
+		case SECRET_TEXT:
+			return PushText.SECRE_TEXT;
+		case IMAGE:
+			return PushText.IMAGE_TEXT;
+		case SECRET_IMAGE:
+			return PushText.SECRE_IMAGE_TEXT;
+		case VOICE:
+			return PushText.AUDIO_TEXT;
+		case SECRET_VOICE:
+			return PushText.SECRE_AUDIO_TEXT;
+		default:
+			break;
+		}
+		return PushText.TEXT;
 	}
 
 }
