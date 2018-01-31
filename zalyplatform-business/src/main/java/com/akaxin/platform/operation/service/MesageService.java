@@ -6,12 +6,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.akaxin.common.channel.ChannelManager;
+import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.platform.operation.api.IMessage;
 import com.akaxin.platform.operation.business.dao.SessionDao;
+import com.akaxin.platform.operation.constant.PlatformAction;
 import com.akaxin.platform.operation.executor.ApiOperateExecutor;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
@@ -56,16 +59,29 @@ public class MesageService implements IMessage {
 				.setErrCode(ErrorCode.ERROR);
 	}
 
+	/**
+	 * <pre>
+	 * 	return false，平台断开长链接 
+	 * 	return true，操作完成，保持长链接
+	 * </pre>
+	 */
 	public boolean doImRequest(Command command) {
-		logger.info("do im request in operation. command={}", command.toString());
 		try {
 			String action = command.getAction();
-			if (!"im.platform.hello".equals(action) || !"im.platform.auth".equals(action)) {
-				// 需要做auth验证
-				// #TODO
+			if (PlatformAction.IM_PLATFORM_HELLO.equals(action) || PlatformAction.IM_PLATFORM_AUTH.equals(action)) {
 				return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
 			} else {
-				return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
+				ChannelSession channelSession = command.getChannelSession();
+				String deviceId = channelSession.getDeviceId();
+				ChannelSession acsession = ChannelManager.getChannelSession(deviceId);
+				logger.info("do platform auth command={} ", command.toString());
+				if (acsession != null) {
+					logger.info("do platform auth userId={} ", acsession.getUserId());
+				}
+				if (acsession != null && acsession.getUserId() != null
+						&& acsession.getUserId().equals(command.getSiteUserId())) {
+					return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
+				}
 			}
 		} catch (Exception e) {
 			logger.error("do im request error", e);

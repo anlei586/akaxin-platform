@@ -1,4 +1,4 @@
-package com.akaxin.platform.operation.business.constant;
+package com.akaxin.platform.operation.constant;
 
 public enum RequestKeys {
 	None(0, "none"), //

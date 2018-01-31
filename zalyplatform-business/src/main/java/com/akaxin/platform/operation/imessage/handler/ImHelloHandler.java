@@ -26,8 +26,7 @@ public class ImHelloHandler extends AbstractImHandler<Command> {
 	@Override
 	public boolean handle(Command command) {
 		try {
-			logger.info("------hello action------ command={}", command.toString());
-
+			logger.info("im.platform.hello command={}", command.toString());
 			ChannelSession channelSession = command.getChannelSession();
 			helloResponse(channelSession.getChannel());
 			return true;

@@ -23,7 +23,10 @@ import com.akaxin.proto.platform.ImPlatformAuthProto;
 import io.netty.channel.Channel;
 
 /**
- * 平台:处理客户端auth行为
+ * <pre>
+ * 	平台认证客户端行为
+ * 	return false，认证失败，断开连接
+ * </pre>
  * 
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2017.10.17
@@ -68,7 +71,7 @@ public class ImAuthHandler extends AbstractImHandler<Command> {
 		} catch (Exception e) {
 			logger.error("im auth error.", e);
 		}
-		return false;
+		return result;
 	}
 
 	private void authResponse(Channel channel, Command command, boolean result) {

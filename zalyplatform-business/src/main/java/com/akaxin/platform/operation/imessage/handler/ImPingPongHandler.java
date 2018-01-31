@@ -10,6 +10,7 @@ import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.RedisCommand;
 import com.akaxin.common.constant.CommandConst;
+import com.akaxin.platform.operation.constant.PlatformAction;
 import com.akaxin.proto.core.CoreProto;
 
 /**
@@ -32,21 +33,12 @@ public class ImPingPongHandler extends AbstractImHandler<Command> {
 				CoreProto.TransportPackageData.Builder pongPackageBuilder = CoreProto.TransportPackageData.newBuilder();
 				pongPackageBuilder.putAllHeader(new HashMap<Integer, String>());
 				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.PROTOCOL_VERSION)
-						.add("im.ptc.pong").add(pongPackageBuilder.build().toByteArray()));
-
-//				ImPtcPushProto.ImPtcPushRequest request = ImPtcPushProto.ImPtcPushRequest.newBuilder()
-//						.setPushAlert("你收到一条阿卡信消息").setPushBadge(1).setSiteServer("demo.akaxin.com:2021")
-//						.setPushTitle("北京时报").build();
-//
-//				pongPackageBuilder.setData(ByteString.copyFrom(request.toByteArray()));
-//				channelSession.getChannel().writeAndFlush(new RedisCommand().add(CommandConst.SITE_VERSION)
-//						.add("im.ptc.push").add(pongPackageBuilder.build().toByteArray()));
+						.add(PlatformAction.IM_PTC_PONG).add(pongPackageBuilder.build().toByteArray()));
 			}
-			return true;
 		} catch (Exception e) {
 			logger.error("ping pong error.", e);
 		}
-		return false;
+		return true;
 	}
 
 }

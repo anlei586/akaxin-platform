@@ -74,7 +74,9 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			}
 
 			if (RequestAction.IM.getName().equals(command.getRety())) {
-				new MesageService().doImRequest(command);
+				if (!new MesageService().doImRequest(command)) {
+					ctx.close();
+				}
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
 				CommandResponse commandResponse = new MesageService().doApiRequest(command);
 				if (commandResponse == null) {

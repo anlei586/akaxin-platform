@@ -8,9 +8,11 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
-import com.akaxin.platform.operation.business.constant.PushText;
+import com.akaxin.common.utils.ServerAddress;
+import com.akaxin.common.utils.StringHelper;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
+import com.akaxin.platform.operation.constant.PushText;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushNotificationService;
@@ -109,6 +111,9 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				logger.info("request parameter error.request={}", request.toString());
 				return false;
 			}
+
+			title = StringHelper.getSubString(title, 20);
+
 			// 获取最新一次登陆的用户设备ID
 			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(userId);
 			// 获取最新登陆（auth）设备对应的用户令牌（usertoken）
@@ -118,8 +123,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			logger.info("api.push.notification check site_user_token:{} platform_user_token:{}", userToken, userToken2);
 			if (userToken.equals(userToken2)) {
 				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
-				logger.info("api.push.notification clientType={}", clientType);
 
+				logger.info("api.push.notification clientType={}", clientType);
 				switch (clientType) {
 				case IOS:
 					// pushtoken，用户每次打开客户端通过api.push.pushToken上传
@@ -129,8 +134,9 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 						ApnsPackage apnsPack = new ApnsPackage();
 						apnsPack.setToken(pushToken);
 						apnsPack.setBadge(1);
-						if (StringUtils.isNotBlank(siteServer)) {
-							apnsPack.setTitle(title + " " + siteServer);
+						ServerAddress address = new ServerAddress(siteServer);
+						if (address.isRightAddress()) {
+							apnsPack.setTitle(title + " " + address.getAddress());
 						} else {
 							apnsPack.setTitle(title);
 						}
@@ -144,7 +150,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				case ANDROID:
 					pushCommand = buildPushCommand(pushType, notification);
 					pushCommand.setDeviceId(deviceId);
-					logger.info("andorid push command={}", pushCommand.toString());
+					logger.info("andorid push... command={}", pushCommand.toString());
 					break;
 				default:
 					logger.error("unknow client type:{}", clientType);
@@ -171,8 +177,9 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();
 		ippRequest.setSiteServer(siteServer);
-		if (StringUtils.isNotBlank(siteServer)) {
-			pushTitle = pushTitle + " " + siteServer;
+		ServerAddress address = new ServerAddress(siteServer);
+		if (address.isRightAddress()) {
+			pushTitle = pushTitle + " " + address.getAddress();
 		}
 		ippRequest.setPushTitle(pushTitle);
 		ippRequest.setPushAlert(alertText);

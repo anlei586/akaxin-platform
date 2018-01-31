@@ -1,11 +1,9 @@
 package com.akaxin.platform.operation.executor;
 
-import com.akaxin.common.chain.AbstractHandlerChain;
-import com.akaxin.common.chain.SimpleHandlerChain;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.executor.AbstracteExecutor;
 import com.akaxin.common.executor.SimpleExecutor;
-import com.akaxin.platform.operation.business.constant.RequestKeys;
+import com.akaxin.platform.operation.constant.PlatformAction;
 import com.akaxin.platform.operation.imessage.handler.ImAuthHandler;
 import com.akaxin.platform.operation.imessage.handler.ImHelloHandler;
 import com.akaxin.platform.operation.imessage.handler.ImPingPongHandler;
@@ -20,15 +18,15 @@ public class ImOperateExecutor {
 	private static AbstracteExecutor<Command> executor = new SimpleExecutor<Command>();
 
 	static {
-		AbstractHandlerChain<Command> imChain = new SimpleHandlerChain<Command>();
-//		imChain.addHandler(new ImHelloHandler());
-//		imChain.addHandler(new ImAuthHandler());
+		// AbstractHandlerChain<Command> imChain = new SimpleHandlerChain<Command>();
+		// imChain.addHandler(new ImHelloHandler());
+		// imChain.addHandler(new ImAuthHandler());
 
-		executor.addChain("im.platform.hello", new ImHelloHandler());
-		executor.addChain("im.platform.auth", new ImAuthHandler());
-		executor.addChain("im.ctp.ping", new ImPingPongHandler());
-		executor.addChain("im.ptc.push", new ImPtcPushHandler());
-		executor.addChain(RequestKeys.IM_ACTION.getName(), imChain);
+		executor.addChain(PlatformAction.IM_PLATFORM_HELLO, new ImHelloHandler());
+		executor.addChain(PlatformAction.IM_PLATFORM_AUTH, new ImAuthHandler());
+		executor.addChain(PlatformAction.IM_CTP_PING, new ImPingPongHandler());
+		executor.addChain(PlatformAction.IM_PTC_PUSH, new ImPtcPushHandler());
+		// executor.addChain(RequestKeys.IM_ACTION.getName(), imChain);
 	}
 
 	private ImOperateExecutor() {

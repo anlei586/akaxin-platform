@@ -1,4 +1,4 @@
-package com.akaxin.platform.operation.business.constant;
+package com.akaxin.platform.operation.constant;
 
 public interface PushText {
 	public String TEXT = "你收到一条消息";
