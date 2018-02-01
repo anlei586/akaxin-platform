@@ -16,6 +16,7 @@ import com.akaxin.platform.operation.constant.PushText;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushNotificationService;
+import com.akaxin.platform.operation.utils.PushAuthLog;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.client.ImPtcPushProto;
@@ -70,12 +71,16 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			} else {
 				errCode = ErrorCode2.ERROR_PARAMETER;
 			}
+
+			PushAuthLog.getInstance().printLog("api.push.auth command={} request={} result={}", command.toString(),
+					request.toString(), errCode.toString());
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			logger.error("api.push.auth error", e);
 		}
 		command.setResponse(commandResponse.setErrCode2(errCode));
 		logger.info("api.push.auth result={}", errCode.toString());
+
 		return errCode.isSuccess();
 	}
 

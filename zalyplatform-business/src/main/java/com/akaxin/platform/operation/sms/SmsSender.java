@@ -2,9 +2,11 @@ package com.akaxin.platform.operation.sms;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 
+import com.akaxin.common.logs.LogCreater;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.operation.bean.SmsResult;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
@@ -17,7 +19,9 @@ import com.google.common.util.concurrent.RateLimiter;
  * @since 2018-01-22 20:51:55
  */
 public class SmsSender {
-	private static final Logger logger = LoggerFactory.getLogger(SmsSender.class);
+	private static final String CONVERSION_PATTERN = "[%p] %d [%c] \\r\\n\\t%m%n";
+	private static final Logger logger = LogCreater.createLogger("sms", null, new PatternLayout(CONVERSION_PATTERN),
+			false, true);
 	private static long sendTotalNumber = 0;
 	private static final int appid = 1400063986;
 	private static final String appkey = "6a468cc0ce6a85df972cf6c2a1cfb73e";
@@ -35,17 +39,13 @@ public class SmsSender {
 			params.add(expireMin + "");
 			SmsSingleSenderResult smsResult = sender.sendWithParam("86", phoneId, 80031, params, null, null, null);
 			sendTotalNumber++;
-			logger.info("send sms count={} phoneId={} vc={} result={} errorMsg={} ", sendTotalNumber, phoneId, vc,
+			LogUtils.info(logger, "sms count={} phoneId={} vc={} result={} errorMsg={} ", sendTotalNumber, phoneId, vc,
 					smsResult.result, smsResult.errMsg);
 			return new SmsResult(smsResult.result, smsResult.errMsg);
 		} catch (Exception e) {
 			logger.error("send sms error", e);
 		}
 		return null;
-	}
-
-	public static void main(String args[]) {
-		send("15271868205", "201024", 1);
 	}
 
 }
