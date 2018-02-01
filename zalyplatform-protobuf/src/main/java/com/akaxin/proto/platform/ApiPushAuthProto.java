@@ -1075,6 +1075,15 @@ public final class ApiPushAuthProto {
   public interface ApiPushAuthResponseOrBuilder extends
       // @@protoc_insertion_point(interface_extends:site.ApiPushAuthResponse)
       com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     *平台是否开启该站点
+     * </pre>
+     *
+     * <code>optional bool open_secret_chat = 1;</code>
+     */
+    boolean getOpenSecretChat();
   }
   /**
    * Protobuf type {@code site.ApiPushAuthResponse}
@@ -1088,6 +1097,7 @@ public final class ApiPushAuthProto {
       super(builder);
     }
     private ApiPushAuthResponse() {
+      openSecretChat_ = false;
     }
 
     @java.lang.Override
@@ -1100,6 +1110,7 @@ public final class ApiPushAuthProto {
         com.google.protobuf.ExtensionRegistryLite extensionRegistry)
         throws com.google.protobuf.InvalidProtocolBufferException {
       this();
+      int mutable_bitField0_ = 0;
       try {
         boolean done = false;
         while (!done) {
@@ -1112,6 +1123,11 @@ public final class ApiPushAuthProto {
               if (!input.skipField(tag)) {
                 done = true;
               }
+              break;
+            }
+            case 8: {
+
+              openSecretChat_ = input.readBool();
               break;
             }
           }
@@ -1137,6 +1153,19 @@ public final class ApiPushAuthProto {
               com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse.class, com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse.Builder.class);
     }
 
+    public static final int OPEN_SECRET_CHAT_FIELD_NUMBER = 1;
+    private boolean openSecretChat_;
+    /**
+     * <pre>
+     *平台是否开启该站点
+     * </pre>
+     *
+     * <code>optional bool open_secret_chat = 1;</code>
+     */
+    public boolean getOpenSecretChat() {
+      return openSecretChat_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -1149,6 +1178,9 @@ public final class ApiPushAuthProto {
 
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (openSecretChat_ != false) {
+        output.writeBool(1, openSecretChat_);
+      }
     }
 
     public int getSerializedSize() {
@@ -1156,6 +1188,10 @@ public final class ApiPushAuthProto {
       if (size != -1) return size;
 
       size = 0;
+      if (openSecretChat_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(1, openSecretChat_);
+      }
       memoizedSize = size;
       return size;
     }
@@ -1172,6 +1208,8 @@ public final class ApiPushAuthProto {
       com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse other = (com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse) obj;
 
       boolean result = true;
+      result = result && (getOpenSecretChat()
+          == other.getOpenSecretChat());
       return result;
     }
 
@@ -1182,6 +1220,9 @@ public final class ApiPushAuthProto {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptorForType().hashCode();
+      hash = (37 * hash) + OPEN_SECRET_CHAT_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getOpenSecretChat());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1300,6 +1341,8 @@ public final class ApiPushAuthProto {
       }
       public Builder clear() {
         super.clear();
+        openSecretChat_ = false;
+
         return this;
       }
 
@@ -1322,6 +1365,7 @@ public final class ApiPushAuthProto {
 
       public com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse buildPartial() {
         com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse result = new com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse(this);
+        result.openSecretChat_ = openSecretChat_;
         onBuilt();
         return result;
       }
@@ -1363,6 +1407,9 @@ public final class ApiPushAuthProto {
 
       public Builder mergeFrom(com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse other) {
         if (other == com.akaxin.proto.platform.ApiPushAuthProto.ApiPushAuthResponse.getDefaultInstance()) return this;
+        if (other.getOpenSecretChat() != false) {
+          setOpenSecretChat(other.getOpenSecretChat());
+        }
         onChanged();
         return this;
       }
@@ -1386,6 +1433,44 @@ public final class ApiPushAuthProto {
             mergeFrom(parsedMessage);
           }
         }
+        return this;
+      }
+
+      private boolean openSecretChat_ ;
+      /**
+       * <pre>
+       *平台是否开启该站点
+       * </pre>
+       *
+       * <code>optional bool open_secret_chat = 1;</code>
+       */
+      public boolean getOpenSecretChat() {
+        return openSecretChat_;
+      }
+      /**
+       * <pre>
+       *平台是否开启该站点
+       * </pre>
+       *
+       * <code>optional bool open_secret_chat = 1;</code>
+       */
+      public Builder setOpenSecretChat(boolean value) {
+        
+        openSecretChat_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *平台是否开启该站点
+       * </pre>
+       *
+       * <code>optional bool open_secret_chat = 1;</code>
+       */
+      public Builder clearOpenSecretChat() {
+        
+        openSecretChat_ = false;
+        onChanged();
         return this;
       }
       public final Builder setUnknownFields(
@@ -1459,11 +1544,12 @@ public final class ApiPushAuthProto {
       "\n\034platform/api_push_auth.proto\022\004site\"d\n\022" +
       "ApiPushAuthRequest\022\024\n\014site_address\030\001 \001(\t" +
       "\022\021\n\tsite_port\030\002 \001(\t\022\021\n\tsite_name\030\003 \001(\t\022\022" +
-      "\n\nuser_token\030\004 \001(\t\"\025\n\023ApiPushAuthRespons" +
-      "e2U\n\026ApiPushAuthSiteService\022;\n\004auth\022\030.si" +
-      "te.ApiPushAuthRequest\032\031.site.ApiPushAuth" +
-      "ResponseB-\n\031com.akaxin.proto.platformB\020A" +
-      "piPushAuthProtob\006proto3"
+      "\n\nuser_token\030\004 \001(\t\"/\n\023ApiPushAuthRespons" +
+      "e\022\030\n\020open_secret_chat\030\001 \001(\0102U\n\026ApiPushAu" +
+      "thSiteService\022;\n\004auth\022\030.site.ApiPushAuth" +
+      "Request\032\031.site.ApiPushAuthResponseB-\n\031co" +
+      "m.akaxin.proto.platformB\020ApiPushAuthProt" +
+      "ob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1488,7 +1574,7 @@ public final class ApiPushAuthProto {
     internal_static_site_ApiPushAuthResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_site_ApiPushAuthResponse_descriptor,
-        new java.lang.String[] { });
+        new java.lang.String[] { "OpenSecretChat", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
