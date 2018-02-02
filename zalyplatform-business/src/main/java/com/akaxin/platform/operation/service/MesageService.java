@@ -11,7 +11,7 @@ import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode;
+import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.platform.operation.api.IMessage;
 import com.akaxin.platform.operation.business.dao.SessionDao;
 import com.akaxin.platform.operation.constant.PlatformAction;
@@ -26,6 +26,7 @@ public class MesageService implements IMessage {
 
 	public CommandResponse doApiRequest(Command command) {
 		logger.info("doplatform api request command={}", command.toString());
+		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			String action = command.getAction();
 
@@ -39,16 +40,21 @@ public class MesageService implements IMessage {
 				String sessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
 				String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
 				logger.info("api auth sessionKey={}", sessionKey);
-				Map<String, String> map = SessionDao.getInstance().getSessionMap(sessionKey);
-				logger.info("api auth sessionId={} map={}", sessionId, map);
-				String userId = map.get(UserKey.userId);
-				String deviceId = map.get(UserKey.deviceId);
-				if (map != null && StringUtils.isNotBlank(userId) && StringUtils.isNotBlank(deviceId)) {
-					command.setSiteUserId(userId);
-					command.setDeviceId(deviceId);
-					logger.info("api request doApiRequest command={}", command.toString());
-					ApiOperateExecutor.getExecutor().execute(command.getService(), command);
-					return command.getResponse();
+
+				if (StringUtils.isNotEmpty(sessionId)) {
+					Map<String, String> map = SessionDao.getInstance().getSessionMap(sessionKey);
+					logger.info("api auth sessionId={} map={}", sessionId, map);
+					String userId = map.get(UserKey.userId);
+					String deviceId = map.get(UserKey.deviceId);
+					if (map != null && StringUtils.isNotBlank(userId) && StringUtils.isNotBlank(deviceId)) {
+						command.setSiteUserId(userId);
+						command.setDeviceId(deviceId);
+						logger.info("api request doApiRequest command={}", command.toString());
+						ApiOperateExecutor.getExecutor().execute(command.getService(), command);
+						return command.getResponse();
+					}
+				} else {
+					errCode = ErrorCode2.ERROR_PARAMETER;
 				}
 			}
 		} catch (Exception e) {
@@ -56,7 +62,7 @@ public class MesageService implements IMessage {
 		}
 
 		return new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES)
-				.setErrCode(ErrorCode.ERROR);
+				.setErrCode2(errCode);
 	}
 
 	/**

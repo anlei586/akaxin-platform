@@ -8,7 +8,7 @@ public class RedisUserTokenDao {
 	private Jedis jedis = RedisManager.getUserTokenJedis();
 
 	public boolean addUserToken(String key, String field, String value) {
-		if (jedis.hset(key, field, value) > 0) {
+		if (jedis.hset(key, field, value) >= 0) {
 			return true;
 		}
 		return false;
