@@ -41,7 +41,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 * 
 	 */
 	public boolean verifyCode(Command command) {
-		logger.info("------api.phone.verify------");
+		logger.info("api.phone.verify");
 		CommandResponse commandResponse = new CommandResponse();
 		ErrorCode2 errorCode = ErrorCode2.ERROR;
 		try {
@@ -129,7 +129,8 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 					.parseFrom(command.getParams());
 			String userId = request.getUserId();
 			String phoneId = UserInfoDao.getInstance().getUserPhoneId(userId);
-			
+			logger.info("api.phone.applyToken command={} reqeust={}", command.toString(), request.toString());
+
 			if (ValidatorPattern.isPhoneId(phoneId)) {
 				String phoneToken = UUID.randomUUID().toString();
 
@@ -161,6 +162,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean confirmToken(Command command) {
+		logger.info("api.phone.confimToken");
 		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;

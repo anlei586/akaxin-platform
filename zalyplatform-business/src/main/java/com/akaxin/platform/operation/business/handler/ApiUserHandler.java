@@ -8,7 +8,7 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
-import com.akaxin.common.crypto.HashCrypto;
+import com.akaxin.common.utils.UserIdUtils;
 import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
@@ -78,7 +78,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 
 			String userIdPrik = request.getUserIdPrik();
 			String userIdPubk = request.getUserIdPubk();
-			String userId = HashCrypto.SHA1(userIdPubk);
+			String userId = UserIdUtils.getV1GlobalUserId(userIdPubk);
 			String phoneId = request.getPhoneId();
 			String verifyCode = request.getPhoneVerifyCode();
 

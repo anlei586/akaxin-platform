@@ -29,10 +29,13 @@ public class MesageService implements IMessage {
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			String action = command.getAction();
-
+			/**
+			 * 过滤一些不需要session验证的action
+			 */
 			if ("api.platform.login".equals(action) || "api.push.notification".equals(action)
 					|| "api.phone.login".equals(action) || "api.phone.verifyCode".equals(action)
-					|| "api.temp.download".equals(action) || "api.temp.upload".equals(action)) {
+					|| "api.temp.download".equals(action) || "api.temp.upload".equals(action)
+					|| "api.phone.confimToken".endsWith(action)) {
 				ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 				return command.getResponse();
 			} else {
