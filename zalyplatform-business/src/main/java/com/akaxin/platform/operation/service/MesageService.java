@@ -35,7 +35,7 @@ public class MesageService implements IMessage {
 			if ("api.platform.login".equals(action) || "api.push.notification".equals(action)
 					|| "api.phone.login".equals(action) || "api.phone.verifyCode".equals(action)
 					|| "api.temp.download".equals(action) || "api.temp.upload".equals(action)
-					|| "api.phone.confimToken".endsWith(action)) {
+					|| "api.phone.confirmToken".endsWith(action)) {
 				ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 				return command.getResponse();
 			} else {

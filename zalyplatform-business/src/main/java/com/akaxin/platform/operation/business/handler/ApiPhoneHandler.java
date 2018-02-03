@@ -162,7 +162,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 	 * @return
 	 */
 	public boolean confirmToken(Command command) {
-		logger.info("api.phone.confimToken");
+		logger.info("api.phone.confimToken ");
 		CommandResponse commandRespone = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		String errorCode = ErrorCode.ERROR;
