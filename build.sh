@@ -23,5 +23,5 @@
 
 
 cd `dirname $0`
-mvn -T 2C clean package
+mvn -T 2C clean install
 cp zalyplatform-connector/target/zalyplatform-jar-with-dependencies.jar zalyplatform-jar-with-dependencies.jar
