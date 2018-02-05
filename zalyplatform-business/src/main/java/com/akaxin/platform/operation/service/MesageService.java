@@ -55,9 +55,11 @@ public class MesageService implements IMessage {
 						logger.info("api request doApiRequest command={}", command.toString());
 						ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 						return command.getResponse();
+					} else {
+						errCode = ErrorCode2.ERROR_SESSION_VALIDATE;
 					}
 				} else {
-					errCode = ErrorCode2.ERROR_PARAMETER;
+					errCode = ErrorCode2.ERROR_SESSION_VALIDATE;
 				}
 			}
 		} catch (Exception e) {

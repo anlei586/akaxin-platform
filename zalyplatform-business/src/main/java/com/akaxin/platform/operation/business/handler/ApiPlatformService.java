@@ -5,6 +5,7 @@ import java.security.Signature;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,8 @@ import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.platform.ApiPlatformLoginProto;
+import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretRequest;
+import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretResponse;
 
 /**
  * 
@@ -109,6 +112,31 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 		}
 		command.setResponse(commandResponse.setErrCode2(errCode));
 		logger.info("api.platform.login result={}", errCode.toString());
+		return errCode.isSuccess();
+	}
+
+	public boolean topSecret(Command command) {
+		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
+		ErrorCode2 errCode = ErrorCode2.ERROR;
+		try {
+			ApiPlatformTopSecretRequest request = ApiPlatformTopSecretRequest.parseFrom(command.getParams());
+			logger.info("api.platform.topSecret command={} request={}", command.toString(), request.toString());
+
+			Random random = new Random();
+			boolean supportTS = random.nextBoolean();
+			logger.info("api.platform.topSecret supportTS={}", supportTS);
+
+			ApiPlatformTopSecretResponse response = ApiPlatformTopSecretResponse.newBuilder()
+					.setOpenTopSecret(supportTS).build();
+			commandResponse.setParams(response.toByteArray());
+			errCode = ErrorCode2.SUCCESS;
+		} catch (Exception e) {
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			logger.error("api.platform.topSecret exception.", e);
+		}
+		command.setResponse(commandResponse.setErrCode2(errCode));
+
+		logger.info("api.platform.topSecret result={}", errCode.toString());
 		return errCode.isSuccess();
 	}
 
