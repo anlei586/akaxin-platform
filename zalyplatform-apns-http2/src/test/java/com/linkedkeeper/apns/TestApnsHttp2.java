@@ -3,12 +3,12 @@ package com.linkedkeeper.apns;
 import java.io.FileInputStream;
 import java.util.concurrent.Future;
 
-import com.akaxin.apns.client.ApnsHttp2Client;
-import com.akaxin.apns.client.IApnsHttp2Client;
-import com.akaxin.apns.constant.ApnsHttp2Config;
-import com.akaxin.apns.notification.IApnsPushNotification;
-import com.akaxin.apns.notification.IApnsPushNotificationResponse;
-import com.akaxin.apns.notification.Payload;
+import com.akaxin.platform.push.client.ApnsHttp2Client;
+import com.akaxin.platform.push.client.IApnsHttp2Client;
+import com.akaxin.platform.push.constant.ApnsHttp2Config;
+import com.akaxin.platform.push.notification.IApnsPushNotification;
+import com.akaxin.platform.push.notification.IApnsPushNotificationResponse;
+import com.akaxin.platform.push.notification.Payload;
 
 /**
  * @author frank@linkedkeeper.com on 2016/12/28.

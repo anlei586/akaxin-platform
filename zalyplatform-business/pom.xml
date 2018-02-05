@@ -31,8 +31,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.akaxin.push</groupId>
-			<artifactId>akaxin-apns-http2</artifactId>
+			<groupId>com.akaxin.platform.push</groupId>
+			<artifactId>zalyplatform-apns-http2</artifactId>
 			<version>0.1.1-SNAPSHOT</version>
 		</dependency>
 
