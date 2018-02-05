@@ -1,12 +1,5 @@
 package com.akaxin.platform.push.constant;
 
-/**
- * MOMO发送Apns的属性配置
- * 
- * @author MR.AN
- * @since 2017.05.18
- *
- */
 public class ApnsHttp2Properties {
 	public static final long DEFAULT_WRITE_TIMEOUT_MILLIS = 20_000;
 	public static final long DEFAULT_FLUSH_AFTER_IDLE_MILLIS = 50;
