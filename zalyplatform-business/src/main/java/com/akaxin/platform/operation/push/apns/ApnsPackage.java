@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.akaxin.apns.notification.Payload;
-import com.akaxin.apns.notification.PayloadBuilder;
+import com.akaxin.platform.push.notification.Payload;
+import com.akaxin.platform.push.notification.PayloadBuilder;
 
 /**
  * APNs的消息结构包

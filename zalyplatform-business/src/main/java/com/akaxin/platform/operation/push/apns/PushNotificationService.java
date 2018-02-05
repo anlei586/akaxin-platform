@@ -5,9 +5,9 @@ import java.util.concurrent.Future;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.akaxin.apns.client.IApnsHttp2Client;
-import com.akaxin.apns.notification.IApnsPushNotification;
-import com.akaxin.apns.notification.IApnsPushNotificationResponse;
+import com.akaxin.platform.push.client.IApnsHttp2Client;
+import com.akaxin.platform.push.notification.IApnsPushNotification;
+import com.akaxin.platform.push.notification.IApnsPushNotificationResponse;
 
 /**
  * 

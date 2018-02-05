@@ -3,9 +3,9 @@ package com.akaxin.platform.operation.push.apns;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.akaxin.apns.client.ApnsHttp2Client;
-import com.akaxin.apns.client.IApnsHttp2Client;
-import com.akaxin.apns.constant.ApnsHttp2Config;
+import com.akaxin.platform.push.client.ApnsHttp2Client;
+import com.akaxin.platform.push.client.IApnsHttp2Client;
+import com.akaxin.platform.push.constant.ApnsHttp2Config;
 
 /**
  * platform与APNs服务交互管理，发送
