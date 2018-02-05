@@ -11,7 +11,7 @@
 		<module>zalyplatform-business</module>
 		<module>zalyplatform-protobuf</module>
 		<module>zalyplatform-storage</module>
-		<module>akaxin-apns-http2</module>
+		<module>zalyplatform-apns-http2</module>
 	</modules>
 
 	<properties>
