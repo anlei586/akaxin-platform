@@ -5,7 +5,6 @@ import java.security.Signature;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -122,10 +121,10 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 			ApiPlatformTopSecretRequest request = ApiPlatformTopSecretRequest.parseFrom(command.getParams());
 			logger.info("api.platform.topSecret command={} request={}", command.toString(), request.toString());
 
-			Random random = new Random();
-			boolean supportTS = random.nextBoolean();
+			// Random random = new Random();
+			// boolean supportTS = random.nextBoolean();
+			boolean supportTS = true;
 			logger.info("api.platform.topSecret supportTS={}", supportTS);
-
 			ApiPlatformTopSecretResponse response = ApiPlatformTopSecretResponse.newBuilder()
 					.setOpenTopSecret(supportTS).build();
 			commandResponse.setParams(response.toByteArray());
