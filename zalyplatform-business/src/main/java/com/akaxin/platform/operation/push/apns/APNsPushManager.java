@@ -21,7 +21,7 @@ public class APNsPushManager {
 	private static final int PRODUCT_MAX_CONN = 4;
 	private static final int DEVELOP_MAX_CONN = 2;
 
-	private static final String PASSWD = "thinkpad";
+	private static final String PASSWD = "123456";
 	private static APNsPushManager instance;
 	private static IApnsHttp2Client apnsHttp2Client;
 	private static IApnsHttp2Client sandboxApnsHttp2Client;
