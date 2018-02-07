@@ -17,7 +17,7 @@ public class APNsPushManager {
 	private static final Logger logger = LoggerFactory.getLogger(APNsPushManager.class);
 	private static final String AKAXIN_PUSH_NAME = "AKAXIN_PUSH";
 	private static final String PRODUCT_APPLE_CERT_FILE = "akaxin-push-certificates.p12";
-	private static final String SANDBOX_APPLE_CERT_FILE = "akaxin-sandbox-certificates.p12";
+	private static final String SANDBOX_APPLE_CERT_FILE = "akaxin-apns-development.p12";
 	private static final int PRODUCT_MAX_CONN = 4;
 	private static final int DEVELOP_MAX_CONN = 2;
 
@@ -39,7 +39,7 @@ public class APNsPushManager {
 
 	public void start() {
 		try {
-//			apnsHttp2Client = SingletonHolder.getApnsHttp2Client();
+			// apnsHttp2Client = SingletonHolder.getApnsHttp2Client();
 			sandboxApnsHttp2Client = SingletonHolder.getSandboxApnsHttp2Client();
 			logger.info("start apns client client={} sandboxClient={}", apnsHttp2Client, sandboxApnsHttp2Client);
 		} catch (Exception e) {
