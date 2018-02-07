@@ -14,11 +14,12 @@ import com.akaxin.platform.push.notification.Payload;
  * @author frank@linkedkeeper.com on 2016/12/28.
  */
 public class TestApnsHttp2 {
-	static final String AKAXIN_FILE = "/Users/anguoyue/Workspace/eclipse-oxygen/akaxin-apns-http2/src/main/resources/akaxin-sanbox-certificates.p12";
+	static final String AKAXIN_FILE = "/Users/anguoyue/git/platform/zalyplatform-apns-http2/src/main/resources/akaxin-apns-development.p12";
 	static final boolean product = true;
 
-	static final String pwd = "thinkpad";
-//	static final String apnsToken = "1d4352e14520d751d12c7f434f22271f2f039f97eb8e36da7b60947957ea2e96";
+	static final String pwd = "123456";
+	// static final String apnsToken =
+	// "1d4352e14520d751d12c7f434f22271f2f039f97eb8e36da7b60947957ea2e96";
 	static final String apnsToken = "d7af5ebf275dd91f76588e6f45065d91938a4aed01858de2e52f78e3416fd231";
 
 	public static void main(String[] args) throws Exception {
