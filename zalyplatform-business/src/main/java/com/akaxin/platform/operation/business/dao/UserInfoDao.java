@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.api.IUserInfoDao;
 import com.akaxin.platform.storage.bean.UserBean;
@@ -154,9 +153,6 @@ public class UserInfoDao {
 
 	// 检测手机号是否已经被实名绑定
 	public boolean existPhoneId(String phoneId) {
-		if (!ValidatorPattern.isPhoneId(phoneId)) {
-			return false;
-		}
 		String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
 		Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
 		if (phoneMap != null) {

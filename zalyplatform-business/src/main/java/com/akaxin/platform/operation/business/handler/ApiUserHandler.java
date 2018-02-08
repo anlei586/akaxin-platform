@@ -68,48 +68,54 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 	 * 
 	 */
 	public boolean realName(Command command) {
-		logger.info("------------api.user.realName-----------");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errorCode = ErrorCode2.ERROR;
 		try {
 			ApiUserRealNameProto.ApiUserRealNameRequest request = ApiUserRealNameProto.ApiUserRealNameRequest
 					.parseFrom(command.getParams());
-
 			String userIdPrik = request.getUserIdPrik();
 			String userIdPubk = request.getUserIdPubk();
 			String userId = UserIdUtils.getV1GlobalUserId(userIdPubk);
 			String phoneId = request.getPhoneId();
 			String verifyCode = request.getPhoneVerifyCode();
+			logger.info("api.user.realName command={} request={}", command.toString(), request.toString());
 
-			UserBean bean = new UserBean();
-			bean.setUserId(userId);
-			bean.setUserIdPrik(userIdPrik);
-			bean.setUserIdPubk(userIdPubk);
-			bean.setPhoneId(phoneId);
-			bean.setPhoneRoaming("+86");
+			// 验证条件
+			// 1.判断参数是否合法
+			if (StringUtils.isNoneEmpty(userIdPrik, userIdPubk, userId, phoneId, verifyCode)) {
+				// 3.验证手机格式是否合法
+				if (ValidatorPattern.isPhoneId(phoneId)) {
+					// 3.已经绑定的号码不在支持再次绑定
+					if (!UserInfoDao.getInstance().existPhoneId(phoneId)) {
+						String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
+						if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
+							UserBean bean = new UserBean();
+							bean.setUserId(userId);
+							bean.setUserIdPrik(userIdPrik);
+							bean.setUserIdPubk(userIdPubk);
+							bean.setPhoneId(phoneId);
+							bean.setPhoneRoaming("+86");
+							logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode,
+									bean.toString());
 
-			logger.info("phone verify code bean={}", bean.toString());
-
-			if (!ValidatorPattern.isPhoneId(phoneId) || StringUtils.isEmpty(userIdPrik)
-					|| StringUtils.isEmpty(userIdPubk)) {
-				errorCode = ErrorCode2.ERROR_PARAMETER;
-				command.setResponse(commandResponse.setErrCode2(errorCode));
-				return false;
-			}
-
-			if (!UserInfoDao.getInstance().existPhoneId(phoneId)) {
-				String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
-				logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode, bean.toString());
-				if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
-					if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
-						errorCode = ErrorCode2.SUCCESS;
+							if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
+								errorCode = ErrorCode2.SUCCESS;
+							}
+						} else {
+							errorCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
+						}
+					} else {
+						// 不支持的手机号 ，手机号码格式错误
+						errorCode = ErrorCode2.ERROR2_PHONE_FORMATTING;
 					}
 				} else {
-					errorCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
+					// 手机号码已经被绑定
+					errorCode = ErrorCode2.ERROR2_PHONE_EXIST;
 				}
 			} else {
-				errorCode = ErrorCode2.ERROR2_PHONE_EXIST;
+				// 错误的请求参数
+				errorCode = ErrorCode2.ERROR_PARAMETER;
 			}
 		} catch (Exception e) {
 			errorCode = ErrorCode2.ERROR_SYSTEMERROR;
