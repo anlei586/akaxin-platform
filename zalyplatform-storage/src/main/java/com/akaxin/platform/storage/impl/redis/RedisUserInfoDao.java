@@ -12,8 +12,7 @@ import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.storage.bean.PushTokenBean;
 import com.akaxin.platform.storage.bean.UserBean;
 import com.akaxin.platform.storage.constant.UserKey;
-
-import redis.clients.jedis.Jedis;
+import com.akaxin.platform.storage.impl.redis.client.JedisClient;
 
 /**
  * <pre>
@@ -29,7 +28,7 @@ import redis.clients.jedis.Jedis;
 public class RedisUserInfoDao {
 	private static final Logger logger = LoggerFactory.getLogger(RedisUserInfoDao.class);
 	private static RedisUserInfoDao instance = new RedisUserInfoDao();
-	private Jedis jedis = RedisManager.getUserInfoJedis();
+	private JedisClient jedis = new JedisClient();
 
 	public static RedisUserInfoDao getInstance() {
 		return instance;
@@ -37,13 +36,13 @@ public class RedisUserInfoDao {
 
 	public boolean hset(String key, String field, String value) {
 		logger.info("hset user key={},field={},value={}", key, field, value);
-		jedis.hset(key, field, value);
+		this.jedis.hset(key, field, value);
 		return false;
 	}
 
 	public String hget(String key, String field) {
 		logger.info("hget user key={},field={}", key, field);
-		return jedis.hget(key, field);
+		return this.jedis.hget(key, field);
 	}
 
 	public boolean saveUserInfo(String key, UserBean bean) {
@@ -73,7 +72,7 @@ public class RedisUserInfoDao {
 		logger.info("userINfoMap={}", GsonUtils.toJson(userMap));
 
 		if (userMap.size() > 0) {
-			if ("OK".equalsIgnoreCase(jedis.hmset(key, userMap))) {
+			if ("OK".equalsIgnoreCase(this.jedis.hmset(key, userMap))) {
 				return true;
 			}
 		}
@@ -82,7 +81,7 @@ public class RedisUserInfoDao {
 
 	public boolean updateUserInfo(String key, Map<String, String> map) {
 		boolean result = false;
-		if ("OK".equalsIgnoreCase(jedis.hmset(key, map))) {
+		if ("OK".equalsIgnoreCase(this.jedis.hmset(key, map))) {
 			result = true;
 		}
 		logger.info("hmset result={} key={} map={}", result, key, GsonUtils.toJson(map));
@@ -91,13 +90,13 @@ public class RedisUserInfoDao {
 	}
 
 	public Map<String, String> getUserInfoMap(String key) {
-		return jedis.hgetAll(key);
+		return this.jedis.hgetAll(key);
 	}
 
 	public PushTokenBean getUserPushInfo(String key) {
 		PushTokenBean bean = new PushTokenBean();
-		bean.setClientType(jedis.hget(key, UserKey.clientType));
-		bean.setPushToken(jedis.hget(key, UserKey.pushToken));
+		bean.setClientType(this.jedis.hget(key, UserKey.clientType));
+		bean.setPushToken(this.jedis.hget(key, UserKey.pushToken));
 		return bean;
 	}
 
@@ -106,7 +105,7 @@ public class RedisUserInfoDao {
 		Map<String, String> phoneMap = new HashMap<String, String>();
 		phoneMap.put(UserKey.userId, bean.getUserId());
 		phoneMap.put(UserKey.phoneRoaming, bean.getPhoneRoaming());
-		if (!"OK".equalsIgnoreCase(jedis.hmset(phoneKey, phoneMap))) {
+		if (!"OK".equalsIgnoreCase(this.jedis.hmset(phoneKey, phoneMap))) {
 			return false;
 		}
 		String userKey = "user_id_" + bean.getUserId();
@@ -114,11 +113,11 @@ public class RedisUserInfoDao {
 	}
 
 	public Map<String, String> getPhoneInfoMap(String key) {
-		return jedis.hgetAll(key);
+		return this.jedis.hgetAll(key);
 	}
-	
+
 	public String getPhoneField(String key, String field) {
-		return jedis.hget(key, UserKey.userPhoneId);
+		return this.jedis.hget(key, UserKey.userPhoneId);
 	}
 
 }

@@ -33,7 +33,7 @@ public class SessionDao {
 		try {
 			return session.addSession(key, map);
 		} catch (Exception e) {
-			logger.error("add session errror.", e);
+			logger.error("add session errror. map={}"+map, e);
 		}
 		return false;
 	}

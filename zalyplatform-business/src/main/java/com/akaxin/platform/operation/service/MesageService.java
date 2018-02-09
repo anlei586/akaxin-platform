@@ -85,13 +85,11 @@ public class MesageService implements IMessage {
 				ChannelSession channelSession = command.getChannelSession();
 				String deviceId = channelSession.getDeviceId();
 				ChannelSession acsession = ChannelManager.getChannelSession(deviceId);
-				logger.info("do platform auth command={} ", command.toString());
-				if (acsession != null) {
-					logger.info("do platform auth userId={} ", acsession.getUserId());
-				}
 				if (acsession != null && acsession.getUserId() != null
 						&& acsession.getUserId().equals(command.getSiteUserId())) {
 					return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
+				} else {
+					logger.info("do im platform auth fail command={} ", command.toString());
 				}
 			}
 		} catch (Exception e) {
