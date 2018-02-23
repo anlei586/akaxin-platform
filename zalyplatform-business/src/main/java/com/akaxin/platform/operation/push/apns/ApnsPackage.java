@@ -27,6 +27,7 @@ public class ApnsPackage implements Serializable {
 	private int badge;
 	private String category;
 	private String sound;
+	private String pushJump;
 
 	private Map<String, Object> alertExtraFields = new HashMap<String, Object>();
 	private Map<String, Object> apsExtraFields = new HashMap<String, Object>();
@@ -74,6 +75,14 @@ public class ApnsPackage implements Serializable {
 		return this;
 	}
 
+	public String getPushJump() {
+		return pushJump;
+	}
+
+	public void setPushJump(String pushJump) {
+		this.pushJump = pushJump;
+	}
+
 	public String buildPayloadJson() {
 
 		PayloadBuilder payLoadBuilder = Payload.newPayload();
@@ -89,6 +98,10 @@ public class ApnsPackage implements Serializable {
 		}
 		if (sound != null) {
 			payLoadBuilder.addSound(sound);
+		}
+
+		if (StringUtils.isNotEmpty(this.pushJump)) {
+			rootExtraFields.put("push-jump", this.pushJump);
 		}
 
 		if (alertExtraFields != null && alertExtraFields.size() > 0) {

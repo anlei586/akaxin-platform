@@ -118,6 +118,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String title = notification.getPushTitle();
 			String pushFrom = notification.getPushFromId();
 			String pushFromName = notification.getPushFromName();
+			String pushAlter = notification.getPushAlert();
 			logger.info("api.push.notification command={} request={}", command.toString(), request.toString());
 
 			if (StringUtils.isAnyBlank(userId, userToken, siteServer)) {
@@ -140,7 +141,6 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				logger.info("api.push.notification clientType={}", clientType);
 				switch (clientType) {
 				case IOS:
-					// pushtoken，用户每次打开客户端通过api.push.pushToken上传
 					String pushToken = UserInfoDao.getInstance().getPushToken(userId);
 					logger.info("ios push ......pushToken={}", pushToken);
 					if (StringUtils.isNotBlank(pushToken)) {
@@ -153,7 +153,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 						} else {
 							apnsPack.setTitle(title);
 						}
-						apnsPack.setBody(getAlterText(pushType));
+						apnsPack.setBody(getAlterText(address, pushFromName, pushAlter, pushType));
+						apnsPack.setPushJump(getPushJump(pushType));
 						PushNotificationService.getInstance().apnsPushNotification(apnsPack);
 					}
 					break;
@@ -163,16 +164,11 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				case ANDROID:
 					pushCommand = buildPushCommand(pushType, notification);
 					pushCommand.setDeviceId(deviceId);
-					logger.info("andorid push... command={}", pushCommand.toString());
-					break;
+					logger.info("andorid push to client pushcommand={}", pushCommand.toString());
+					return ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);
 				default:
 					logger.error("unknow client type:{}", clientType);
 					break;
-				}
-
-				if (pushCommand != null) {
-					logger.info("im push to client pushcommand={}", pushCommand.toString());
-					return ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);
 				}
 
 			}
@@ -186,8 +182,9 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	private Command buildPushCommand(CoreProto.MsgType pushType, PushProto.Notification notification) {
 		String siteServer = notification.getSiteServer();// 192.168.0.1:2021
 		String pushTitle = notification.getPushTitle();
-		String alertText = getAlterText(pushType);
-
+		String pushFromName = notification.getPushFromName();
+		String pushAlter = notification.getPushAlert();
+		
 		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();
 		ippRequest.setSiteServer(siteServer);
 		ServerAddress address = new ServerAddress(siteServer);
@@ -195,10 +192,10 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			pushTitle = pushTitle + " " + address.getAddress();
 		}
 		ippRequest.setPushTitle(pushTitle);
-		ippRequest.setPushAlert(alertText);
+		ippRequest.setPushAlert(getAlterText(address, pushFromName, pushAlter, pushType));
+		ippRequest.setPushJump(getPushJump(pushType));
 		ippRequest.setPushBadge(1);
-		ippRequest.setPushSound("sms-received1.caf");// 使用系统默认
-		ippRequest.setPushJump("[tof|1|]");// [goto|message{group}|param][http|1|param]
+		ippRequest.setPushSound("default.caf");// 使用系统默认
 
 		Command command = new Command();
 		command.setAction("im.ptc.push");
@@ -207,7 +204,16 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		return command;
 	}
 
-	private String getAlterText(CoreProto.MsgType pushType) {
+	private String getAlterText(ServerAddress address, String fromName, String pushAlter, CoreProto.MsgType pushType) {
+		if (address != null && StringUtils.isNotEmpty(address.getHost()) && address.getHost().equals("im.akaxin.com")) {
+			if (StringUtils.isNotEmpty(pushAlter)) {
+				if (StringUtils.isNotEmpty(fromName)) {
+					return fromName + ":" + pushAlter;
+				}
+				return pushAlter;
+			}
+		}
+
 		switch (pushType) {
 		case TEXT:
 			return PushText.TEXT;
@@ -225,6 +231,22 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			break;
 		}
 		return PushText.TEXT;
+	}
+
+	/**
+	 * <pre>
+	 * [A|B|C|D]
+	 * 
+	 * [bof|1|args|] 
+	 * [goto|message{group}|args|] 
+	 * [https|1|args|]
+	 * </pre>
+	 * 
+	 * @param pushType
+	 * @return
+	 */
+	private String getPushJump(CoreProto.MsgType pushType) {
+		return "[bof|1||]";
 	}
 
 }

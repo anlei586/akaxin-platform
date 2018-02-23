@@ -113,8 +113,8 @@ public final class PayloadBuilder {
 	 */
 	public PayloadBuilder addExtraFileApsField(String filePath, int type) {
 		aps.put("mutable-content", 1);
-		aps.put("file_path", filePath);
-		aps.put("file_type", type);
+		aps.put("file-path", filePath);
+		aps.put("file-type", type);
 		return this;
 	}
 
