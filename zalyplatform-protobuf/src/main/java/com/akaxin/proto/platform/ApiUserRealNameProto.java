@@ -107,6 +107,15 @@ public final class ApiUserRealNameProto {
      */
     com.google.protobuf.ByteString
         getGlobalRoamingBytes();
+
+    /**
+     * <pre>
+     *手机验证码类型
+     * </pre>
+     *
+     * <code>optional int32 vc_type = 6;</code>
+     */
+    int getVcType();
   }
   /**
    * Protobuf type {@code platform.ApiUserRealNameRequest}
@@ -125,6 +134,7 @@ public final class ApiUserRealNameProto {
       phoneId_ = "";
       phoneVerifyCode_ = "";
       globalRoaming_ = "";
+      vcType_ = 0;
     }
 
     @java.lang.Override
@@ -180,6 +190,11 @@ public final class ApiUserRealNameProto {
               java.lang.String s = input.readStringRequireUtf8();
 
               globalRoaming_ = s;
+              break;
+            }
+            case 48: {
+
+              vcType_ = input.readInt32();
               break;
             }
           }
@@ -415,6 +430,19 @@ public final class ApiUserRealNameProto {
       }
     }
 
+    public static final int VC_TYPE_FIELD_NUMBER = 6;
+    private int vcType_;
+    /**
+     * <pre>
+     *手机验证码类型
+     * </pre>
+     *
+     * <code>optional int32 vc_type = 6;</code>
+     */
+    public int getVcType() {
+      return vcType_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -442,6 +470,9 @@ public final class ApiUserRealNameProto {
       if (!getGlobalRoamingBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, globalRoaming_);
       }
+      if (vcType_ != 0) {
+        output.writeInt32(6, vcType_);
+      }
     }
 
     public int getSerializedSize() {
@@ -463,6 +494,10 @@ public final class ApiUserRealNameProto {
       }
       if (!getGlobalRoamingBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, globalRoaming_);
+      }
+      if (vcType_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(6, vcType_);
       }
       memoizedSize = size;
       return size;
@@ -490,6 +525,8 @@ public final class ApiUserRealNameProto {
           .equals(other.getPhoneVerifyCode());
       result = result && getGlobalRoaming()
           .equals(other.getGlobalRoaming());
+      result = result && (getVcType()
+          == other.getVcType());
       return result;
     }
 
@@ -510,6 +547,8 @@ public final class ApiUserRealNameProto {
       hash = (53 * hash) + getPhoneVerifyCode().hashCode();
       hash = (37 * hash) + GLOBAL_ROAMING_FIELD_NUMBER;
       hash = (53 * hash) + getGlobalRoaming().hashCode();
+      hash = (37 * hash) + VC_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getVcType();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -638,6 +677,8 @@ public final class ApiUserRealNameProto {
 
         globalRoaming_ = "";
 
+        vcType_ = 0;
+
         return this;
       }
 
@@ -665,6 +706,7 @@ public final class ApiUserRealNameProto {
         result.phoneId_ = phoneId_;
         result.phoneVerifyCode_ = phoneVerifyCode_;
         result.globalRoaming_ = globalRoaming_;
+        result.vcType_ = vcType_;
         onBuilt();
         return result;
       }
@@ -725,6 +767,9 @@ public final class ApiUserRealNameProto {
         if (!other.getGlobalRoaming().isEmpty()) {
           globalRoaming_ = other.globalRoaming_;
           onChanged();
+        }
+        if (other.getVcType() != 0) {
+          setVcType(other.getVcType());
         }
         onChanged();
         return this;
@@ -1196,6 +1241,44 @@ public final class ApiUserRealNameProto {
         onChanged();
         return this;
       }
+
+      private int vcType_ ;
+      /**
+       * <pre>
+       *手机验证码类型
+       * </pre>
+       *
+       * <code>optional int32 vc_type = 6;</code>
+       */
+      public int getVcType() {
+        return vcType_;
+      }
+      /**
+       * <pre>
+       *手机验证码类型
+       * </pre>
+       *
+       * <code>optional int32 vc_type = 6;</code>
+       */
+      public Builder setVcType(int value) {
+        
+        vcType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *手机验证码类型
+       * </pre>
+       *
+       * <code>optional int32 vc_type = 6;</code>
+       */
+      public Builder clearVcType() {
+        
+        vcType_ = 0;
+        onChanged();
+        return this;
+      }
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
         return this;
@@ -1630,15 +1713,15 @@ public final class ApiUserRealNameProto {
   static {
     java.lang.String[] descriptorData = {
       "\n platform/api_user_realName.proto\022\010plat" +
-      "form\"\211\001\n\026ApiUserRealNameRequest\022\024\n\014user_" +
+      "form\"\232\001\n\026ApiUserRealNameRequest\022\024\n\014user_" +
       "id_prik\030\001 \001(\t\022\024\n\014user_id_pubk\030\002 \001(\t\022\020\n\010p" +
       "hone_id\030\003 \001(\t\022\031\n\021phone_verify_code\030\004 \001(\t" +
-      "\022\026\n\016global_roaming\030\005 \001(\t\"\031\n\027ApiUserRealN" +
-      "ameResponse2i\n\026ApiUserRealNameService\022O\n" +
-      "\010realName\022 .platform.ApiUserRealNameRequ" +
-      "est\032!.platform.ApiUserRealNameResponseB1" +
-      "\n\031com.akaxin.proto.platformB\024ApiUserReal" +
-      "NameProtob\006proto3"
+      "\022\026\n\016global_roaming\030\005 \001(\t\022\017\n\007vc_type\030\006 \001(" +
+      "\005\"\031\n\027ApiUserRealNameResponse2i\n\026ApiUserR" +
+      "ealNameService\022O\n\010realName\022 .platform.Ap" +
+      "iUserRealNameRequest\032!.platform.ApiUserR" +
+      "ealNameResponseB1\n\031com.akaxin.proto.plat" +
+      "formB\024ApiUserRealNameProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1657,7 +1740,7 @@ public final class ApiUserRealNameProto {
     internal_static_platform_ApiUserRealNameRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_platform_ApiUserRealNameRequest_descriptor,
-        new java.lang.String[] { "UserIdPrik", "UserIdPubk", "PhoneId", "PhoneVerifyCode", "GlobalRoaming", });
+        new java.lang.String[] { "UserIdPrik", "UserIdPubk", "PhoneId", "PhoneVerifyCode", "GlobalRoaming", "VcType", });
     internal_static_platform_ApiUserRealNameResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_platform_ApiUserRealNameResponse_fieldAccessorTable = new

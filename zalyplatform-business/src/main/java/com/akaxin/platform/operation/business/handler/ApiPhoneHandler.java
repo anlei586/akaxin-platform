@@ -48,11 +48,12 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 			ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeRequest request = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeRequest
 					.parseFrom(command.getParams());
 			String phoneId = request.getPhoneId();
+			int vcType = request.getVcType();
 			// 这随机生成一个4位数验证码
 			String phoneVC = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
 			SmsResult smsResult = SmsSender.send(phoneId, phoneVC, EXPIRE_TIME / 60);
 			if (smsResult != null && smsResult.isSuccess()) {
-				if (PhoneVCTokenDao.getInstance().setPhoneVC(phoneId, phoneVC + "", EXPIRE_TIME)) {
+				if (PhoneVCTokenDao.getInstance().setPhoneVC(phoneId + vcType, phoneVC + "", EXPIRE_TIME)) {
 					ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse response = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse
 							.newBuilder().setExpireTime(60).build();
 					commandResponse.setParams(response.toByteArray());
@@ -85,10 +86,11 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 					.parseFrom(command.getParams());
 			String phoneId = request.getPhoneId();
 			String phoneVC = request.getPhoneVerifyCode();
+			int vcType = request.getVcType();
 			logger.info("api.phone.login  command={} request={}", command.toString(), request.toString());
 
 			if (ValidatorPattern.isPhoneId(phoneId) && StringUtils.isNotBlank(phoneVC)) {
-				String realPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
+				String realPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId + "_" + vcType);
 				logger.info("vc1={} vc2={}", phoneVC, realPhoneVC);
 
 				if (phoneVC.equals(realPhoneVC)) {

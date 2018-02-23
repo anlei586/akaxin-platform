@@ -59,10 +59,10 @@ public class PhoneVCTokenDao {
 	}
 
 	// 设置手机验证码
-	public boolean setPhoneVC(String phoneId, String value, int expireTime) {
+	public boolean setPhoneVC(String phoneIdWithType, String value, int expireTime) {
 		boolean result = false;
 		try {
-			String key = RedisKeyUtils.getPhoneVCKey(phoneId);
+			String key = RedisKeyUtils.getPhoneVCKey(phoneIdWithType);
 			result = phoneDao.setStringValue(key, value, expireTime);
 		} catch (Exception e) {
 			logger.error("apply phone verrify code error", e);

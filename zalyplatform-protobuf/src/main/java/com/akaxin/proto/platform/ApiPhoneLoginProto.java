@@ -53,6 +53,15 @@ public final class ApiPhoneLoginProto {
      */
     com.google.protobuf.ByteString
         getPhoneVerifyCodeBytes();
+
+    /**
+     * <pre>
+     *手机验证码类型
+     * </pre>
+     *
+     * <code>optional int32 vc_type = 3;</code>
+     */
+    int getVcType();
   }
   /**
    * Protobuf type {@code platform.ApiPhoneLoginRequest}
@@ -68,6 +77,7 @@ public final class ApiPhoneLoginProto {
     private ApiPhoneLoginRequest() {
       phoneId_ = "";
       phoneVerifyCode_ = "";
+      vcType_ = 0;
     }
 
     @java.lang.Override
@@ -105,6 +115,11 @@ public final class ApiPhoneLoginProto {
               java.lang.String s = input.readStringRequireUtf8();
 
               phoneVerifyCode_ = s;
+              break;
+            }
+            case 24: {
+
+              vcType_ = input.readInt32();
               break;
             }
           }
@@ -214,6 +229,19 @@ public final class ApiPhoneLoginProto {
       }
     }
 
+    public static final int VC_TYPE_FIELD_NUMBER = 3;
+    private int vcType_;
+    /**
+     * <pre>
+     *手机验证码类型
+     * </pre>
+     *
+     * <code>optional int32 vc_type = 3;</code>
+     */
+    public int getVcType() {
+      return vcType_;
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -232,6 +260,9 @@ public final class ApiPhoneLoginProto {
       if (!getPhoneVerifyCodeBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, phoneVerifyCode_);
       }
+      if (vcType_ != 0) {
+        output.writeInt32(3, vcType_);
+      }
     }
 
     public int getSerializedSize() {
@@ -244,6 +275,10 @@ public final class ApiPhoneLoginProto {
       }
       if (!getPhoneVerifyCodeBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, phoneVerifyCode_);
+      }
+      if (vcType_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(3, vcType_);
       }
       memoizedSize = size;
       return size;
@@ -265,6 +300,8 @@ public final class ApiPhoneLoginProto {
           .equals(other.getPhoneId());
       result = result && getPhoneVerifyCode()
           .equals(other.getPhoneVerifyCode());
+      result = result && (getVcType()
+          == other.getVcType());
       return result;
     }
 
@@ -279,6 +316,8 @@ public final class ApiPhoneLoginProto {
       hash = (53 * hash) + getPhoneId().hashCode();
       hash = (37 * hash) + PHONE_VERIFY_CODE_FIELD_NUMBER;
       hash = (53 * hash) + getPhoneVerifyCode().hashCode();
+      hash = (37 * hash) + VC_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getVcType();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -401,6 +440,8 @@ public final class ApiPhoneLoginProto {
 
         phoneVerifyCode_ = "";
 
+        vcType_ = 0;
+
         return this;
       }
 
@@ -425,6 +466,7 @@ public final class ApiPhoneLoginProto {
         com.akaxin.proto.platform.ApiPhoneLoginProto.ApiPhoneLoginRequest result = new com.akaxin.proto.platform.ApiPhoneLoginProto.ApiPhoneLoginRequest(this);
         result.phoneId_ = phoneId_;
         result.phoneVerifyCode_ = phoneVerifyCode_;
+        result.vcType_ = vcType_;
         onBuilt();
         return result;
       }
@@ -473,6 +515,9 @@ public final class ApiPhoneLoginProto {
         if (!other.getPhoneVerifyCode().isEmpty()) {
           phoneVerifyCode_ = other.phoneVerifyCode_;
           onChanged();
+        }
+        if (other.getVcType() != 0) {
+          setVcType(other.getVcType());
         }
         onChanged();
         return this;
@@ -674,6 +719,44 @@ public final class ApiPhoneLoginProto {
   checkByteStringIsUtf8(value);
         
         phoneVerifyCode_ = value;
+        onChanged();
+        return this;
+      }
+
+      private int vcType_ ;
+      /**
+       * <pre>
+       *手机验证码类型
+       * </pre>
+       *
+       * <code>optional int32 vc_type = 3;</code>
+       */
+      public int getVcType() {
+        return vcType_;
+      }
+      /**
+       * <pre>
+       *手机验证码类型
+       * </pre>
+       *
+       * <code>optional int32 vc_type = 3;</code>
+       */
+      public Builder setVcType(int value) {
+        
+        vcType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *手机验证码类型
+       * </pre>
+       *
+       * <code>optional int32 vc_type = 3;</code>
+       */
+      public Builder clearVcType() {
+        
+        vcType_ = 0;
         onChanged();
         return this;
       }
@@ -1458,14 +1541,14 @@ public final class ApiPhoneLoginProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\036platform/api_phone_login.proto\022\010platfo" +
-      "rm\"C\n\024ApiPhoneLoginRequest\022\020\n\010phone_id\030\001" +
-      " \001(\t\022\031\n\021phone_verify_code\030\002 \001(\t\"C\n\025ApiPh" +
-      "oneLoginResponse\022\024\n\014user_id_prik\030\001 \001(\t\022\024" +
-      "\n\014user_id_pubk\030\002 \001(\t2`\n\024ApiPhoneLoginSer" +
-      "vice\022H\n\005login\022\036.platform.ApiPhoneLoginRe" +
-      "quest\032\037.platform.ApiPhoneLoginResponseB/" +
-      "\n\031com.akaxin.proto.platformB\022ApiPhoneLog" +
-      "inProtob\006proto3"
+      "rm\"T\n\024ApiPhoneLoginRequest\022\020\n\010phone_id\030\001" +
+      " \001(\t\022\031\n\021phone_verify_code\030\002 \001(\t\022\017\n\007vc_ty" +
+      "pe\030\003 \001(\005\"C\n\025ApiPhoneLoginResponse\022\024\n\014use" +
+      "r_id_prik\030\001 \001(\t\022\024\n\014user_id_pubk\030\002 \001(\t2`\n" +
+      "\024ApiPhoneLoginService\022H\n\005login\022\036.platfor" +
+      "m.ApiPhoneLoginRequest\032\037.platform.ApiPho" +
+      "neLoginResponseB/\n\031com.akaxin.proto.plat" +
+      "formB\022ApiPhoneLoginProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1484,7 +1567,7 @@ public final class ApiPhoneLoginProto {
     internal_static_platform_ApiPhoneLoginRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_platform_ApiPhoneLoginRequest_descriptor,
-        new java.lang.String[] { "PhoneId", "PhoneVerifyCode", });
+        new java.lang.String[] { "PhoneId", "PhoneVerifyCode", "VcType", });
     internal_static_platform_ApiPhoneLoginResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_platform_ApiPhoneLoginResponse_fieldAccessorTable = new

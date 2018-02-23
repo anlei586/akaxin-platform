@@ -79,6 +79,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			String userId = UserIdUtils.getV1GlobalUserId(userIdPubk);
 			String phoneId = request.getPhoneId();
 			String verifyCode = request.getPhoneVerifyCode();
+			int vcType = request.getVcType();
 			logger.info("api.user.realName command={} request={}", command.toString(), request.toString());
 
 			// 验证条件
@@ -103,7 +104,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 							// 此手机号码已经绑定其他账号
 							errorCode = ErrorCode2.ERROR2_PHONE_EXIST;
 						} else {
-							String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
+							String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId + "_" + vcType);
 							if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
 								UserBean bean = new UserBean();
 								bean.setUserId(userId);
