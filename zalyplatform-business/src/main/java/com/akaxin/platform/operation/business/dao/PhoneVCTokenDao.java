@@ -71,8 +71,8 @@ public class PhoneVCTokenDao {
 	}
 
 	// 获取验证码
-	public String getPhoneVC(String phoneId) {
-		String key = RedisKeyUtils.getPhoneVCKey(phoneId);
+	public String getPhoneVC(String phoneIdWithType) {
+		String key = RedisKeyUtils.getPhoneVCKey(phoneIdWithType);
 		try {
 			return phoneDao.getStringValue(key);
 		} catch (Exception e) {

@@ -53,7 +53,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 			String phoneVC = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
 			SmsResult smsResult = SmsSender.send(phoneId, phoneVC, EXPIRE_TIME / 60);
 			if (smsResult != null && smsResult.isSuccess()) {
-				if (PhoneVCTokenDao.getInstance().setPhoneVC(phoneId + vcType, phoneVC + "", EXPIRE_TIME)) {
+				if (PhoneVCTokenDao.getInstance().setPhoneVC(phoneId + "_" + vcType, phoneVC + "", EXPIRE_TIME)) {
 					ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse response = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse
 							.newBuilder().setExpireTime(60).build();
 					commandResponse.setParams(response.toByteArray());
