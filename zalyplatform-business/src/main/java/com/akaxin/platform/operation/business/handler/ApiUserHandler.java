@@ -134,6 +134,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			errorCode = ErrorCode2.ERROR_SYSTEMERROR;
 			logger.error("api.user.realName error.", e);
 		}
+		logger.info("api.user.realName result={}", errorCode.toString());
 		command.setResponse(commandResponse.setErrCode2(errorCode));
 		return true;
 	}
