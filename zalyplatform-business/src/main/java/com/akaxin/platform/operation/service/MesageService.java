@@ -56,10 +56,10 @@ public class MesageService implements IMessage {
 						ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 						return command.getResponse();
 					} else {
-						errCode = ErrorCode2.ERROR_SESSION_VALIDATE;
+						errCode = ErrorCode2.ERROR_SESSION;
 					}
 				} else {
-					errCode = ErrorCode2.ERROR_SESSION_VALIDATE;
+					errCode = ErrorCode2.ERROR_SESSION;
 				}
 			}
 		} catch (Exception e) {
@@ -89,6 +89,7 @@ public class MesageService implements IMessage {
 						&& acsession.getUserId().equals(command.getSiteUserId())) {
 					return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
 				} else {
+//					errCode = ErrorCode2.ERROR_SESSION;
 					logger.info("do im platform auth fail command={} ", command.toString());
 				}
 			}
