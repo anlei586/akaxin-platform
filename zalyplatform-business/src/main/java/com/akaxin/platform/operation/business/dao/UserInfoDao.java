@@ -151,17 +151,44 @@ public class UserInfoDao {
 		return ClientType.UNKNOW;
 	}
 
-	// 检测手机号是否已经被实名绑定
-	public boolean existPhoneId(String phoneId) {
-		String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
-		Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
-		if (phoneMap != null) {
-			String userId = phoneMap.get(UserKey.userId);
-			if (StringUtils.isNotBlank(userId)) {
+	// // 检测手机号是否已经被实名绑定
+	// public boolean existPhoneId(String phoneId) {
+	// String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+	// Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
+	// if (phoneMap != null) {
+	// String userId = phoneMap.get(UserKey.userId);
+	// if (StringUtils.isNotBlank(userId)) {
+	// String userKey = RedisKeyUtils.getUserIdKey(userId);
+	// return phoneId.equals(userDao.hget(userKey, UserKey.userId));
+	// }
+	// }
+	// return false;
+	// }
+
+	/**
+	 * 通过手机号码，获取用户信息，可能获取不到
+	 * 
+	 * @param phoneId
+	 * @return
+	 */
+	public UserBean getUserInfoByPhoneId(String phoneId) {
+		UserBean userBean = new UserBean();
+		try {
+			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+			Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
+			if (phoneMap != null) {
+				String userId = phoneMap.get(UserKey.userId);
+
 				String userKey = RedisKeyUtils.getUserIdKey(userId);
-				return phoneId.equals(userDao.hget(userKey, UserKey.userId));
+				Map<String, String> userInfoMap = userDao.getUserInfoMap(userKey);
+				userBean.setUserIdPrik(userInfoMap.get(UserKey.userIdPrik));
+				userBean.setUserIdPubk(userInfoMap.get(UserKey.userIdPubk));
+				userBean.setUserId(userId);// globalUserId
 			}
+
+		} catch (Exception e) {
+			logger.error("getUserInfo by phoneid error.", e);
 		}
-		return false;
+		return userBean;
 	}
 }

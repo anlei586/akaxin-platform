@@ -84,34 +84,47 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			// 验证条件
 			// 1.判断参数是否合法
 			if (StringUtils.isNoneEmpty(userIdPrik, userIdPubk, userId, phoneId, verifyCode)) {
-				// 3.验证手机格式是否合法
+				// 2.验证手机格式是否合法
 				if (ValidatorPattern.isPhoneId(phoneId)) {
-					// 3.已经绑定的号码不在支持再次绑定
-					if (!UserInfoDao.getInstance().existPhoneId(phoneId)) {
-						String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
-						if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
-							UserBean bean = new UserBean();
-							bean.setUserId(userId);
-							bean.setUserIdPrik(userIdPrik);
-							bean.setUserIdPubk(userIdPubk);
-							bean.setPhoneId(phoneId);
-							bean.setPhoneRoaming("+86");
-							logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode,
-									bean.toString());
-
-							if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
-								errorCode = ErrorCode2.SUCCESS;
-							}
+					String phoneId2 = UserInfoDao.getInstance().getUserPhoneId(userId);
+					// 3.已经绑定的账号，不能绑定其他手机号
+					if (ValidatorPattern.isPhoneId(phoneId2)) {
+						if (phoneId.equals(phoneId2)) {
+							// 已经绑定的号码就是此号码，提醒用户“此账号已经绑定该手机号码”
+							errorCode = ErrorCode2.ERROR2_PHONE_SAME;
 						} else {
-							errorCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
+							// 此账号已经绑定了手机号码
+							errorCode = ErrorCode2.ERROR2_PHONE_REALNAME_EXIST;
 						}
 					} else {
-						// 不支持的手机号 ，手机号码格式错误
-						errorCode = ErrorCode2.ERROR2_PHONE_FORMATTING;
+						// 4.已经绑定的手机号码不能绑定其他账号
+						UserBean userBean = UserInfoDao.getInstance().getUserInfoByPhoneId(phoneId);
+						if (userBean.getUserIdPrik() != null && userBean.getUserIdPubk() != null) {
+							// 此手机号码已经绑定其他账号
+							errorCode = ErrorCode2.ERROR2_PHONE_EXIST;
+						} else {
+							String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId);
+							if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
+								UserBean bean = new UserBean();
+								bean.setUserId(userId);
+								bean.setUserIdPrik(userIdPrik);
+								bean.setUserIdPubk(userIdPubk);
+								bean.setPhoneId(phoneId);
+								bean.setPhoneRoaming("+86");
+								logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode,
+										bean.toString());
+								if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
+									errorCode = ErrorCode2.SUCCESS;
+								}
+							} else {
+								errorCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
+							}
+						}
 					}
+
 				} else {
-					// 手机号码已经被绑定
-					errorCode = ErrorCode2.ERROR2_PHONE_EXIST;
+					// 不支持的手机号,手机号码格式错误
+					errorCode = ErrorCode2.ERROR2_PHONE_FORMATTING;
 				}
 			} else {
 				// 错误的请求参数
