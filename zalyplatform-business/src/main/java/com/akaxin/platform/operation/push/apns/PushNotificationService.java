@@ -2,6 +2,7 @@ package com.akaxin.platform.operation.push.apns;
 
 import java.util.concurrent.Future;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,7 +17,8 @@ import com.akaxin.platform.push.notification.IApnsPushNotificationResponse;
  */
 public class PushNotificationService {
 	private static final Logger logger = LoggerFactory.getLogger(PushNotificationService.class);
-	private static final boolean isSandboxEnv = true;
+	private static boolean isSandboxEnv = false;
+	private static final String SANBOX_PRE = "dev_";
 
 	private static class SingletonHolder {
 		private static PushNotificationService instance = new PushNotificationService();
@@ -48,6 +50,11 @@ public class PushNotificationService {
 
 	private boolean sendPayload(String apnsToken, String payload) {
 		try {
+			// 需要通过token，判断是否为开发版本/sandbox/develop/测试版本
+			if (StringUtils.isNotBlank(apnsToken) && apnsToken.startsWith(SANBOX_PRE)) {
+				isSandboxEnv = true;
+			}
+
 			IApnsHttp2Client apnsHttp2Client = APNsPushManager.getInstance().getApnsClient(isSandboxEnv);
 			Future<IApnsPushNotificationResponse<IApnsPushNotification>> response = apnsHttp2Client
 					.pushMessageAsync(apnsToken, payload);

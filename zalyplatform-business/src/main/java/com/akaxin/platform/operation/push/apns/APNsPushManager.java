@@ -16,14 +16,14 @@ import com.akaxin.platform.push.constant.ApnsHttp2Config;
 public class APNsPushManager {
 	private static final Logger logger = LoggerFactory.getLogger(APNsPushManager.class);
 	private static final String AKAXIN_PUSH_NAME = "AKAXIN_PUSH";
-	private static final String PRODUCT_APPLE_CERT_FILE = "akaxin-push-certificates.p12";
-	private static final String SANDBOX_APPLE_CERT_FILE = "akaxin-apns-development.p12";
+	private static final String PRODUCT_APPLE_CERT_FILE = "akaxin-apns-certificates.p12";
+	private static final String DEVELOP_APPLE_CERT_FILE = "akaxin-apns-development.p12";
 	private static final int PRODUCT_MAX_CONN = 4;
 	private static final int DEVELOP_MAX_CONN = 2;
-
-	private static final String PASSWD = "123456";
+	private static final String PRODUCT_PASSWD = "push#akaxin";
+	private static final String DEVELOP_PASSWD = "123456";
 	private static APNsPushManager instance;
-	private static IApnsHttp2Client apnsHttp2Client;
+	private static IApnsHttp2Client productApnsHttp2Client;
 	private static IApnsHttp2Client sandboxApnsHttp2Client;
 
 	private APNsPushManager() {
@@ -39,16 +39,16 @@ public class APNsPushManager {
 
 	public void start() {
 		try {
-			// apnsHttp2Client = SingletonHolder.getApnsHttp2Client();
+			productApnsHttp2Client = SingletonHolder.getApnsHttp2Client();
 			sandboxApnsHttp2Client = SingletonHolder.getSandboxApnsHttp2Client();
-			logger.info("start apns client client={} sandboxClient={}", apnsHttp2Client, sandboxApnsHttp2Client);
+			logger.info("start apns client client={} sandboxClient={}", productApnsHttp2Client, sandboxApnsHttp2Client);
 		} catch (Exception e) {
 			logger.error("create apns client error", e);
 		}
 	}
 
 	public IApnsHttp2Client getApnsClient(boolean isSandboxEnv) {
-		return isSandboxEnv ? sandboxApnsHttp2Client : apnsHttp2Client;
+		return isSandboxEnv ? sandboxApnsHttp2Client : productApnsHttp2Client;
 	}
 
 	private static class SingletonHolder {
@@ -74,11 +74,11 @@ public class APNsPushManager {
 		}
 
 		public static IApnsHttp2Client getApnsHttp2Client() {
-			return buildApnsHttp2Client(PRODUCT_APPLE_CERT_FILE, PASSWD, PRODUCT_MAX_CONN, false);
+			return buildApnsHttp2Client(PRODUCT_APPLE_CERT_FILE, PRODUCT_PASSWD, PRODUCT_MAX_CONN, false);
 		}
 
 		public static IApnsHttp2Client getSandboxApnsHttp2Client() {
-			return buildApnsHttp2Client(SANDBOX_APPLE_CERT_FILE, PASSWD, DEVELOP_MAX_CONN, true);
+			return buildApnsHttp2Client(DEVELOP_APPLE_CERT_FILE, DEVELOP_PASSWD, DEVELOP_MAX_CONN, true);
 		}
 
 	}
