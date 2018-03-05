@@ -111,13 +111,14 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
 					.parseFrom(command.getParams());
 			CoreProto.MsgType pushType = request.getPushType();
+			int type = getType(pushType);
 			PushProto.Notification notification = request.getNotification();
 			String siteServer = notification.getSiteServer();
 			String userId = notification.getUserId();
 			String userToken = notification.getUserToken();
 			String title = notification.getPushTitle();
-			String pushFrom = notification.getPushFromId();
-			String pushFromName = notification.getPushFromName();
+			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId或者群组groupId
+			String pushFromName = notification.getPushFromName();// 发送者用户昵称或者群组昵称
 			String pushAlter = notification.getPushAlert();
 			logger.info("api.push.notification command={} request={}", command.toString(), request.toString());
 
@@ -137,8 +138,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			logger.info("api.push.notification check site_user_token:{} platform_user_token:{}", userToken, userToken2);
 			if (userToken.equals(userToken2)) {
 				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
-
 				logger.info("api.push.notification clientType={}", clientType);
+
 				switch (clientType) {
 				case IOS:
 					String pushToken = UserInfoDao.getInstance().getPushToken(userId);
@@ -184,7 +185,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		String pushTitle = notification.getPushTitle();
 		String pushFromName = notification.getPushFromName();
 		String pushAlter = notification.getPushAlert();
-		
+
 		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();
 		ippRequest.setSiteServer(siteServer);
 		ServerAddress address = new ServerAddress(siteServer);
@@ -216,14 +217,19 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 		switch (pushType) {
 		case TEXT:
+		case GROUP_TEXT:
 			return PushText.TEXT;
 		case SECRET_TEXT:
+		case GROUP_SECRET_TEXT:
 			return PushText.SECRE_TEXT;
 		case IMAGE:
+		case GROUP_IMAGE:
 			return PushText.IMAGE_TEXT;
 		case SECRET_IMAGE:
+		case GROUP_SECRET_IMAGE:
 			return PushText.SECRE_IMAGE_TEXT;
 		case VOICE:
+		case GROUP_VOICE:
 			return PushText.AUDIO_TEXT;
 		case SECRET_VOICE:
 			return PushText.SECRE_AUDIO_TEXT;
@@ -231,6 +237,33 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			break;
 		}
 		return PushText.TEXT;
+	}
+
+	/**
+	 * <pre>
+	 * 0:二人消息PUSH
+	 * 1:群组消息PUSH
+	 * 2:通知PUSH
+	 * </pre>
+	 * 
+	 * @param pushType
+	 * @return
+	 */
+	private int getType(CoreProto.MsgType pushType) {
+		switch (pushType) {
+		case NOTICE:
+			return 2;
+		case GROUP_TEXT:
+		case GROUP_IMAGE:
+		case GROUP_VOICE:
+			return 1;
+		case TEXT:
+		case IMAGE:
+		case MAP:
+		case VOICE:
+		default:
+			return 0;
+		}
 	}
 
 	/**
