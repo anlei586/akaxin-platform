@@ -114,6 +114,24 @@ public class ApiPlatformService extends AbstractApiHandler<Command> {
 		return errCode.isSuccess();
 	}
 
+	/**
+	 * <pre>
+	 * 
+	 * 到平台进行auth，获取设备唯一标识别码
+	 * 	设备标识码通过
+	 * 			1.pushToken
+	 * 			2.rom
+	 * 			3.clientType
+	 * </pre>
+	 * 
+	 * @param command
+	 * @return
+	 */
+	public boolean auth(Command command) {
+		
+		return false;
+	}
+
 	public boolean topSecret(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errCode = ErrorCode2.ERROR;

@@ -25,7 +25,7 @@ import com.akaxin.proto.platform.ApiUserRealNameProto;
  */
 public class ApiUserHandler extends AbstractApiHandler<Command> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiUserHandler.class);
-
+	
 	public boolean pushToken(Command command) {
 		logger.info("----api.user.pushToken command={}", command.toString());
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)

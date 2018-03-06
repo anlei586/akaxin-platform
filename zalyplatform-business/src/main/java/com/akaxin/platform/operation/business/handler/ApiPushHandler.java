@@ -39,8 +39,11 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 	/**
 	 * <pre>
+	 * 
+	 * 每次访问站点同时执行 api.push.auth
 	 * 用户点击登陆站点，允许站点发送push认证
 	 * client->platform
+	 * 
 	 * </pre>
 	 * 
 	 * @param command
@@ -49,6 +52,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	public boolean auth(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errCode = ErrorCode2.ERROR;
+
 		try {
 			ApiPushAuthProto.ApiPushAuthRequest request = ApiPushAuthProto.ApiPushAuthRequest
 					.parseFrom(command.getParams());
