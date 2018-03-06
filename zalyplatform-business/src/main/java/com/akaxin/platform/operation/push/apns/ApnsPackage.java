@@ -26,7 +26,7 @@ public class ApnsPackage implements Serializable {
 	private String body;
 	private int badge;
 	private String category;
-	private String sound;
+	private String sound = "default.caf";
 	private String pushJump;
 
 	private Map<String, Object> alertExtraFields = new HashMap<String, Object>();
