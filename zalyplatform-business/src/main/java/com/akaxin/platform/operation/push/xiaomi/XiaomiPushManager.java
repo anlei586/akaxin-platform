@@ -17,19 +17,15 @@ public class XiaomiPushManager {
 	// private static Sender officialSender;
 
 	public static void pushMessage(String token, Message message, boolean isSandbox) throws Exception {
-		System.out.println("token=" + token + " issanbox=" + isSandbox);
-		System.out.println("message=" + message);
-
+		logger.info("push xiaoxi message token={} isSandbox={} message={}", token, isSandbox, message);
 		Sender sender = null;
 		Constants.useOfficial();
 		if (isSandbox) {
-			Constants.useOfficial();
 			sender = new Sender(APP_SECRET_KEY_DEBUG);
 		} else {
 			sender = new Sender(APP_SECRET_KEY);
 		}
 		Result result = sender.send(message, token, 1); // 根据regID，发送消息到指定设备上，不重试。
-		System.out.println("result=" + result);
 		logger.info("send xiaomi push result={}", result);
 	}
 
