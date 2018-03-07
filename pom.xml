@@ -84,10 +84,6 @@
 					<source>${java_source_version}</source>
 					<target>${java_target_version}</target>
 					<encoding>${file_encoding}</encoding>
-					<!-- <compilerArgs>
-						<arg>-extdirs</arg>
-						<arg>${project.basedir}/src/lib</arg>
-					</compilerArgs> -->
 				</configuration>
 			</plugin>
 			<plugin>
@@ -129,7 +125,7 @@
 		<developer>
 			<name>AnGuoYue(SAM)</name>
 			<id>an.guoyue</id>
-			<email>guoyue.an@akaxin.com</email>
+			<email>an.guoyue@akaxin.xyz</email>
 			<roles>
 				<role>Developer</role>
 			</roles>

@@ -1,0 +1,75 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.akaxin.platform</groupId>
+	<artifactId>zalyplatform-operation</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+					<encoding>UTF-8</encoding>
+					<compilerArgs>
+						<arg>-extdirs</arg>
+						<arg>${project.basedir}/lib/</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.akaxin.common</groupId>
+			<artifactId>openzaly-common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.akaxin.platform</groupId>
+			<artifactId>zalyplatform-protobuf</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.akaxin.platform</groupId>
+			<artifactId>zalyplatform-storage</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.github.qcloudsms</groupId>
+			<artifactId>sms</artifactId>
+			<version>0.9.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.akaxin.platform.push</groupId>
+			<artifactId>zalyplatform-apns-http2</artifactId>
+			<version>0.1.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.xiaomi</groupId>
+			<artifactId>MiPush_SDK_Server</artifactId>
+			<version>2.2.18</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/MiPush_SDK_Server-2.2.18.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>com.xiaomi</groupId>
+			<artifactId>json-simple</artifactId>
+			<version>1.1.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/json-simple-1.1.1.jar</systemPath>
+		</dependency>
+
+	</dependencies>
+
+</project>

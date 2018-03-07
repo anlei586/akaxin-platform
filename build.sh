@@ -21,7 +21,11 @@
 # under the License.
 # ----------------------------------------------------------------------------
 
+zalyplatform-operation/lib/MiPush_SDK_Server-2.2.18.jar
+zalyplatform-operation/lib/json-simple-1.1.1.jar
+
+mvn install:install-file -Dfile=cloud.jar -DgroupId=com.hope.cloud -DartifactId=cloud -Dversion=1.0 -Dpackaging=jar
 
 cd `dirname $0`
-mvn -T 2C clean install
+mvn -T 2C clean package
 cp zalyplatform-connector/target/zalyplatform-connector-jar-with-dependencies.jar zalyplatform-jar-with-dependencies.jar
