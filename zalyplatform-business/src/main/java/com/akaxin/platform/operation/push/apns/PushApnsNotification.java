@@ -15,19 +15,19 @@ import com.akaxin.platform.push.notification.IApnsPushNotificationResponse;
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2018-01-23 18:17:29
  */
-public class PushNotificationService {
-	private static final Logger logger = LoggerFactory.getLogger(PushNotificationService.class);
+public class PushApnsNotification {
+	private static final Logger logger = LoggerFactory.getLogger(PushApnsNotification.class);
 	private static final String SANBOX_PRE = "dev_";
 
 	private static class SingletonHolder {
-		private static PushNotificationService instance = new PushNotificationService();
+		private static PushApnsNotification instance = new PushApnsNotification();
 	}
 
-	public static PushNotificationService getInstance() {
+	public static PushApnsNotification getInstance() {
 		return SingletonHolder.instance;
 	}
 
-	private PushNotificationService() {
+	private PushApnsNotification() {
 
 	}
 
@@ -42,7 +42,7 @@ public class PushNotificationService {
 		return false;
 	}
 
-	public boolean apnsPushNotification(ApnsPackage apnsPack) {
+	public boolean pushNotification(ApnsPackage apnsPack) {
 		logger.info("token={} payload={}", apnsPack.getToken(), apnsPack.buildPayloadJson());
 		return sendPayload(apnsPack.getToken(), apnsPack.buildPayloadJson());
 	}
@@ -65,6 +65,7 @@ public class PushNotificationService {
 		} catch (Exception e) {
 			logger.error("send payload error", e);
 		}
+
 		return false;
 	}
 

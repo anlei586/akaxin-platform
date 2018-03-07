@@ -1,6 +1,5 @@
 package com.akaxin.platform.operation.push.apns;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,11 +14,8 @@ import com.akaxin.platform.push.notification.PayloadBuilder;
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2018-01-23 17:24:14
  */
-public class ApnsPackage implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class ApnsPackage {
+	private static final String PUSH_GOTO = "push_goto";
 
 	private String token;
 	private String title;
@@ -27,7 +23,7 @@ public class ApnsPackage implements Serializable {
 	private int badge;
 	private String category;
 	private String sound = "default.caf";
-	private String pushJump;
+	private String pushGoto;
 
 	private Map<String, Object> alertExtraFields = new HashMap<String, Object>();
 	private Map<String, Object> apsExtraFields = new HashMap<String, Object>();
@@ -75,12 +71,12 @@ public class ApnsPackage implements Serializable {
 		return this;
 	}
 
-	public String getPushJump() {
-		return pushJump;
+	public String getPushGoto() {
+		return pushGoto;
 	}
 
-	public void setPushJump(String pushJump) {
-		this.pushJump = pushJump;
+	public void setPushGoto(String pushGoto) {
+		this.pushGoto = pushGoto;
 	}
 
 	public String buildPayloadJson() {
@@ -100,8 +96,8 @@ public class ApnsPackage implements Serializable {
 			payLoadBuilder.addSound(sound);
 		}
 
-		if (StringUtils.isNotEmpty(this.pushJump)) {
-			rootExtraFields.put("push-jump", this.pushJump);
+		if (StringUtils.isNotEmpty(this.pushGoto)) {
+			rootExtraFields.put(PUSH_GOTO, this.pushGoto);
 		}
 
 		if (alertExtraFields != null && alertExtraFields.size() > 0) {

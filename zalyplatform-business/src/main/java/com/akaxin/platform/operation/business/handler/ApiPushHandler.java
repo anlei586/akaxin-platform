@@ -15,8 +15,10 @@ import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.constant.OpenSCAddress;
 import com.akaxin.platform.operation.constant.PushText;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
+import com.akaxin.platform.operation.push.PushNotification;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
-import com.akaxin.platform.operation.push.apns.PushNotificationService;
+import com.akaxin.platform.operation.push.apns.PushApnsNotification;
+import com.akaxin.platform.operation.push.xiaomi.XiaomiPackage;
 import com.akaxin.platform.operation.utils.PushAuthLog;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
@@ -159,13 +161,31 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 							apnsPack.setTitle(title);
 						}
 						apnsPack.setBody(getAlterText(address, pushFromName, pushAlter, pushType));
-						apnsPack.setPushJump(getPushJump(pushType));
-						PushNotificationService.getInstance().apnsPushNotification(apnsPack);
+						apnsPack.setPushGoto(getPushGoto(address, pushType));
+						PushApnsNotification.getInstance().pushNotification(apnsPack);
 					}
 					break;
 				case ANDROID_HUAWEI:
 				case ANDROID_OPPO:
 				case ANDROID_XIAOMI:
+					String xmPushToken = UserInfoDao.getInstance().getPushToken(userId);
+					logger.info("xiaomi push token={}", xmPushToken);
+					if (StringUtils.isNotBlank(xmPushToken)) {
+						XiaomiPackage xmpack = new XiaomiPackage();
+						xmpack.setPushToken(xmPushToken);
+						xmpack.setBadge(1);
+						ServerAddress address = new ServerAddress(siteServer);
+						if (address.isRightAddress()) {
+							xmpack.setTitle(title + " " + address.getAddress());
+						} else {
+							xmpack.setTitle(title);
+						}
+						xmpack.setDescription(getAlterText(address, pushFromName, pushAlter, pushType));
+						xmpack.setPushGoto(getPushGoto(address, pushType));
+						PushNotification.pushXiaomiNotification(xmpack);
+					}
+
+					break;
 				case ANDROID:
 					pushCommand = buildPushCommand(pushType, notification);
 					pushCommand.setDeviceId(deviceId);
@@ -198,7 +218,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		}
 		ippRequest.setPushTitle(pushTitle);
 		ippRequest.setPushAlert(getAlterText(address, pushFromName, pushAlter, pushType));
-		ippRequest.setPushJump(getPushJump(pushType));
+		ippRequest.setPushJump(getPushGoto(address, pushType));
 		ippRequest.setPushBadge(1);
 		ippRequest.setPushSound("default.caf");// 使用系统默认
 
@@ -272,18 +292,14 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 	/**
 	 * <pre>
-	 * [A|B|C|D]
-	 * 
-	 * [bof|1|args|] 
-	 * [goto|message{group}|args|] 
-	 * [https|1|args|]
+	 * 		zaly://domain-name/goto?page=""&siteUserId=""
 	 * </pre>
 	 * 
 	 * @param pushType
 	 * @return
 	 */
-	private String getPushJump(CoreProto.MsgType pushType) {
-		return "[bof|1||]";
+	private String getPushGoto(ServerAddress address, CoreProto.MsgType pushType) {
+		return "zaly://" + address.getAddress() + "/goto?page=bof&index=1";
 	}
 
 }
