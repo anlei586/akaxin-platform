@@ -13,6 +13,7 @@ import com.akaxin.common.utils.StringHelper;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.constant.OpenSCAddress;
+import com.akaxin.platform.operation.constant.PushHost;
 import com.akaxin.platform.operation.constant.PushText;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.push.PushNotification;
@@ -117,7 +118,6 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
 					.parseFrom(command.getParams());
 			CoreProto.MsgType pushType = request.getPushType();
-			int type = getType(pushType);
 			PushProto.Notification notification = request.getNotification();
 			String siteServer = notification.getSiteServer();
 			String userId = notification.getUserId();
@@ -161,7 +161,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 							apnsPack.setTitle(title);
 						}
 						apnsPack.setBody(getAlterText(address, pushFromName, pushAlter, pushType));
-						apnsPack.setPushGoto(getPushGoto(address, pushType));
+						apnsPack.setPushGoto(getPushGoto(address, pushType, pushFromId));
 						PushApnsNotification.getInstance().pushNotification(apnsPack);
 					}
 					break;
@@ -181,7 +181,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 							xmpack.setTitle(title);
 						}
 						xmpack.setDescription(getAlterText(address, pushFromName, pushAlter, pushType));
-						xmpack.setPushGoto(getPushGoto(address, pushType));
+						xmpack.setPushGoto(getPushGoto(address, pushType,pushFromId));
 						PushNotification.pushXiaomiNotification(xmpack);
 					}
 
@@ -209,6 +209,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		String pushTitle = notification.getPushTitle();
 		String pushFromName = notification.getPushFromName();
 		String pushAlter = notification.getPushAlert();
+		String pushFromId = notification.getPushFromId();
 
 		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();
 		ippRequest.setSiteServer(siteServer);
@@ -218,7 +219,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		}
 		ippRequest.setPushTitle(pushTitle);
 		ippRequest.setPushAlert(getAlterText(address, pushFromName, pushAlter, pushType));
-		ippRequest.setPushJump(getPushGoto(address, pushType));
+		ippRequest.setPushJump(getPushGoto(address, pushType, pushFromId));
 		ippRequest.setPushBadge(1);
 		ippRequest.setPushSound("default.caf");// 使用系统默认
 
@@ -230,7 +231,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	}
 
 	private String getAlterText(ServerAddress address, String fromName, String pushAlter, CoreProto.MsgType pushType) {
-		if (address != null && StringUtils.isNotEmpty(address.getHost()) && address.getHost().equals("im.akaxin.com")) {
+		// 平台是否配置允许该站点host发送明文push
+		if (PushHost.isAuthedAddress(address)) {
 			if (StringUtils.isNotEmpty(pushAlter)) {
 				if (StringUtils.isNotEmpty(fromName)) {
 					return fromName + ":" + pushAlter;
@@ -241,26 +243,52 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 		switch (pushType) {
 		case TEXT:
-		case GROUP_TEXT:
 			return PushText.TEXT;
+		case GROUP_TEXT:
+			return PushText.GROUP_TEXT;
 		case SECRET_TEXT:
 		case GROUP_SECRET_TEXT:
 			return PushText.SECRE_TEXT;
 		case IMAGE:
-		case GROUP_IMAGE:
 			return PushText.IMAGE_TEXT;
+		case GROUP_IMAGE:
+			return PushText.GROUP_IMAGE_TEXT;
 		case SECRET_IMAGE:
 		case GROUP_SECRET_IMAGE:
 			return PushText.SECRE_IMAGE_TEXT;
 		case VOICE:
-		case GROUP_VOICE:
 			return PushText.AUDIO_TEXT;
+		case GROUP_VOICE:
+			return PushText.GROUP_AUDIO_TEXT;
 		case SECRET_VOICE:
 			return PushText.SECRE_AUDIO_TEXT;
 		default:
 			break;
 		}
-		return PushText.TEXT;
+		return PushText.DEFAULT_TEXT;
+	}
+
+	/**
+	 * <pre>
+	 *		zaly://domain-name/goto?page="main" 主帧
+	 * 		zaly://domain-name/goto?page="message"	消息帧
+	 * 		zaly://domain-name/goto?page="contacts"	通讯录帧
+	 * 		zaly://domain-name/goto?page="personal"	个人帧
+	 * 		zaly://domain-name/goto?page="u2-msg"&siteUserId="" 个人消息帧
+	 * </pre>
+	 * 
+	 * @param pushType
+	 * @return
+	 */
+	private String getPushGoto(ServerAddress address, CoreProto.MsgType pushType, String id) {
+		String pageValue = getGotoType(pushType);
+		String pushGoto = "zaly://" + address.getFullAddress() + "/goto?page=" + pageValue;
+		if ("u2_msg".equals(pageValue)) {
+			pushGoto += "&userId=" + id;
+		} else if ("group_msg".equals(pageValue)) {
+			pushGoto += "&groupId=" + id;
+		}
+		return pushGoto;
 	}
 
 	/**
@@ -273,33 +301,24 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 * @param pushType
 	 * @return
 	 */
-	private int getType(CoreProto.MsgType pushType) {
+	private String getGotoType(CoreProto.MsgType pushType) {
 		switch (pushType) {
 		case NOTICE:
-			return 2;
+			return "notice";
 		case GROUP_TEXT:
 		case GROUP_IMAGE:
 		case GROUP_VOICE:
-			return 1;
+			return "group_msg";
 		case TEXT:
 		case IMAGE:
-		case MAP:
 		case VOICE:
+		case SECRET_TEXT:
+		case SECRET_IMAGE:
+		case GROUP_SECRET_VOICE:
+			return "u2_msg";
 		default:
-			return 0;
+			return "main ";
 		}
-	}
-
-	/**
-	 * <pre>
-	 * 		zaly://domain-name/goto?page=""&siteUserId=""
-	 * </pre>
-	 * 
-	 * @param pushType
-	 * @return
-	 */
-	private String getPushGoto(ServerAddress address, CoreProto.MsgType pushType) {
-		return "zaly://" + address.getAddress() + "/goto?page=bof&index=1";
 	}
 
 }
