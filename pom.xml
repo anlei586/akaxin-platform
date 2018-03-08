@@ -8,7 +8,7 @@
 
 	<modules>
 		<module>zalyplatform-connector</module>
-		<module>zalyplatform-business</module>
+		<module>zalyplatform-operation</module>
 		<module>zalyplatform-protobuf</module>
 		<module>zalyplatform-storage</module>
 		<module>zalyplatform-apns-http2</module>
@@ -58,6 +58,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
 				<configuration>
 					<archive>
 						<addMavenDescriptor>true</addMavenDescriptor>
@@ -72,6 +73,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
+				<version>2.8.2</version>
 				<configuration>
 					<skip>${skip_maven_deploy}</skip>
 				</configuration>
@@ -79,6 +81,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.7.0</version>
 				<configuration>
 					<fork>true</fork>
 					<source>${java_source_version}</source>
@@ -87,7 +90,9 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>

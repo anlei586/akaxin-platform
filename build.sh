@@ -21,10 +21,9 @@
 # under the License.
 # ----------------------------------------------------------------------------
 
-zalyplatform-operation/lib/MiPush_SDK_Server-2.2.18.jar
-zalyplatform-operation/lib/json-simple-1.1.1.jar
 
-mvn install:install-file -Dfile=cloud.jar -DgroupId=com.hope.cloud -DartifactId=cloud -Dversion=1.0 -Dpackaging=jar
+mvn install:install-file -Dfile=zalyplatform-operation/lib/MiPush-SDK-Server-2.2.18.jar -DgroupId=com.xiaomi -DartifactId=MiPush-SDK-Server -Dversion=2.2.18 -Dpackaging=jar
+mvn install:install-file -Dfile=zalyplatform-operation/lib/json-simple-1.1.1.jar -DgroupId=org.json.simple -DartifactId=json-simple -Dversion=1.1.1 -Dpackaging=jar
 
 cd `dirname $0`
 mvn -T 2C clean package
