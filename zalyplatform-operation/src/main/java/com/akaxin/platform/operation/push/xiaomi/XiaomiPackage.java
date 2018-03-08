@@ -11,7 +11,7 @@ import com.xiaomi.xmpush.server.Message;
 
 public class XiaomiPackage {
 	private static final String APP_PACKAGE_NAME = "com.akaxin.client";
-	private static final String PUSH_GOTO = "push_goto";
+	private static final String PUSH_GOTO = "push-goto";
 
 	private String pushToken;
 	private String title; // 通知栏展示的通知的标题。

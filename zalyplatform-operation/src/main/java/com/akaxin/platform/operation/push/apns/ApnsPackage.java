@@ -15,7 +15,7 @@ import com.akaxin.platform.push.notification.PayloadBuilder;
  * @since 2018-01-23 17:24:14
  */
 public class ApnsPackage {
-	private static final String PUSH_GOTO = "push_goto";
+	private static final String PUSH_GOTO = "push-goto";
 
 	private String token;
 	private String title;
