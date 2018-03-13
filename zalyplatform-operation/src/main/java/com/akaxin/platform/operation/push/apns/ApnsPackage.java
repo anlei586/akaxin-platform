@@ -97,7 +97,7 @@ public class ApnsPackage {
 		}
 
 		if (StringUtils.isNotEmpty(this.pushGoto)) {
-			rootExtraFields.put(PUSH_GOTO, this.pushGoto);
+			apsExtraFields.put(PUSH_GOTO, this.pushGoto);
 		}
 
 		if (alertExtraFields != null && alertExtraFields.size() > 0) {
