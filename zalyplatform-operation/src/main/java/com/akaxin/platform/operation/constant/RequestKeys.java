@@ -9,6 +9,7 @@ public enum RequestKeys {
 	API_PHONE(4, "phone"), //
 	API_TEMP_SPACE(5, "temp"), //
 	API_PUSH(50, "push"), //
+	API_SETTING(51, "setting"), //
 
 	IM_ACTION(100, "im"), //
 	IM_HELLO(101, "hello"), //

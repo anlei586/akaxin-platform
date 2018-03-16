@@ -9,6 +9,12 @@ import org.slf4j.helpers.MessageFormatter;
 
 import redis.clients.jedis.Jedis;
 
+/**
+ * 定制话的redisClient，通过自定义的jedis线程池实现
+ * 
+ * @author Sam{@link an.guoyue254@gmail.com}
+ * @since 2018-03-16 16:01:01
+ */
 public class JedisClient {
 	private static final Logger logger = LoggerFactory.getLogger(JedisClient.class);
 
@@ -94,6 +100,20 @@ public class JedisClient {
 			RedisPoolManager.returnResource(jedis);
 		}
 		return null;
+	}
+
+	public Long hdel(final String key, final String field) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.hdel(key, field);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis hget key={} ", key), e);
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return -1l;
 	}
 
 	public Long expire(final String key, final int seconds) {

@@ -17,6 +17,7 @@ import com.akaxin.platform.operation.bean.SmsResult;
 import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.sms.SmsSender;
+import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.bean.UserBean;
 import com.akaxin.proto.platform.ApiPhoneApplyTokenProto;
 import com.akaxin.proto.platform.ApiPhoneConfirmTokenProto;
@@ -135,10 +136,10 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 
 			if (ValidatorPattern.isPhoneId(phoneId)) {
 				String phoneToken = UUID.randomUUID().toString();
-
 				logger.info("userId={},phoneId={},phoneToken={}", userId, phoneId, phoneToken);
-				// 随机UUID
-				if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneToken, phoneId, EXPIRE_TIME)) {
+
+				String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
+				if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneTokenKey, phoneId, EXPIRE_TIME)) {
 					ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse.Builder responseBuilder = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse
 							.newBuilder();
 					responseBuilder.setPhoneId(phoneId);
@@ -171,11 +172,11 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command> {
 		try {
 			ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenRequest request = ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenRequest
 					.parseFrom(command.getParams());
-
 			String phoneToken = request.getPhoneToken();
-			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(phoneToken);
+			String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
+			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(phoneTokenKey);
 
-			logger.info("api.phone.confimCode phoneCode={} phoneId={}", phoneToken, phoneId);
+			logger.info("api.phone.confimToken phoneToken={} phoneId={}", phoneToken, phoneId);
 
 			if (ValidatorPattern.isPhoneId(phoneId)) {
 				ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse response = ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse

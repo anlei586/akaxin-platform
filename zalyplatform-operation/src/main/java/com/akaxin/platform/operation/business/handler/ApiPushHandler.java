@@ -12,7 +12,6 @@ import com.akaxin.common.utils.ServerAddress;
 import com.akaxin.common.utils.StringHelper;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
-import com.akaxin.platform.operation.constant.OpenSCAddress;
 import com.akaxin.platform.operation.constant.PushHost;
 import com.akaxin.platform.operation.constant.PushText;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
@@ -75,12 +74,12 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
 					UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
 
-					// OpenSCAddress，检测是否支持绝密聊天
-					ApiPushAuthProto.ApiPushAuthResponse response = ApiPushAuthProto.ApiPushAuthResponse.newBuilder()
-							.setOpenSecretChat(OpenSCAddress.isAllow(siteAddress)).build();
-					commandResponse.setParams(response.toByteArray());
+//					// OpenSCAddress，检测是否支持绝密聊天
+//					ApiPushAuthProto.ApiPushAuthResponse response = ApiPushAuthProto.ApiPushAuthResponse.newBuilder()
+//							.setOpenSecretChat(OpenSCAddress.isAllow(siteAddress)).build();
+//					commandResponse.setParams(response.toByteArray());
 					errCode = ErrorCode2.SUCCESS;
-					logger.info("siteadress is open secret-chat response={}", response.toString());
+//					logger.info("siteadress is open secret-chat response={}", response.toString());
 				}
 			} else {
 				errCode = ErrorCode2.ERROR_PARAMETER;

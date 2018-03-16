@@ -23,12 +23,18 @@ public class RedisKeyUtils {
 	}
 
 	// 手机令牌
-	public static String getPhoneToken(String phoneId) {
-		return "phone_token_" + phoneId;
+	public static String getPhoneToken(String phoneToken) {
+		return "phone:token:" + phoneToken;
 	}
 
 	// 手机验证码
 	public static String getPhoneVCKey(String key) {
-		return "phone_vc_" + key;
+		return "phone:vc:" + key;
 	}
+
+	// 用户个人静音设置 Hash接口
+	public static String getUserMuteKey(String userId) {
+		return "user:mute:" + userId;
+	}
+
 }
