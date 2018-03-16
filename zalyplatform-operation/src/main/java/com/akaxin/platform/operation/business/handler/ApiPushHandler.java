@@ -240,14 +240,14 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 	private String getAlterText(ServerAddress address, String fromName, String pushAlter, CoreProto.MsgType pushType) {
 		// 平台是否配置允许该站点host发送明文push
-		if (PushHost.isAuthedAddress(address)) {
-			if (StringUtils.isNotEmpty(pushAlter)) {
-				if (StringUtils.isNotEmpty(fromName)) {
-					return fromName + ":" + pushAlter;
-				}
-				return pushAlter;
+//		if (PushHost.isAuthedAddress(address)) {
+		if (StringUtils.isNotEmpty(pushAlter)) {
+			if (StringUtils.isNotEmpty(fromName)) {
+				return fromName + ":" + pushAlter;
 			}
+			return pushAlter;
 		}
+//		}
 
 		switch (pushType) {
 		case TEXT:
