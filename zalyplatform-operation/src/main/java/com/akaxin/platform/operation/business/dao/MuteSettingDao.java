@@ -36,6 +36,14 @@ public class MuteSettingDao {
 		return SingletonHolder.instance;
 	}
 
+	public boolean checkSiteMute(String globalUserId, ServerAddress siteAddress) {
+		int muteNum = getSiteMute(globalUserId, siteAddress);
+		if (muteNum == 1) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * <pre>
 	 * 默认false：非静音状态 

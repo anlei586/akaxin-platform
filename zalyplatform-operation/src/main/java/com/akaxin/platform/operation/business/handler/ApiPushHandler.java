@@ -10,6 +10,7 @@ import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.utils.ServerAddress;
 import com.akaxin.common.utils.StringHelper;
+import com.akaxin.platform.operation.business.dao.MuteSettingDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.constant.PushHost;
@@ -74,12 +75,14 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
 					UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
 
-//					// OpenSCAddress，检测是否支持绝密聊天
-//					ApiPushAuthProto.ApiPushAuthResponse response = ApiPushAuthProto.ApiPushAuthResponse.newBuilder()
-//							.setOpenSecretChat(OpenSCAddress.isAllow(siteAddress)).build();
-//					commandResponse.setParams(response.toByteArray());
+					// // OpenSCAddress，检测是否支持绝密聊天
+					// ApiPushAuthProto.ApiPushAuthResponse response =
+					// ApiPushAuthProto.ApiPushAuthResponse.newBuilder()
+					// .setOpenSecretChat(OpenSCAddress.isAllow(siteAddress)).build();
+					// commandResponse.setParams(response.toByteArray());
 					errCode = ErrorCode2.SUCCESS;
-//					logger.info("siteadress is open secret-chat response={}", response.toString());
+					// logger.info("siteadress is open secret-chat response={}",
+					// response.toString());
 				}
 			} else {
 				errCode = ErrorCode2.ERROR_PARAMETER;
@@ -132,6 +135,13 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				return false;
 			}
 
+			// 首先判断当前用户是否对该站点屏蔽
+			ServerAddress address = new ServerAddress(siteServer);
+			if (MuteSettingDao.getInstance().checkSiteMute(userId, address)) {
+				logger.info("user={} set mute to site={}", userId, address.getAddress());
+				return false;
+			}
+
 			title = StringHelper.getSubString(title, 20);
 
 			// 获取最新一次登陆的用户设备ID
@@ -153,7 +163,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 						ApnsPackage apnsPack = new ApnsPackage();
 						apnsPack.setToken(pushToken);
 						apnsPack.setBadge(1);
-						ServerAddress address = new ServerAddress(siteServer);
+
 						if (address.isRightAddress()) {
 							apnsPack.setTitle(title + " " + address.getAddress());
 						} else {
@@ -173,14 +183,13 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 						XiaomiPackage xmpack = new XiaomiPackage();
 						xmpack.setPushToken(xmPushToken);
 						xmpack.setBadge(1);
-						ServerAddress address = new ServerAddress(siteServer);
 						if (address.isRightAddress()) {
 							xmpack.setTitle(title + " " + address.getAddress());
 						} else {
 							xmpack.setTitle(title);
 						}
 						xmpack.setDescription(getAlterText(address, pushFromName, pushAlter, pushType));
-						xmpack.setPushGoto(getPushGoto(address, pushType,pushFromId));
+						xmpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
 						PushNotification.pushXiaomiNotification(xmpack);
 					}
 
