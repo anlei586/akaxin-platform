@@ -25,11 +25,11 @@ import com.google.protobuf.ByteString;
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2018-01-31 17:44:59
  */
-public class ImPtcPushHandler extends AbstractImHandler<Command> {
+public class ImPtcPushHandler extends AbstractImHandler<Command, Boolean> {
 	private static final Logger logger = LoggerFactory.getLogger(ImPtcPushHandler.class);
 
 	@Override
-	public boolean handle(Command command) {
+	public Boolean handle(Command command) {
 		try {
 			logger.info("---------im.ptc.push----------");
 			String deviceId = command.getDeviceId();

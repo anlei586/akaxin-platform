@@ -12,6 +12,7 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.operation.api.IMessage;
 import com.akaxin.platform.operation.business.dao.SessionDao;
 import com.akaxin.platform.operation.constant.PlatformAction;
@@ -21,17 +22,22 @@ import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.core.CoreProto;
 
+/**
+ * 
+ * @author Sam{@link an.guoyue254@gmail.com}
+ * @since 2018-03-31 15:25:03
+ */
 public class MesageService implements IMessage {
 	private static final Logger logger = LoggerFactory.getLogger(MesageService.class);
 
+	/**
+	 * 业务层处理API请求
+	 */
 	public CommandResponse doApiRequest(Command command) {
-		logger.info("doplatform api request command={}", command.toString());
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			String action = command.getAction();
-			/**
-			 * 过滤一些不需要session验证的action
-			 */
+			// 过滤一些不需要session验证的action
 			if ("api.platform.login".equals(action) || "api.push.notification".equals(action)
 					|| "api.phone.login".equals(action) || "api.phone.verifyCode".equals(action)
 					|| "api.temp.download".equals(action) || "api.temp.upload".equals(action)
@@ -47,14 +53,13 @@ public class MesageService implements IMessage {
 				if (StringUtils.isNotEmpty(sessionId)) {
 					Map<String, String> map = SessionDao.getInstance().getSessionMap(sessionKey);
 					logger.info("api auth sessionId={} map={}", sessionId, map);
-					String userId = map.get(UserKey.userId);
+					String globalUserId = map.get(UserKey.userId);
 					String deviceId = map.get(UserKey.deviceId);
-					if (map != null && StringUtils.isNotBlank(userId) && StringUtils.isNotBlank(deviceId)) {
-						command.setSiteUserId(userId);
+					if (map != null && StringUtils.isNotBlank(globalUserId) && StringUtils.isNotBlank(deviceId)) {
+						command.setSiteUserId(globalUserId);
 						command.setDeviceId(deviceId);
 						logger.info("api request doApiRequest command={}", command.toString());
-						ApiOperateExecutor.getExecutor().execute(command.getService(), command);
-						return command.getResponse();
+						return ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 					} else {
 						errCode = ErrorCode2.ERROR_SESSION;
 					}
@@ -63,7 +68,7 @@ public class MesageService implements IMessage {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("platform api request error.", e);
+			LogUtils.requestErrorLog(logger, command, this.getClass(), e);
 		}
 
 		return new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES)
@@ -89,7 +94,7 @@ public class MesageService implements IMessage {
 						&& acsession.getUserId().equals(command.getSiteUserId())) {
 					return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
 				} else {
-//					errCode = ErrorCode2.ERROR_SESSION;
+					// errCode = ErrorCode2.ERROR_SESSION;
 					logger.info("do im platform auth fail command={} ", command.toString());
 				}
 			}

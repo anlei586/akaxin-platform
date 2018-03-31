@@ -15,10 +15,11 @@ import com.akaxin.platform.operation.imessage.handler.ImPtcPushHandler;
  * @since 2017-11-06 11:40:45
  */
 public class ImOperateExecutor {
-	private static AbstracteExecutor<Command> executor = new SimpleExecutor<Command>();
+	private static AbstracteExecutor<Command, Boolean> executor = new SimpleExecutor<Command, Boolean>();
 
 	static {
-		// AbstractHandlerChain<Command> imChain = new SimpleHandlerChain<Command>();
+		// AbstractHandlerChain<Command, Boolean> imChain = new
+		// SimpleHandlerChain<Command, Boolean>();
 		// imChain.addHandler(new ImHelloHandler());
 		// imChain.addHandler(new ImAuthHandler());
 
@@ -26,13 +27,12 @@ public class ImOperateExecutor {
 		executor.addChain(PlatformAction.IM_PLATFORM_AUTH, new ImAuthHandler());
 		executor.addChain(PlatformAction.IM_CTP_PING, new ImPingPongHandler());
 		executor.addChain(PlatformAction.IM_PTC_PUSH, new ImPtcPushHandler());
-		// executor.addChain(RequestKeys.IM_ACTION.getName(), imChain);
 	}
 
 	private ImOperateExecutor() {
 	}
 
-	public static AbstracteExecutor<Command> getExecutor() {
+	public static AbstracteExecutor<Command, Boolean> getExecutor() {
 		return executor;
 	}
 

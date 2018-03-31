@@ -8,6 +8,7 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.ServerAddress;
 import com.akaxin.platform.operation.business.dao.MuteSettingDao;
 import com.akaxin.proto.platform.ApiSettingSiteMuteProto;
@@ -24,7 +25,7 @@ import com.akaxin.proto.platform.ApiSettingUpdateSiteMuteProto;
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2018-03-16 13:10:01
  */
-public class ApiSettingService extends AbstractApiHandler<Command> {
+public class ApiSettingService extends AbstractApiHandler<Command, CommandResponse> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiSettingService.class);
 
 	/**
@@ -33,7 +34,7 @@ public class ApiSettingService extends AbstractApiHandler<Command> {
 	 * @param command
 	 * @return
 	 */
-	public boolean siteMute(Command command) {
+	public CommandResponse siteMute(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
@@ -42,7 +43,7 @@ public class ApiSettingService extends AbstractApiHandler<Command> {
 			String globalUserId = command.getSiteUserId();// 放这里
 			String host = request.getSiteHost();
 			int port = request.getSitePort();
-			logger.info("api.setting.siteMute command={} request={}", command.toString(), request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (StringUtils.isNoneBlank(globalUserId, host) && port > 0) {
 				ServerAddress siteAddress = new ServerAddress(host, port);
@@ -61,15 +62,13 @@ public class ApiSettingService extends AbstractApiHandler<Command> {
 				errCode = ErrorCode2.ERROR_PARAMETER;
 			}
 		} catch (Exception e) {
-			logger.error("api.push token error", e);
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		command.setResponse(commandResponse.setErrCode2(errCode));
-
-		logger.info("api.setting.siteMute result={}", errCode.toString());
-		return errCode.isSuccess();
+		return commandResponse.setErrCode2(errCode);
 	}
 
-	public boolean updateSiteMute(Command command) {
+	public CommandResponse updateSiteMute(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
@@ -79,6 +78,7 @@ public class ApiSettingService extends AbstractApiHandler<Command> {
 			String host = request.getSiteHost();
 			int port = request.getSitePort();
 			boolean mute = request.getMute();
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (StringUtils.isNoneEmpty(globalUserId, host) && port > 0) {
 				ServerAddress siteAddress = new ServerAddress(host, port);
@@ -92,12 +92,10 @@ public class ApiSettingService extends AbstractApiHandler<Command> {
 			}
 
 		} catch (Exception e) {
-			logger.error("api.setting.updateSiteMute error", e);
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		command.setResponse(commandResponse.setErrCode2(errCode));
-
-		logger.info("api.setting.updateSiteMute result={}", errCode.toString());
-		return errCode.isSuccess();
+		return commandResponse.setErrCode2(errCode);
 	}
 
 }

@@ -12,7 +12,9 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.command.RedisCommand;
 import com.akaxin.common.constant.CommandConst;
+import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.constant.RequestAction;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.connector.codec.parser.ParserConst;
 import com.akaxin.platform.operation.service.MesageService;
 import com.akaxin.proto.core.CoreProto;
@@ -27,6 +29,8 @@ import io.netty.channel.SimpleChannelInboundHandler;
  */
 public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisCommand> {
 	private static final Logger logger = LoggerFactory.getLogger(NettyInboundHandler.class);
+	private static int API = 0;
+	private static int IM = 1;
 
 	/**
 	 * 用户建立连接到服务端,会激活channel
@@ -42,7 +46,8 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		ChannelSession channelSession = ctx.channel().attr(ParserConst.CHANNELSESSION).get();
-		if (channelSession.getCtype() == 1) {
+		//
+		if (IM == channelSession.getCtype()) {
 			ChannelManager.delChannelSession(channelSession.getDeviceId());
 		}
 		logger.info("close netty channel connection...client={}", ctx.channel().toString());
@@ -55,6 +60,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			String clientIP = insocket.getAddress().getHostAddress();
 			ChannelSession channelSession = ctx.channel().attr(ParserConst.CHANNELSESSION).get();
 
+			// 网络协议的版本，第一版本为1.0
 			String version = redisCommand.getParameterByIndex(0);
 			String action = redisCommand.getParameterByIndex(1);
 			byte[] params = redisCommand.getBytesParamByIndex(2);
@@ -74,16 +80,20 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			}
 
 			if (RequestAction.IM.getName().equals(command.getRety())) {
+				CommandResponse response = customResponse(ErrorCode2.SUCCESS);
 				if (!new MesageService().doImRequest(command)) {
+					response.setErrCode2(ErrorCode2.ERROR);
 					ctx.close();
 				}
+				LogUtils.requestResultLog(logger, command, response);
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
-				CommandResponse commandResponse = new MesageService().doApiRequest(command);
-				if (commandResponse == null) {
-					commandResponse = new CommandResponse();
+				CommandResponse response = new MesageService().doApiRequest(command);
+				if (response == null) {
+					response = new CommandResponse();
 				}
-				commandResponse.setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES);
-				ChannelWriter.writeAndClose(ctx.channel(), commandResponse);
+				response.setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES);
+				ChannelWriter.writeAndClose(ctx.channel(), response);
+				LogUtils.requestResultLog(logger, command, response);
 			} else {
 				logger.error("unknow request command = {}", command.toString());
 			}
@@ -100,7 +110,15 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 	@Override
 	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
-		logger.info("netty server: user event triggered.");
+		// logger.info("netty server: user event triggered.");
+	}
+
+	// defined by user
+	protected CommandResponse customResponse(ErrorCode2 errCode) {
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
+				.setAction(CommandConst.ACTION_RES);
+		commandResponse.setErrCode2(errCode);
+		return commandResponse;
 	}
 
 }

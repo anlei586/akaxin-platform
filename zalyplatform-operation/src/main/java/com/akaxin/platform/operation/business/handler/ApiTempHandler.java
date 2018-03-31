@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.operation.business.dao.TempSpaceDao;
 import com.akaxin.proto.platform.ApiTempDownloadProto;
 import com.akaxin.proto.platform.ApiTempUploadProto;
@@ -23,13 +23,12 @@ import com.google.protobuf.ByteString;
  * @since 2017.10.17
  *
  */
-public class ApiTempHandler extends AbstractApiHandler<Command> {
+public class ApiTempHandler extends AbstractApiHandler<Command, CommandResponse> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiTempHandler.class);
 
-	public boolean upload(Command command) {
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
-		String errorCode = ErrorCode.ERROR;
+	public CommandResponse upload(Command command) {
+		CommandResponse commandResponse = new CommandResponse();
+		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			ApiTempUploadProto.ApiTempUploadRequest request = ApiTempUploadProto.ApiTempUploadRequest
 					.parseFrom(command.getParams());
@@ -37,7 +36,7 @@ public class ApiTempHandler extends AbstractApiHandler<Command> {
 			if (StringUtils.isEmpty(key)) {
 				key = UUID.randomUUID().toString();
 			}
-			logger.info("api.tmp.upload key={} request={}", key, request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString() + " key=" + key);
 
 			String value = Base64.getEncoder().encodeToString(request.getContent().toByteArray());
 			int expireTime = 10 * 60;// 默认10分钟
@@ -45,26 +44,24 @@ public class ApiTempHandler extends AbstractApiHandler<Command> {
 				ApiTempUploadProto.ApiTempUploadResponse response = ApiTempUploadProto.ApiTempUploadResponse
 						.newBuilder().setName(key).build();
 				commandResponse.setParams(response.toByteArray());
-				errorCode = ErrorCode.SUCCESS;
+				errCode = ErrorCode2.SUCCESS;
 			}
 		} catch (Exception e) {
-			commandResponse.setErrInfo("apply temp space error");
-			logger.error("upload temp space error.", e);
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		logger.info("api.tmp.upload result={}", errorCode.toString());
-		command.setResponse(commandResponse.setErrCode(errorCode));
-		return false;
+		return commandResponse.setErrCode2(errCode);
 	}
 
-	public boolean download(Command command) {
+	public CommandResponse download(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
-		ErrorCode2 errorCode = ErrorCode2.ERROR;
+		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			ApiTempDownloadProto.ApiTempDownloadRequest request = ApiTempDownloadProto.ApiTempDownloadRequest
 					.parseFrom(command.getParams());
 			String keyName = request.getName();
-			logger.info("api.tmp.download keyName={} request={}", keyName, request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (keyName != null && keyName.length() > 5) {
 				String contentString = TempSpaceDao.getInstance().getTempValue(keyName);
@@ -73,19 +70,17 @@ public class ApiTempHandler extends AbstractApiHandler<Command> {
 					ApiTempDownloadProto.ApiTempDownloadResponse response = ApiTempDownloadProto.ApiTempDownloadResponse
 							.newBuilder().setContent(ByteString.copyFrom(contentBytes)).build();
 					commandResponse.setParams(response.toByteArray());
-					errorCode = ErrorCode2.SUCCESS;
+					errCode = ErrorCode2.SUCCESS;
 				}
-			}else {
-				errorCode = ErrorCode2.ERROR_PARAMETER;
+			} else {
+				errCode = ErrorCode2.ERROR_PARAMETER;
 			}
 
 		} catch (Exception e) {
-			commandResponse.setErrInfo("download from temp space error");
-			logger.error("download from temp space error.", e);
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		logger.info("api.tmp.download result={}", errorCode.toString());
-		command.setResponse(commandResponse.setErrCode2(errorCode));
-		return false;
+		return commandResponse.setErrCode2(errCode);
 	}
 
 }

@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
-import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.storage.bean.UserBean;
 import com.akaxin.proto.core.ClientProto;
@@ -18,19 +18,18 @@ import com.akaxin.proto.platform.ApiUserPushTokenProto;
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2017.10.17
  */
-public class ApiDeviceHandler extends AbstractApiHandler<Command> {
+public class ApiDeviceHandler extends AbstractApiHandler<Command, CommandResponse> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiDeviceHandler.class);
 
 	/**
-	 * 上传设备唯一码
+	 * 上传设备唯一码,暂时不可使用
 	 * 
 	 * @param command
 	 * @return
 	 */
-	public boolean token(Command command) {
-		logger.info("----api.device.token command={}", command.toString());
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
+	@Deprecated
+	public CommandResponse token(Command command) {
+		CommandResponse commandResponse = new CommandResponse();
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			ApiUserPushTokenProto.ApiUserPushTokenRequest request = ApiUserPushTokenProto.ApiUserPushTokenRequest
@@ -39,8 +38,7 @@ public class ApiDeviceHandler extends AbstractApiHandler<Command> {
 			String rom = request.getRom();
 			String pushToken = request.getPushToken();
 			String deviceId = command.getDeviceId();
-
-			logger.info("api.user.pushToken deviceId={} request={}", deviceId, request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			UserBean userBean = new UserBean();
 			userBean.setUserId(command.getSiteUserId());
@@ -49,8 +47,6 @@ public class ApiDeviceHandler extends AbstractApiHandler<Command> {
 			userBean.setPushToken(pushToken);
 			userBean.setDeviceId(deviceId);
 
-			logger.info("userInfoBean=" + userBean.toString());
-
 			if (UserInfoDao.getInstance().saveUserInfo(userBean)) {
 				errCode = ErrorCode2.SUCCESS;
 			} else {
@@ -58,10 +54,10 @@ public class ApiDeviceHandler extends AbstractApiHandler<Command> {
 			}
 
 		} catch (Exception e) {
-			logger.error("api.push token error", e);
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		command.setResponse(commandResponse.setErrCode2(errCode));
-		return true;
+		return commandResponse.setErrCode2(errCode);
 	}
 
 }

@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
-import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.UserIdUtils;
 import com.akaxin.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
@@ -23,13 +23,11 @@ import com.akaxin.proto.platform.ApiUserRealNameProto;
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2017.10.17
  */
-public class ApiUserHandler extends AbstractApiHandler<Command> {
+public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiUserHandler.class);
-	
-	public boolean pushToken(Command command) {
-		logger.info("----api.user.pushToken command={}", command.toString());
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
+
+	public CommandResponse pushToken(Command command) {
+		CommandResponse commandResponse = new CommandResponse();
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			ApiUserPushTokenProto.ApiUserPushTokenRequest request = ApiUserPushTokenProto.ApiUserPushTokenRequest
@@ -38,8 +36,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			String rom = request.getRom();
 			String pushToken = request.getPushToken();
 			String deviceId = command.getDeviceId();
-
-			logger.info("api.user.pushToken deviceId={} request={}", deviceId, request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			UserBean userBean = new UserBean();
 			userBean.setUserId(command.getSiteUserId());
@@ -47,8 +44,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			userBean.setRom(rom);
 			userBean.setPushToken(pushToken);
 			userBean.setDeviceId(deviceId);
-
-			logger.info("userInfoBean=" + userBean.toString());
+			logger.debug("userInfoBean=" + userBean.toString());
 
 			if (UserInfoDao.getInstance().saveUserInfo(userBean)) {
 				errCode = ErrorCode2.SUCCESS;
@@ -57,19 +53,18 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			}
 
 		} catch (Exception e) {
-			logger.error("api.push token error", e);
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		command.setResponse(commandResponse.setErrCode2(errCode));
-		return true;
+		return commandResponse.setErrCode2(errCode);
 	}
 
 	/**
 	 * 实名认证,绑定手机号码以及设置密码
 	 * 
 	 */
-	public boolean realName(Command command) {
-		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
-				.setAction(CommandConst.ACTION_RES);
+	public CommandResponse realName(Command command) {
+		CommandResponse commandResponse = new CommandResponse();
 		ErrorCode2 errorCode = ErrorCode2.ERROR;
 		try {
 			ApiUserRealNameProto.ApiUserRealNameRequest request = ApiUserRealNameProto.ApiUserRealNameRequest
@@ -80,7 +75,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			String phoneId = request.getPhoneId();
 			String verifyCode = request.getPhoneVerifyCode();
 			int vcType = request.getVcType();
-			logger.info("api.user.realName command={} request={}", command.toString(), request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			// 验证条件
 			// 1.判断参数是否合法
@@ -112,7 +107,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 								bean.setUserIdPubk(userIdPubk);
 								bean.setPhoneId(phoneId);
 								bean.setPhoneRoaming("+86");
-								logger.info("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode,
+								logger.debug("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode,
 										bean.toString());
 								if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
 									errorCode = ErrorCode2.SUCCESS;
@@ -133,11 +128,9 @@ public class ApiUserHandler extends AbstractApiHandler<Command> {
 			}
 		} catch (Exception e) {
 			errorCode = ErrorCode2.ERROR_SYSTEMERROR;
-			logger.error("api.user.realName error.", e);
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		logger.info("api.user.realName result={}", errorCode.toString());
-		command.setResponse(commandResponse.setErrCode2(errorCode));
-		return true;
+		return commandResponse.setErrCode2(errorCode);
 	}
 
 }

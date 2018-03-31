@@ -13,6 +13,7 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.ServerAddressUtils;
 import com.akaxin.platform.operation.business.dao.SessionDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
@@ -29,23 +30,22 @@ import io.netty.channel.Channel;
  * </pre>
  * 
  * @author Sam{@link an.guoyue254@gmail.com}
- * @since 2017.10.17
+ * @since 2017-10-17 15:25:44
  *
  */
-public class ImAuthHandler extends AbstractImHandler<Command> {
+public class ImAuthHandler extends AbstractImHandler<Command, Boolean> {
 	private static final Logger logger = LoggerFactory.getLogger(ImAuthHandler.class);
 
 	@Override
-	public boolean handle(Command command) {
+	public Boolean handle(Command command) {
 		boolean result = false;
 		try {
-			logger.info("api.platform.auth");
 			ChannelSession channelSession = command.getChannelSession();
 			ImPlatformAuthProto.ImPlatformAuthRequest request = ImPlatformAuthProto.ImPlatformAuthRequest
 					.parseFrom(command.getParams());
 			String globalUserId = request.getUserId();
 			String sessionId = request.getSessionId();
-			logger.info("api.platform.auth command={} request={}", command.toString(), request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			String sessionKey = RedisKeyUtils.getSessionKey(sessionId);
 			logger.info("auth action session redis key={}", sessionKey);

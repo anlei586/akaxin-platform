@@ -130,6 +130,34 @@ public class JedisClient {
 		return 0l;
 	}
 
+	public Long del(final String... keys) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.del(keys);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis delete key={} error", String.valueOf(keys), e));
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return 0l;
+	}
+
+	public Long del(final String key) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.del(key);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis delete key={} error", key, e));
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return 0l;
+	}
+
 	private String formatMessage(String messagePattern, Object... objects) {
 		FormattingTuple format = MessageFormatter.arrayFormat(messagePattern, objects);
 		return format.getMessage();

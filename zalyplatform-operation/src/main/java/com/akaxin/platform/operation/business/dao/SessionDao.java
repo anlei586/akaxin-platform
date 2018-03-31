@@ -29,11 +29,11 @@ public class SessionDao {
 		return SingletonHolder.instance;
 	}
 
-	public boolean addSession(String key, Map<String, String> map) {
+	public boolean addSessionMap(String key, Map<String, String> map, int expireSec) {
 		try {
-			return session.addSession(key, map);
+			return session.addSession(key, map, expireSec);
 		} catch (Exception e) {
-			logger.error("add session errror. map={}"+map, e);
+			logger.error("add session errror. map={}" + map, e);
 		}
 		return false;
 	}
@@ -45,6 +45,15 @@ public class SessionDao {
 			logger.error("get session map error.", e);
 		}
 		return null;
+	}
+
+	public boolean deleteSessionKey(String key) {
+		try {
+			return session.deleteSession(key);
+		} catch (Exception e) {
+			logger.error("delete session key error,key=" + key, e);
+		}
+		return false;
 	}
 
 }

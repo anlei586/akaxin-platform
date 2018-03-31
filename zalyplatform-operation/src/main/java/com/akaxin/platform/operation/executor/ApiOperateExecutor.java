@@ -1,6 +1,7 @@
 package com.akaxin.platform.operation.executor;
 
 import com.akaxin.common.command.Command;
+import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.executor.AbstracteExecutor;
 import com.akaxin.common.executor.SimpleExecutor;
 import com.akaxin.platform.operation.business.handler.ApiPhoneHandler;
@@ -17,7 +18,7 @@ import com.akaxin.platform.operation.constant.RequestKeys;
  * @since 2017-11-06 11:40:45
  */
 public class ApiOperateExecutor {
-	private static AbstracteExecutor<Command> executor = new SimpleExecutor<Command>();
+	private static AbstracteExecutor<Command, CommandResponse> executor = new SimpleExecutor<Command, CommandResponse>();
 
 	static {
 		executor.addChain(RequestKeys.API_PLATFORM.getName(), new ApiPlatformService());
@@ -31,7 +32,7 @@ public class ApiOperateExecutor {
 	private ApiOperateExecutor() {
 	}
 
-	public static AbstracteExecutor<Command> getExecutor() {
+	public static AbstracteExecutor<Command, CommandResponse> getExecutor() {
 		return executor;
 	}
 

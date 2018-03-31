@@ -20,11 +20,11 @@ import com.akaxin.proto.core.CoreProto;
  * @since 2017.10.17
  *
  */
-public class ImPingPongHandler extends AbstractImHandler<Command> {
+public class ImPingPongHandler extends AbstractImHandler<Command, Boolean> {
 	private static final Logger logger = LoggerFactory.getLogger(ImPingPongHandler.class);
 
 	@Override
-	public boolean handle(Command command) {
+	public Boolean handle(Command command) {
 		try {
 			String deviceId = command.getDeviceId();
 			ChannelSession channelSession = command.getChannelSession();

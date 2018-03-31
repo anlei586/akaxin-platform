@@ -8,13 +8,14 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.ServerAddress;
 import com.akaxin.common.utils.StringHelper;
 import com.akaxin.platform.operation.business.dao.MuteSettingDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
-import com.akaxin.platform.operation.constant.PushHost;
 import com.akaxin.platform.operation.constant.PushText;
+import com.akaxin.platform.operation.exceptions.RequestException;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.push.PushNotification;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
@@ -37,7 +38,7 @@ import com.akaxin.proto.platform.ApiPushNotificationProto;
  * @since 2017.11.08 15:11:48
  * @param <Command>
  */
-public class ApiPushHandler extends AbstractApiHandler<Command> {
+public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiPushHandler.class);
 
 	/**
@@ -52,7 +53,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 * @param command
 	 * @return
 	 */
-	public boolean auth(Command command) {
+	public CommandResponse auth(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 
@@ -65,24 +66,16 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String port = request.getSitePort();
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
-			logger.info("api.push.auth command={} request={}", command.toString(), request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (StringUtils.isNoneEmpty(userId, deviceId, siteAddress, port, userToken)) {
-				// 存库
+				// save db
 				String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
 				String siteServer = siteAddress + ":" + port;
-				logger.info("add user token,key:{},field:{},value:{}", redisKey, siteServer, userToken);
+				logger.debug("add user token,key:{},field:{},value:{}", redisKey, siteServer, userToken);
 				if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
 					UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
-
-					// // OpenSCAddress，检测是否支持绝密聊天
-					// ApiPushAuthProto.ApiPushAuthResponse response =
-					// ApiPushAuthProto.ApiPushAuthResponse.newBuilder()
-					// .setOpenSecretChat(OpenSCAddress.isAllow(siteAddress)).build();
-					// commandResponse.setParams(response.toByteArray());
 					errCode = ErrorCode2.SUCCESS;
-					// logger.info("siteadress is open secret-chat response={}",
-					// response.toString());
 				}
 			} else {
 				errCode = ErrorCode2.ERROR_PARAMETER;
@@ -93,12 +86,10 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
-			logger.error("api.push.auth error", e);
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		command.setResponse(commandResponse.setErrCode2(errCode));
-		logger.info("api.push.auth result={}", errCode.toString());
 
-		return errCode.isSuccess();
+		return commandResponse.setErrCode2(errCode);
 	}
 
 	/**
@@ -111,10 +102,10 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 	 * @param command
 	 * @return
 	 */
-	public boolean notification(Command command) {
+	public CommandResponse notification(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
-		ErrorCode2 errCode = ErrorCode2.SUCCESS;
-		command.setResponse(commandResponse.setErrCode2(errCode));
+		ErrorCode2 errCode = ErrorCode2.ERROR;
+
 		try {
 			Command pushCommand = null;
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
@@ -128,18 +119,16 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId或者群组groupId
 			String pushFromName = notification.getPushFromName();// 发送者用户昵称或者群组昵称
 			String pushAlter = notification.getPushAlert();
-			logger.info("api.push.notification command={} request={}", command.toString(), request.toString());
+			LogUtils.requestDebugLog(logger, pushCommand, request.toString());
 
 			if (StringUtils.isAnyBlank(userId, userToken, siteServer)) {
-				logger.info("request parameter error.request={}", request.toString());
-				return false;
+				throw new RequestException(ErrorCode2.ERROR_PARAMETER);
 			}
 
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
 			if (MuteSettingDao.getInstance().checkSiteMute(userId, address)) {
-				logger.info("user={} set mute to site={}", userId, address.getAddress());
-				return false;
+				throw new RequestException(ErrorCode2.SUCCESS);
 			}
 
 			title = StringHelper.getSubString(title, 20);
@@ -150,15 +139,16 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
 					siteServer);
 			// 如果用户令牌相同，则相等（授权校验方式）
-			logger.info("api.push.notification check site_user_token:{} platform_user_token:{}", userToken, userToken2);
+			logger.debug("api.push.notification check site_user_token:{} platform_user_token:{}", userToken,
+					userToken2);
 			if (userToken.equals(userToken2)) {
 				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
-				logger.info("api.push.notification clientType={}", clientType);
+				logger.debug("api.push.notification clientType={}", clientType);
 
 				switch (clientType) {
 				case IOS:
 					String pushToken = UserInfoDao.getInstance().getPushToken(userId);
-					logger.info("ios push ......pushToken={}", pushToken);
+					logger.debug("ios push ......pushToken={}", pushToken);
 					if (StringUtils.isNotBlank(pushToken)) {
 						ApnsPackage apnsPack = new ApnsPackage();
 						apnsPack.setToken(pushToken);
@@ -178,7 +168,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				case ANDROID_OPPO:
 				case ANDROID_XIAOMI:
 					String xmPushToken = UserInfoDao.getInstance().getPushToken(userId);
-					logger.info("xiaomi push token={}", xmPushToken);
+					logger.debug("xiaomi push......pushToken={}", xmPushToken);
 					if (StringUtils.isNotBlank(xmPushToken)) {
 						XiaomiPackage xmpack = new XiaomiPackage();
 						xmpack.setPushToken(xmPushToken);
@@ -197,19 +187,25 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 				case ANDROID:
 					pushCommand = buildPushCommand(pushType, notification);
 					pushCommand.setDeviceId(deviceId);
-					logger.info("andorid push to client pushcommand={}", pushCommand.toString());
-					return ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);
+					logger.debug("andorid push to client pushcommand={}", pushCommand.toString());
+					ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);
 				default:
 					logger.error("unknow client type:{}", clientType);
 					break;
 				}
-
+				errCode = ErrorCode2.SUCCESS;
 			}
 		} catch (Exception e) {
-			logger.error("api push notification error.", e);
+			if (e instanceof RequestException) {
+				errCode = ((RequestException) e).getErrCode();
+			} else {
+				errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			}
+			if (!errCode.isSuccess()) {
+				LogUtils.requestErrorLog(logger, command, e);
+			}
 		}
-		logger.info("api.push.notification result={}", errCode.toString());
-		return false;
+		return commandResponse.setErrCode2(errCode);
 	}
 
 	private Command buildPushCommand(CoreProto.MsgType pushType, PushProto.Notification notification) {
@@ -234,20 +230,20 @@ public class ApiPushHandler extends AbstractApiHandler<Command> {
 		Command command = new Command();
 		command.setAction("im.ptc.push");
 		command.setParams(ippRequest.build().toByteArray());
-		logger.info("build push command={}", command.toString());
+		logger.debug("build push command={}", command.toString());
 		return command;
 	}
 
 	private String getAlterText(ServerAddress address, String fromName, String pushAlter, CoreProto.MsgType pushType) {
 		// 平台是否配置允许该站点host发送明文push
-//		if (PushHost.isAuthedAddress(address)) {
+		// if (PushHost.isAuthedAddress(address)) {
 		if (StringUtils.isNotEmpty(pushAlter)) {
 			if (StringUtils.isNotEmpty(fromName)) {
 				return fromName + ":" + pushAlter;
 			}
 			return pushAlter;
 		}
-//		}
+		// }
 
 		switch (pushType) {
 		case TEXT:
