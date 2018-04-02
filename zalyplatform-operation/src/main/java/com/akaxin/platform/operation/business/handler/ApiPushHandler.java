@@ -107,7 +107,6 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 
 		try {
-			Command pushCommand = null;
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
 					.parseFrom(command.getParams());
 			CoreProto.MsgType pushType = request.getPushType();
@@ -185,7 +184,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 
 					break;
 				case ANDROID:
-					pushCommand = buildPushCommand(pushType, notification);
+					Command pushCommand = buildPushCommand(pushType, notification);
 					pushCommand.setDeviceId(deviceId);
 					logger.debug("andorid push to client pushcommand={}", pushCommand.toString());
 					ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);

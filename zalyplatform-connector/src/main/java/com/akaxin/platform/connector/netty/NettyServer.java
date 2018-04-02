@@ -44,7 +44,7 @@ public abstract class NettyServer {
 		bootstrap.childOption(ChannelOption.TCP_NODELAY, true);
 		bootstrap.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT);
 		bootstrap.childOption(ChannelOption.RCVBUF_ALLOCATOR, AdaptiveRecvByteBufAllocator.DEFAULT); // 动态缓冲区
-		bootstrap.handler(new LoggingHandler(LogLevel.INFO));
+		bootstrap.handler(new LoggingHandler(LogLevel.DEBUG));
 		bootstrap.childHandler(new BimChannelInitializer());
 	}
 
