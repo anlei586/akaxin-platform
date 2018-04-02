@@ -119,7 +119,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId或者群组groupId
 			String pushFromName = notification.getPushFromName();// 发送者用户昵称或者群组昵称
 			String pushAlter = notification.getPushAlert();
-			LogUtils.requestDebugLog(logger, pushCommand, request.toString());
+			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (StringUtils.isAnyBlank(userId, userToken, siteServer)) {
 				throw new RequestException(ErrorCode2.ERROR_PARAMETER);
