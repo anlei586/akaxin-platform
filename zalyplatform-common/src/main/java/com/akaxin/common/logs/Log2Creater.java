@@ -23,12 +23,14 @@ import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
 
 /**
+ * 创建log4j日志(指定不同的格式)
+ * 
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2018-01-31 12:31:53
  */
 public class Log2Creater {
 	private static final Logger logger = Logger.getLogger(Log2Creater.class);
-	private static final String DEFAULT_SITE_PATH = "site-logs/";
+	private static final String DEFAULT_PATH = "logs/";
 
 	public static Logger createLogger(String logName) {
 		return createLogger(logName, null, new PatternLayout(), false, false);
@@ -39,11 +41,11 @@ public class Log2Creater {
 	}
 
 	public static Logger createTimeLogger(String logName) {
-		return createLogger(logName, null, new PatternLayout("[%p] %d [%c] \r\n\t%m%n"), false, false);
+		return createLogger(logName, null, new PatternLayout("[%p] %d [%c] %m%n"), false, false);
 	}
 
 	public static Logger createTimeLogger(String logName, String logPath) {
-		return createLogger(logName, null, new PatternLayout("[%p] %d [%c] \r\n\t%m%n"), false, false);
+		return createLogger(logName, logPath, new PatternLayout("[%p] %d [%c] %m%n"), false, false);
 	}
 
 	/**
@@ -66,7 +68,7 @@ public class Log2Creater {
 		try {
 			String logFileName = null;
 			if (StringUtils.isEmpty(logPath)) {
-				logFileName = DEFAULT_SITE_PATH + logName + ".log";
+				logFileName = DEFAULT_PATH + logName + ".log";
 			} else if (logPath.endsWith("/")) {
 				logFileName = logPath + logName + ".log";
 			} else {
