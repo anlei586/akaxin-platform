@@ -94,7 +94,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 					sessionMap.put(UserKey.deviceId, deviceId);
 					sessionMap.put(UserKey.TIME, System.currentTimeMillis() + "");
 
-					int sessionExpireTime = 90 * 24 * 60 * 60;// 90天
+					int sessionExpireTime = 1 * 24 * 60 * 60;// 90天
 					if (SessionDao.getInstance().addSessionMap(sessionKey, sessionMap, sessionExpireTime)) {
 						ApiPlatformLoginProto.ApiPlatformLoginResponse response = ApiPlatformLoginProto.ApiPlatformLoginResponse
 								.newBuilder().setUserId(globalUserId).setSessionId(sessionId).build();
