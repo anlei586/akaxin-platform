@@ -12,6 +12,7 @@
 		<module>zalyplatform-protobuf</module>
 		<module>zalyplatform-storage</module>
 		<module>zalyplatform-apns-http2</module>
+		<module>zalyplatform-common</module>
 	</modules>
 
 	<properties>

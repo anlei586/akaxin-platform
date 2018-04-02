@@ -19,8 +19,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.akaxin.common</groupId>
-			<artifactId>openzaly-common</artifactId>
+			<groupId>com.akaxin.platform.common</groupId>
+			<artifactId>zalyplatform-common</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
