@@ -68,12 +68,14 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			CoreProto.TransportPackageData packageData = CoreProto.TransportPackageData.parseFrom(params);
 
 			Command command = new Command();
+			command.setClientIp(clientIP);
 			command.setSiteUserId(channelSession.getUserId());
 			command.setDeviceId(channelSession.getDeviceId());
 			command.setAction(action);
 			command.setChannelSession(channelSession);
 			command.setParams(packageData.getData().toByteArray());
 			command.setHeader(packageData.getHeaderMap());
+			command.setStartTime(System.currentTimeMillis());
 
 			if (!"ping".equals(command.getMethod())) {
 				logger.info("client id:{} request command:{}", clientIP, command.toString());
