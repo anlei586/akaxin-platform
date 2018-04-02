@@ -34,6 +34,7 @@ public class MesageService implements IMessage {
 	 * 业务层处理API请求
 	 */
 	public CommandResponse doApiRequest(Command command) {
+		CommandResponse response = null;
 		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			String action = command.getAction();
@@ -42,7 +43,7 @@ public class MesageService implements IMessage {
 					|| "api.phone.login".equals(action) || "api.phone.verifyCode".equals(action)
 					|| "api.temp.download".equals(action) || "api.temp.upload".equals(action)
 					|| "api.phone.confirmToken".endsWith(action)) {
-				return ApiOperateExecutor.getExecutor().execute(command.getService(), command);
+				response = ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 			} else {
 				Map<Integer, String> header = command.getHeader();
 				String sessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);
@@ -58,7 +59,7 @@ public class MesageService implements IMessage {
 						command.setSiteUserId(globalUserId);
 						command.setDeviceId(deviceId);
 						logger.info("api request doApiRequest command={}", command.toString());
-						return ApiOperateExecutor.getExecutor().execute(command.getService(), command);
+						response = ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 					} else {
 						errCode = ErrorCode2.ERROR_SESSION;
 					}
@@ -67,11 +68,16 @@ public class MesageService implements IMessage {
 				}
 			}
 		} catch (Exception e) {
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			LogUtils.requestErrorLog(logger, command, this.getClass(), e);
 		}
 
-		return new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES)
-				.setErrCode2(errCode);
+		if (response == null) {
+			response = new CommandResponse();
+		}
+		response.setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES);
+
+		return response.setErrCode2(errCode);
 	}
 
 	/**

@@ -93,7 +93,6 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 				if (response == null) {
 					response = customResponse(ErrorCode2.ERROR);
 				}
-				response.setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES);
 				ChannelWriter.writeAndClose(ctx.channel(), response);
 				LogUtils.requestResultLog(logger, command, response);
 			} else {
