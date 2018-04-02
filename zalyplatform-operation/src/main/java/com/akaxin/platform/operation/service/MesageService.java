@@ -42,8 +42,7 @@ public class MesageService implements IMessage {
 					|| "api.phone.login".equals(action) || "api.phone.verifyCode".equals(action)
 					|| "api.temp.download".equals(action) || "api.temp.upload".equals(action)
 					|| "api.phone.confirmToken".endsWith(action)) {
-				ApiOperateExecutor.getExecutor().execute(command.getService(), command);
-				return command.getResponse();
+				return ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 			} else {
 				Map<Integer, String> header = command.getHeader();
 				String sessionId = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_SITE_SESSION_ID_VALUE);

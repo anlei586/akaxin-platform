@@ -89,7 +89,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
 				CommandResponse response = new MesageService().doApiRequest(command);
 				if (response == null) {
-					response = new CommandResponse();
+					response = customResponse(ErrorCode2.ERROR);
 				}
 				response.setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES);
 				ChannelWriter.writeAndClose(ctx.channel(), response);
