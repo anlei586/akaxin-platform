@@ -73,11 +73,11 @@ public class MesageService implements IMessage {
 		}
 
 		if (response == null) {
-			response = new CommandResponse();
+			response = new CommandResponse().setErrCode2(errCode);
 		}
 		response.setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES);
 
-		return response.setErrCode2(errCode);
+		return response;
 	}
 
 	/**

@@ -100,7 +100,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			}
 
 		} catch (Exception e) {
-			logger.error("receive from client error.", e);
+			logger.error("receive data from client error.", e);
 		}
 	}
 
