@@ -26,7 +26,6 @@ import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.client.ImPtcPushProto;
 import com.akaxin.proto.core.ClientProto;
-import com.akaxin.proto.core.CoreProto;
 import com.akaxin.proto.core.PushProto;
 import com.akaxin.proto.platform.ApiPushAuthProto;
 import com.akaxin.proto.platform.ApiPushNotificationProto;
@@ -109,7 +108,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		try {
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
 					.parseFrom(command.getParams());
-			CoreProto.MsgType pushType = request.getPushType();
+			PushProto.PushType pushType = request.getPushType();
 			PushProto.Notification notification = request.getNotification();
 			String siteServer = notification.getSiteServer();
 			String userId = notification.getUserId();
@@ -207,7 +206,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		return commandResponse.setErrCode2(errCode);
 	}
 
-	private Command buildPushCommand(CoreProto.MsgType pushType, PushProto.Notification notification) {
+	private Command buildPushCommand(PushProto.PushType pushType, PushProto.Notification notification) {
 		String siteServer = notification.getSiteServer();// 192.168.0.1:2021
 		String pushTitle = notification.getPushTitle();
 		String pushFromName = notification.getPushFromName();
@@ -233,7 +232,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		return command;
 	}
 
-	private String getAlterText(ServerAddress address, String fromName, String pushAlter, CoreProto.MsgType pushType) {
+	private String getAlterText(ServerAddress address, String fromName, String pushAlter, PushProto.PushType pushType) {
 		// 平台是否配置允许该站点host发送明文push
 		// if (PushHost.isAuthedAddress(address)) {
 		if (StringUtils.isNotEmpty(pushAlter)) {
@@ -245,26 +244,28 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		// }
 
 		switch (pushType) {
-		case TEXT:
+		case PUSH_TEXT:
 			return PushText.TEXT;
-		case GROUP_TEXT:
+		case PUSH_GROUP_TEXT:
 			return PushText.GROUP_TEXT;
-		case SECRET_TEXT:
-		case GROUP_SECRET_TEXT:
+		case PUSH_SECRET_TEXT:
+		case PUSH_GROUP_SECRET_TEXT:
 			return PushText.SECRE_TEXT;
-		case IMAGE:
+		case PUSH_IMAGE:
 			return PushText.IMAGE_TEXT;
-		case GROUP_IMAGE:
+		case PUSH_GROUP_IMAGE:
 			return PushText.GROUP_IMAGE_TEXT;
-		case SECRET_IMAGE:
-		case GROUP_SECRET_IMAGE:
+		case PUSH_SECRET_IMAGE:
+		case PUSH_GROUP_SECRET_IMAGE:
 			return PushText.SECRE_IMAGE_TEXT;
-		case VOICE:
+		case PUSH_VOICE:
 			return PushText.AUDIO_TEXT;
-		case GROUP_VOICE:
+		case PUSH_GROUP_VOICE:
 			return PushText.GROUP_AUDIO_TEXT;
-		case SECRET_VOICE:
+		case PUSH_SECRET_VOICE:
 			return PushText.SECRE_AUDIO_TEXT;
+		case PUSH_APPLY_FRIEND_NOTICE:
+			return PushText.NEW_FRIEND_APPLY;
 		default:
 			break;
 		}
@@ -283,7 +284,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 * @param pushType
 	 * @return
 	 */
-	private String getPushGoto(ServerAddress address, CoreProto.MsgType pushType, String id) {
+	private String getPushGoto(ServerAddress address, PushProto.PushType pushType, String id) {
 		String pageValue = getGotoType(pushType);
 		String pushGoto = "zaly://" + address.getFullAddress() + "/goto?page=" + pageValue;
 		if ("u2_msg".equals(pageValue)) {
@@ -304,21 +305,23 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 * @param pushType
 	 * @return
 	 */
-	private String getGotoType(CoreProto.MsgType pushType) {
+	private String getGotoType(PushProto.PushType pushType) {
 		switch (pushType) {
-		case NOTICE:
+		case PUSH_NOTICE:
 			return "notice";
-		case GROUP_TEXT:
-		case GROUP_IMAGE:
-		case GROUP_VOICE:
+		case PUSH_GROUP_TEXT:
+		case PUSH_GROUP_IMAGE:
+		case PUSH_GROUP_VOICE:
 			return "group_msg";
-		case TEXT:
-		case IMAGE:
-		case VOICE:
-		case SECRET_TEXT:
-		case SECRET_IMAGE:
-		case GROUP_SECRET_VOICE:
+		case PUSH_TEXT:
+		case PUSH_IMAGE:
+		case PUSH_VOICE:
+		case PUSH_SECRET_TEXT:
+		case PUSH_SECRET_IMAGE:
+		case PUSH_GROUP_SECRET_VOICE:
 			return "u2_msg";
+		case PUSH_APPLY_FRIEND_NOTICE:
+			return "new_friend_apply";
 		default:
 			return "main ";
 		}

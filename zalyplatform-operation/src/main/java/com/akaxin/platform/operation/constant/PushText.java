@@ -14,4 +14,5 @@ public interface PushText {
 	public String GROUP_IMAGE_TEXT = "你收到一张【群图片】";
 	public String GROUP_AUDIO_TEXT = "你收到一段【群语音】";
 
+	public String NEW_FRIEND_APPLY = "你有一个新的好友申请，请注意查看";
 }
