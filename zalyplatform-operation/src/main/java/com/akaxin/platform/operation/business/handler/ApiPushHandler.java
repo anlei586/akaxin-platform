@@ -321,7 +321,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		case PUSH_GROUP_SECRET_VOICE:
 			return "u2_msg";
 		case PUSH_APPLY_FRIEND_NOTICE:
-			return "new_friend_apply";
+			return "friend_apply";// 新的好友申请
 		default:
 			return "main ";
 		}
