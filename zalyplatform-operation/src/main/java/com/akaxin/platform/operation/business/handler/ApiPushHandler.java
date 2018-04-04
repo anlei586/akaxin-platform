@@ -21,7 +21,6 @@ import com.akaxin.platform.operation.push.PushNotification;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushApnsNotification;
 import com.akaxin.platform.operation.push.xiaomi.XiaomiPackage;
-import com.akaxin.platform.operation.utils.PushAuthLog;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.client.ImPtcPushProto;
@@ -55,7 +54,6 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	public CommandResponse auth(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		ErrorCode2 errCode = ErrorCode2.ERROR;
-
 		try {
 			ApiPushAuthProto.ApiPushAuthRequest request = ApiPushAuthProto.ApiPushAuthRequest
 					.parseFrom(command.getParams());
@@ -79,9 +77,6 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			} else {
 				errCode = ErrorCode2.ERROR_PARAMETER;
 			}
-
-			PushAuthLog.getInstance().printLog("api.push.auth command={} request={} result={}", command.toString(),
-					request.toString(), errCode.toString());
 
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
