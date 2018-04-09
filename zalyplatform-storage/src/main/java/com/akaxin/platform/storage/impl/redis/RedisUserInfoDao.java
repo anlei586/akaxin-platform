@@ -35,14 +35,19 @@ public class RedisUserInfoDao {
 	}
 
 	public boolean hset(String key, String field, String value) {
-		logger.info("hset user key={},field={},value={}", key, field, value);
+		logger.debug("hset user key={},field={},value={}", key, field, value);
 		this.jedis.hset(key, field, value);
 		return false;
 	}
 
 	public String hget(String key, String field) {
-		logger.info("hget user key={},field={}", key, field);
+		logger.debug("hget user key={},field={}", key, field);
 		return this.jedis.hget(key, field);
+	}
+
+	public boolean hdel(String key, String field) {
+		logger.debug("hdel user key={},field={}", key, field);
+		return this.jedis.hdel(key, field) == 1;
 	}
 
 	public boolean saveUserInfo(String key, UserBean bean) {

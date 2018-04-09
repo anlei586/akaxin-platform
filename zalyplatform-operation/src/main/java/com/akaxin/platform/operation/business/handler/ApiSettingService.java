@@ -40,7 +40,7 @@ public class ApiSettingService extends AbstractApiHandler<Command, CommandRespon
 		try {
 			ApiSettingSiteMuteProto.ApiSettingSiteMuteRequest request = ApiSettingSiteMuteProto.ApiSettingSiteMuteRequest
 					.parseFrom(command.getParams());
-			String globalUserId = command.getSiteUserId();// 放这里
+			String globalUserId = command.getGlobalUserId();
 			String host = request.getSiteHost();
 			int port = request.getSitePort();
 			LogUtils.requestDebugLog(logger, command, request.toString());
@@ -74,7 +74,7 @@ public class ApiSettingService extends AbstractApiHandler<Command, CommandRespon
 		try {
 			ApiSettingUpdateSiteMuteProto.ApiSettingUpdateSiteMuteRequest request = ApiSettingUpdateSiteMuteProto.ApiSettingUpdateSiteMuteRequest
 					.parseFrom(command.getParams());
-			String globalUserId = command.getSiteUserId();
+			String globalUserId = command.getGlobalUserId();
 			String host = request.getSiteHost();
 			int port = request.getSitePort();
 			boolean mute = request.getMute();

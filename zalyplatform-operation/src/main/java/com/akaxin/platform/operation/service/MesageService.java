@@ -56,7 +56,7 @@ public class MesageService implements IMessage {
 					String globalUserId = map.get(UserKey.userId);
 					String deviceId = map.get(UserKey.deviceId);
 					if (map != null && StringUtils.isNotBlank(globalUserId) && StringUtils.isNotBlank(deviceId)) {
-						command.setSiteUserId(globalUserId);
+						command.setGlobalUserId(globalUserId);
 						command.setDeviceId(deviceId);
 						logger.info("api request doApiRequest command={}", command.toString());
 						response = ApiOperateExecutor.getExecutor().execute(command.getService(), command);

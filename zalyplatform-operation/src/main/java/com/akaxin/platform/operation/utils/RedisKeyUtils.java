@@ -15,7 +15,7 @@ public class RedisKeyUtils {
 	// 用户令牌：Hash结构
 	// 存储每个站点的usertoken <siteAddress,userToken>
 	public static String getUserTokenKey(String deviceId) {
-		return "user_token_" + deviceId;
+		return "user:token:" + deviceId;
 	}
 
 	// 用户存储的session:hash结构

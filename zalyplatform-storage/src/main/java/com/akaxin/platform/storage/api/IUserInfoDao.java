@@ -10,6 +10,8 @@ public interface IUserInfoDao {
 
 	public String hget(String key, String field);
 
+	public boolean hdel(String key, String field);
+
 	// user
 	public boolean saveUserInfo(String key, UserBean bean);
 

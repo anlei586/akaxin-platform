@@ -18,6 +18,11 @@ public class UserInfoDaoService implements IUserInfoDao {
 		return RedisUserInfoDao.getInstance().hget(key, field);
 	}
 
+	@Override
+	public boolean hdel(String key, String field) {
+		return RedisUserInfoDao.getInstance().hdel(key, field);
+	}
+
 	// user
 	@Override
 	public boolean saveUserInfo(String key, UserBean bean) {

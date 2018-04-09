@@ -17,6 +17,7 @@ import com.akaxin.common.constant.CommandConst;
 import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.crypto.RSACrypto;
+import com.akaxin.common.exceptions.ZalyException;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.StringHelper;
 import com.akaxin.common.utils.UserIdUtils;
@@ -26,6 +27,7 @@ import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.platform.ApiPlatformLoginProto;
+import com.akaxin.proto.platform.ApiPlatformLogoutProto;
 import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretRequest;
 import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretResponse;
 
@@ -156,6 +158,51 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			LogUtils.requestErrorLog(logger, command, e);
 		}
 
+		return commandResponse.setErrCode2(errCode);
+	}
+
+	public CommandResponse logout(Command command) {
+		CommandResponse commandResponse = new CommandResponse();
+		ErrorCode2 errCode = ErrorCode2.ERROR;
+		try {
+			ApiPlatformLogoutProto.ApiPlatformLogoutRequest request = ApiPlatformLogoutProto.ApiPlatformLogoutRequest
+					.parseFrom(command.getParams());
+			String globalUserId = command.getGlobalUserId();
+			String userIdPubk = request.getUserIdPubk();
+			String deviceIdPubk = request.getDeviceIdPubk();
+			String userId = UserIdUtils.getV1GlobalUserId(userIdPubk);
+			String deviceId = HashCrypto.MD5(deviceIdPubk);
+			LogUtils.requestDebugLog(logger, command, request.toString());
+
+			if (StringUtils.isAnyEmpty(globalUserId, userIdPubk, deviceIdPubk, deviceId)) {
+				logger.error("globalUserId={} action={} userId={} userIdPubk={} deviceId={} deviceIdPubk={}",
+						globalUserId, command.getAction(), userId, userIdPubk, deviceId, deviceIdPubk);
+				throw new ZalyException(ErrorCode2.ERROR_PARAMETER);
+			}
+
+			if (globalUserId.equals(userId)) {
+				logger.error("globalUserId={} userId={} action={}", globalUserId, userId, command.getAction());
+				throw new ZalyException(ErrorCode2.ERROR_USER_ID);
+			}
+
+			// 获取用户当前的deviceId
+			String latestDeviceId = UserInfoDao.getInstance().getLatestDeviceId(globalUserId);
+			if (deviceId.equals(latestDeviceId)) {// remove push token
+				if (UserInfoDao.getInstance().delUserField(userId, UserKey.pushToken)) {
+					errCode = ErrorCode2.SUCCESS;
+				}
+			} else {
+				errCode = ErrorCode2.SUCCESS;
+			}
+
+		} catch (Exception e) {
+			if (e instanceof ZalyException) {
+				errCode = ((ZalyException) e).getErrCode();
+			} else {
+				errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			}
+			LogUtils.requestErrorLog(logger, command, e);
+		}
 		return commandResponse.setErrCode2(errCode);
 	}
 

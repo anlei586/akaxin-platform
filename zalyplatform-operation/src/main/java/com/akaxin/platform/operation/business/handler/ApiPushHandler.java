@@ -57,7 +57,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		try {
 			ApiPushAuthProto.ApiPushAuthRequest request = ApiPushAuthProto.ApiPushAuthRequest
 					.parseFrom(command.getParams());
-			String userId = command.getSiteUserId();
+			String globalUserId = command.getGlobalUserId();
 			String deviceId = command.getDeviceId();
 			String siteAddress = request.getSiteAddress();
 			String port = request.getSitePort();
@@ -65,13 +65,13 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String userToken = request.getUserToken();
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
-			if (StringUtils.isNoneEmpty(userId, deviceId, siteAddress, port, userToken)) {
+			if (StringUtils.isNoneEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
 				// save db
 				String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
 				String siteServer = siteAddress + ":" + port;
 				logger.debug("add user token,key:{},field:{},value:{}", redisKey, siteServer, userToken);
 				if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
-					UserInfoDao.getInstance().updateUserField(userId, UserKey.deviceId, deviceId);
+					UserInfoDao.getInstance().updateUserField(globalUserId, UserKey.deviceId, deviceId);
 					errCode = ErrorCode2.SUCCESS;
 				}
 			} else {

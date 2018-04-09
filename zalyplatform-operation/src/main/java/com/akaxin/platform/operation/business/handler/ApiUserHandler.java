@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.exceptions.ZalyException;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.UserIdUtils;
 import com.akaxin.common.utils.ValidatorPattern;
@@ -14,6 +15,7 @@ import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.storage.bean.UserBean;
 import com.akaxin.proto.core.ClientProto;
+import com.akaxin.proto.platform.ApiUserPhoneProto;
 import com.akaxin.proto.platform.ApiUserPushTokenProto;
 import com.akaxin.proto.platform.ApiUserRealNameProto;
 
@@ -26,6 +28,12 @@ import com.akaxin.proto.platform.ApiUserRealNameProto;
 public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiUserHandler.class);
 
+	/**
+	 * 提交用户客户端的pushtoken，用户平台发送PUSH使用
+	 * 
+	 * @param command
+	 * @return
+	 */
 	public CommandResponse pushToken(Command command) {
 		CommandResponse commandResponse = new CommandResponse();
 		ErrorCode2 errCode = ErrorCode2.ERROR;
@@ -39,7 +47,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			UserBean userBean = new UserBean();
-			userBean.setUserId(command.getSiteUserId());
+			userBean.setUserId(command.getGlobalUserId());
 			userBean.setClientType(clientType.getNumber());
 			userBean.setRom(rom);
 			userBean.setPushToken(pushToken);
@@ -131,6 +139,44 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 			LogUtils.requestErrorLog(logger, command, e);
 		}
 		return commandResponse.setErrCode2(errorCode);
+	}
+
+	/**
+	 * 获取用户绑定的手机号码
+	 * 
+	 * @param command
+	 * @return
+	 */
+	public CommandResponse phone(Command command) {
+		CommandResponse commandResponse = new CommandResponse();
+		ErrorCode2 errCode = ErrorCode2.ERROR;
+		try {
+			ApiUserPhoneProto.ApiUserPhoneRequest request = ApiUserPhoneProto.ApiUserPhoneRequest
+					.parseFrom(command.getParams());
+			String globalUserId = command.getGlobalUserId();
+			LogUtils.requestDebugLog(logger, command, request.toString());
+
+			if (StringUtils.isAnyEmpty(globalUserId)) {
+				throw new ZalyException(ErrorCode2.ERROR_PARAMETER);
+			}
+
+			String phoneId = UserInfoDao.getInstance().getUserPhoneId(globalUserId);
+
+			if (StringUtils.isNotEmpty(phoneId)) {
+				ApiUserPhoneProto.ApiUserPhoneResponse response = ApiUserPhoneProto.ApiUserPhoneResponse.newBuilder()
+						.setGlobalRoaming("+86").setPhoneId(phoneId).build();
+				commandResponse.setParams(response.toByteArray());
+			}
+			errCode = ErrorCode2.SUCCESS;
+		} catch (Exception e) {
+			if (e instanceof ZalyException) {
+				errCode = ((ZalyException) e).getErrCode();
+			} else {
+				errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			}
+			LogUtils.requestErrorLog(logger, command, e);
+		}
+		return commandResponse.setErrCode2(errCode);
 	}
 
 }

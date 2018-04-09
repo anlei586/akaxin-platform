@@ -37,6 +37,7 @@ public enum ErrorCode2 {
 	ERROR_INVALIDPACKAGEACTION("error.alter", "无效的包名称"), // 无效的包action
 	ERROR_DATABASE_EXECUTE("error.alter", "数据库执行错误"), // 无效的包action
 
+	ERROR_USER_ID("error.alter", "用户ID身份不匹配"), // 请求参数错误
 	ERROR_SESSION("error.session", "用户身份认证失败"), // session验证失败
 
 	ERROR_REGISTER("error.alter", "用户注册失败"), // 用户注册失败

@@ -69,7 +69,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 
 			Command command = new Command();
 			command.setClientIp(clientIP);
-			command.setSiteUserId(channelSession.getUserId());
+			command.setGlobalUserId(channelSession.getUserId());
 			command.setDeviceId(channelSession.getDeviceId());
 			command.setAction(action);
 			command.setChannelSession(channelSession);

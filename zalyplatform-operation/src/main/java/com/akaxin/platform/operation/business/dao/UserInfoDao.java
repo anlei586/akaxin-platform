@@ -62,6 +62,17 @@ public class UserInfoDao {
 		return false;
 	}
 
+	public boolean delUserField(String userId, String field) {
+		try {
+			String redisKey = RedisKeyUtils.getUserIdKey(userId);
+			userDao.hdel(redisKey, field);
+			return true;
+		} catch (Exception e) {
+			logger.error("del user filed error.", e);
+		}
+		return false;
+	}
+
 	public boolean updatePhoneInfo(UserBean userBean) {
 		try {
 			if (userBean != null && StringUtils.isNotBlank(userBean.getPhoneId())) {
@@ -150,20 +161,6 @@ public class UserInfoDao {
 		}
 		return ClientType.UNKNOW;
 	}
-
-	// // 检测手机号是否已经被实名绑定
-	// public boolean existPhoneId(String phoneId) {
-	// String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
-	// Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
-	// if (phoneMap != null) {
-	// String userId = phoneMap.get(UserKey.userId);
-	// if (StringUtils.isNotBlank(userId)) {
-	// String userKey = RedisKeyUtils.getUserIdKey(userId);
-	// return phoneId.equals(userDao.hget(userKey, UserKey.userId));
-	// }
-	// }
-	// return false;
-	// }
 
 	/**
 	 * 通过手机号码，获取用户信息，可能获取不到
