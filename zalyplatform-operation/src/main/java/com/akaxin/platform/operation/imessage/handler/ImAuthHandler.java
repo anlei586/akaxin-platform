@@ -12,7 +12,7 @@ import com.akaxin.common.channel.ChannelWriter;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode;
+import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.ServerAddressUtils;
 import com.akaxin.platform.operation.business.dao.SessionDao;
@@ -66,7 +66,7 @@ public class ImAuthHandler extends AbstractImHandler<Command, Boolean> {
 				// 更新用户最新的设备id
 				UserInfoDao.getInstance().updateUserField(globalUserId, UserKey.deviceId, deviceId);
 			}
-			logger.info("auth result = {},sessionSize={}", result, ChannelManager.getChannelSessionSize());
+			logger.info("auth result={},sessionSize={}", result, ChannelManager.getChannelSessionSize());
 			authResponse(channelSession.getChannel(), command, result);
 		} catch (Exception e) {
 			logger.error("im auth error.", e);
@@ -75,19 +75,16 @@ public class ImAuthHandler extends AbstractImHandler<Command, Boolean> {
 	}
 
 	private void authResponse(Channel channel, Command command, boolean result) {
-		logger.info("----- auth response ------");
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
-		String errorCode = ErrorCode.ERROR;
+		ErrorCode2 errorCode = ErrorCode2.ERROR_SESSION;
 		if (result) {
 			String serverAddress = ServerAddressUtils.getAddressPort();
 			ImPlatformAuthProto.ImPlatformAuthResponse response = ImPlatformAuthProto.ImPlatformAuthResponse
 					.newBuilder().setPlatformServer(serverAddress).build();
 			commandResponse.setParams(response.toByteArray());
-			errorCode = ErrorCode.SUCCESS;
-		} else {
-			commandResponse.setErrInfo("auth fail.");
+			errorCode = ErrorCode2.SUCCESS;
 		}
-		ChannelWriter.write(channel, commandResponse.setErrCode(errorCode));
+		ChannelWriter.write(channel, commandResponse.setErrCode2(errorCode));
 	}
 }

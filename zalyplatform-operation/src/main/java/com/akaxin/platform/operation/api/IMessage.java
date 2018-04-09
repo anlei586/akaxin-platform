@@ -7,6 +7,6 @@ public interface IMessage {
 
 	public CommandResponse doApiRequest(Command command);
 
-	public boolean doImRequest(Command command);
+	public CommandResponse doImRequest(Command command);
 
 }

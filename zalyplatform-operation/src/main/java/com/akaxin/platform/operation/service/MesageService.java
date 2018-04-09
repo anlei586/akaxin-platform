@@ -86,27 +86,44 @@ public class MesageService implements IMessage {
 	 * 	return true，操作完成，保持长链接
 	 * </pre>
 	 */
-	public boolean doImRequest(Command command) {
+	public CommandResponse doImRequest(Command command) {
+		CommandResponse response = customResponse();
+		ErrorCode2 errCode = ErrorCode2.ERROR;
 		try {
 			String action = command.getAction();
+			String globalUserId = command.getGlobalUserId();
+
 			if (PlatformAction.IM_PLATFORM_HELLO.equals(action) || PlatformAction.IM_PLATFORM_AUTH.equals(action)) {
-				return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
+				// <im.platform.hello> return true by default
+				boolean result = ImOperateExecutor.getExecutor().execute(command.getAction(), command);
+				errCode = getErrorCode2(result, ErrorCode2.ERROR_SESSION);
 			} else {
 				ChannelSession channelSession = command.getChannelSession();
 				String deviceId = channelSession.getDeviceId();
 				ChannelSession acsession = ChannelManager.getChannelSession(deviceId);
-				if (acsession != null && acsession.getUserId() != null
-						&& acsession.getUserId().equals(command.getSiteUserId())) {
-					return ImOperateExecutor.getExecutor().execute(command.getAction(), command);
+
+				if (acsession != null && globalUserId != null && globalUserId.equals(acsession.getUserId())) {
+					boolean result = ImOperateExecutor.getExecutor().execute(command.getAction(), command);
+					errCode = getErrorCode2(result, ErrorCode2.ERROR);
 				} else {
-					// errCode = ErrorCode2.ERROR_SESSION;
-					logger.info("do im platform auth fail command={} ", command.toString());
+					errCode = ErrorCode2.ERROR_SESSION;
 				}
 			}
 		} catch (Exception e) {
-			logger.error("do im request error", e);
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return false;
+		return response.setErrCode2(errCode);
+	}
+
+	// defined by user
+	protected CommandResponse customResponse() {
+		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
+				.setAction(CommandConst.ACTION_RES);
+		return commandResponse;
+	}
+
+	private ErrorCode2 getErrorCode2(boolean result, ErrorCode2 errCode) {
+		return result ? ErrorCode2.SUCCESS : errCode;
 	}
 
 }

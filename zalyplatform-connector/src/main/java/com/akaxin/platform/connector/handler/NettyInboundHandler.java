@@ -82,9 +82,9 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			}
 
 			if (RequestAction.IM.getName().equals(command.getRety())) {
-				CommandResponse response = customResponse(ErrorCode2.SUCCESS);
-				if (!new MesageService().doImRequest(command)) {
-					response.setErrCode2(ErrorCode2.ERROR);
+				CommandResponse response = new MesageService().doImRequest(command);
+				// IM 连接
+				if (ErrorCode2.ERROR_SESSION.equals(response.getErrCode())) {
 					ctx.close();
 				}
 				LogUtils.requestResultLog(logger, command, response);
