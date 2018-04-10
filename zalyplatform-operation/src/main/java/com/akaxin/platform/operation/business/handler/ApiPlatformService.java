@@ -182,7 +182,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
-			if (globalUserId.equals(userId)) {
+			if (!globalUserId.equals(userId)) {
 				logger.error("globalUserId={} userId={} action={}", globalUserId, userId, command.getAction());
 				throw new ErrCodeException(ErrorCode.ERROR_USER_ID);
 			}
