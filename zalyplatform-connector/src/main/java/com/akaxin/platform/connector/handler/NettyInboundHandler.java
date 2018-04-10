@@ -12,7 +12,7 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.command.RedisCommand;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.constant.RequestAction;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.connector.codec.parser.ParserConst;
@@ -84,14 +84,14 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			if (RequestAction.IM.getName().equals(command.getRety())) {
 				CommandResponse response = new MesageService().doImRequest(command);
 				// IM 连接
-				if (ErrorCode2.ERROR_SESSION.equals(response.getErrCode())) {
+				if (ErrorCode.ERROR_SESSION.equals(response.getErrCode())) {
 					ctx.close();
 				}
 				LogUtils.requestResultLog(logger, command, response);
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
 				CommandResponse response = new MesageService().doApiRequest(command);
 				if (response == null) {
-					response = customResponse(ErrorCode2.ERROR);
+					response = customResponse(ErrorCode.ERROR);
 				}
 				ChannelWriter.writeAndClose(ctx.channel(), response);
 				LogUtils.requestResultLog(logger, command, response);
@@ -115,10 +115,10 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	}
 
 	// defined by user
-	protected CommandResponse customResponse(ErrorCode2 errCode) {
+	protected CommandResponse customResponse(ErrorCode errCode) {
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
-		commandResponse.setErrCode2(errCode);
+		commandResponse.setErrCode(errCode);
 		return commandResponse;
 	}
 

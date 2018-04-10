@@ -11,7 +11,7 @@ import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.operation.api.IMessage;
 import com.akaxin.platform.operation.business.dao.SessionDao;
@@ -35,7 +35,7 @@ public class MesageService implements IMessage {
 	 */
 	public CommandResponse doApiRequest(Command command) {
 		CommandResponse response = null;
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		ErrorCode errCode = ErrorCode.ERROR;
 		try {
 			String action = command.getAction();
 			// 过滤一些不需要session验证的action
@@ -61,19 +61,19 @@ public class MesageService implements IMessage {
 						logger.info("api request doApiRequest command={}", command.toString());
 						response = ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 					} else {
-						errCode = ErrorCode2.ERROR_SESSION;
+						errCode = ErrorCode.ERROR_SESSION;
 					}
 				} else {
-					errCode = ErrorCode2.ERROR_SESSION;
+					errCode = ErrorCode.ERROR_SESSION;
 				}
 			}
 		} catch (Exception e) {
-			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			errCode = ErrorCode.ERROR_SYSTEMERROR;
 			LogUtils.requestErrorLog(logger, command, this.getClass(), e);
 		}
 
 		if (response == null) {
-			response = new CommandResponse().setErrCode2(errCode);
+			response = new CommandResponse().setErrCode(errCode);
 		}
 		response.setVersion(CommandConst.PROTOCOL_VERSION).setAction(CommandConst.ACTION_RES);
 
@@ -88,7 +88,7 @@ public class MesageService implements IMessage {
 	 */
 	public CommandResponse doImRequest(Command command) {
 		CommandResponse response = customResponse();
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		ErrorCode errCode = ErrorCode.ERROR;
 		try {
 			String action = command.getAction();
 			String globalUserId = command.getGlobalUserId();
@@ -96,7 +96,7 @@ public class MesageService implements IMessage {
 			if (PlatformAction.IM_PLATFORM_HELLO.equals(action) || PlatformAction.IM_PLATFORM_AUTH.equals(action)) {
 				// <im.platform.hello> return true by default
 				boolean result = ImOperateExecutor.getExecutor().execute(command.getAction(), command);
-				errCode = getErrorCode2(result, ErrorCode2.ERROR_SESSION);
+				errCode = getErrorCode2(result, ErrorCode.ERROR_SESSION);
 			} else {
 				ChannelSession channelSession = command.getChannelSession();
 				String deviceId = channelSession.getDeviceId();
@@ -104,15 +104,15 @@ public class MesageService implements IMessage {
 
 				if (acsession != null && globalUserId != null && globalUserId.equals(acsession.getUserId())) {
 					boolean result = ImOperateExecutor.getExecutor().execute(command.getAction(), command);
-					errCode = getErrorCode2(result, ErrorCode2.ERROR);
+					errCode = getErrorCode2(result, ErrorCode.ERROR);
 				} else {
-					errCode = ErrorCode2.ERROR_SESSION;
+					errCode = ErrorCode.ERROR_SESSION;
 				}
 			}
 		} catch (Exception e) {
 			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return response.setErrCode2(errCode);
+		return response.setErrCode(errCode);
 	}
 
 	// defined by user
@@ -122,8 +122,8 @@ public class MesageService implements IMessage {
 		return commandResponse;
 	}
 
-	private ErrorCode2 getErrorCode2(boolean result, ErrorCode2 errCode) {
-		return result ? ErrorCode2.SUCCESS : errCode;
+	private ErrorCode getErrorCode2(boolean result, ErrorCode errCode) {
+		return result ? ErrorCode.SUCCESS : errCode;
 	}
 
 }

@@ -7,7 +7,10 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
+import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.constant.IErrorCode;
+import com.akaxin.common.exceptions.ErrCodeException;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.ServerAddress;
 import com.akaxin.common.utils.StringHelper;
@@ -15,7 +18,6 @@ import com.akaxin.platform.operation.business.dao.MuteSettingDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.constant.PushText;
-import com.akaxin.platform.operation.exceptions.RequestException;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.push.PushNotification;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
@@ -53,7 +55,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 */
 	public CommandResponse auth(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode2.ERROR;
 		try {
 			ApiPushAuthProto.ApiPushAuthRequest request = ApiPushAuthProto.ApiPushAuthRequest
 					.parseFrom(command.getParams());
@@ -83,7 +85,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			LogUtils.requestErrorLog(logger, command, e);
 		}
 
-		return commandResponse.setErrCode2(errCode);
+		return commandResponse.setErrCode(errCode);
 	}
 
 	/**
@@ -98,7 +100,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 */
 	public CommandResponse notification(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode2.ERROR;
 
 		try {
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
@@ -115,13 +117,13 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (StringUtils.isAnyBlank(userId, userToken, siteServer)) {
-				throw new RequestException(ErrorCode2.ERROR_PARAMETER);
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
 			if (MuteSettingDao.getInstance().checkSiteMute(userId, address)) {
-				throw new RequestException(ErrorCode2.SUCCESS);
+				throw new ErrCodeException(ErrorCode.SUCCESS);
 			}
 
 			title = StringHelper.getSubString(title, 20);
@@ -189,8 +191,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				errCode = ErrorCode2.SUCCESS;
 			}
 		} catch (Exception e) {
-			if (e instanceof RequestException) {
-				errCode = ((RequestException) e).getErrCode();
+			if (e instanceof ErrCodeException) {
+				errCode = ((ErrCodeException) e).getErrCode();
 			} else {
 				errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			}
@@ -198,7 +200,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				LogUtils.requestErrorLog(logger, command, e);
 			}
 		}
-		return commandResponse.setErrCode2(errCode);
+		return commandResponse.setErrCode(errCode);
 	}
 
 	private Command buildPushCommand(PushProto.PushType pushType, PushProto.Notification notification) {

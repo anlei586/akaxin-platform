@@ -6,7 +6,10 @@ import org.slf4j.LoggerFactory;
 
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
+import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.constant.IErrorCode;
+import com.akaxin.common.exceptions.ErrCodeException;
 import com.akaxin.common.exceptions.ZalyException;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.UserIdUtils;
@@ -149,7 +152,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 	 */
 	public CommandResponse phone(Command command) {
 		CommandResponse commandResponse = new CommandResponse();
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode.ERROR;
 		try {
 			ApiUserPhoneProto.ApiUserPhoneRequest request = ApiUserPhoneProto.ApiUserPhoneRequest
 					.parseFrom(command.getParams());
@@ -157,7 +160,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (StringUtils.isAnyEmpty(globalUserId)) {
-				throw new ZalyException(ErrorCode2.ERROR_PARAMETER);
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
 			String phoneId = UserInfoDao.getInstance().getUserPhoneId(globalUserId);
@@ -167,16 +170,16 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 						.setGlobalRoaming("+86").setPhoneId(phoneId).build();
 				commandResponse.setParams(response.toByteArray());
 			}
-			errCode = ErrorCode2.SUCCESS;
+			errCode = ErrorCode.SUCCESS;
 		} catch (Exception e) {
 			if (e instanceof ZalyException) {
-				errCode = ((ZalyException) e).getErrCode();
+				errCode = ((ErrCodeException) e).getErrCode();
 			} else {
-				errCode = ErrorCode2.ERROR_SYSTEMERROR;
+				errCode = ErrorCode.ERROR_SYSTEMERROR;
 			}
 			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return commandResponse.setErrCode2(errCode);
+		return commandResponse.setErrCode(errCode);
 	}
 
 }

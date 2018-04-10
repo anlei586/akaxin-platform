@@ -14,10 +14,12 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
+import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.constant.IErrorCode;
 import com.akaxin.common.crypto.HashCrypto;
 import com.akaxin.common.crypto.RSACrypto;
-import com.akaxin.common.exceptions.ZalyException;
+import com.akaxin.common.exceptions.ErrCodeException;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.StringHelper;
 import com.akaxin.common.utils.UserIdUtils;
@@ -53,7 +55,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 	 */
 	public CommandResponse login(Command command) {
 		CommandResponse commandResponse = new CommandResponse();
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode2.ERROR;
 		try {
 			ApiPlatformLoginProto.ApiPlatformLoginRequest loginRequest = ApiPlatformLoginProto.ApiPlatformLoginRequest
 					.parseFrom(command.getParams());
@@ -116,7 +118,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return commandResponse.setErrCode2(errCode);
+		return commandResponse.setErrCode(errCode);
 	}
 
 	// 绑定新的sessionid与deviceid之间的关系
@@ -143,7 +145,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 
 	public CommandResponse topSecret(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode2.ERROR;
 		try {
 			ApiPlatformTopSecretRequest request = ApiPlatformTopSecretRequest.parseFrom(command.getParams());
 			boolean supportTS = true;
@@ -158,12 +160,12 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			LogUtils.requestErrorLog(logger, command, e);
 		}
 
-		return commandResponse.setErrCode2(errCode);
+		return commandResponse.setErrCode(errCode);
 	}
 
 	public CommandResponse logout(Command command) {
 		CommandResponse commandResponse = new CommandResponse();
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode2.ERROR;
 		try {
 			ApiPlatformLogoutProto.ApiPlatformLogoutRequest request = ApiPlatformLogoutProto.ApiPlatformLogoutRequest
 					.parseFrom(command.getParams());
@@ -177,12 +179,12 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			if (StringUtils.isAnyEmpty(globalUserId, userIdPubk, deviceIdPubk, deviceId)) {
 				logger.error("globalUserId={} action={} userId={} userIdPubk={} deviceId={} deviceIdPubk={}",
 						globalUserId, command.getAction(), userId, userIdPubk, deviceId, deviceIdPubk);
-				throw new ZalyException(ErrorCode2.ERROR_PARAMETER);
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
 			if (globalUserId.equals(userId)) {
 				logger.error("globalUserId={} userId={} action={}", globalUserId, userId, command.getAction());
-				throw new ZalyException(ErrorCode2.ERROR_USER_ID);
+				throw new ErrCodeException(ErrorCode.ERROR_USER_ID);
 			}
 
 			// 获取用户当前的deviceId
@@ -196,14 +198,14 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			}
 
 		} catch (Exception e) {
-			if (e instanceof ZalyException) {
-				errCode = ((ZalyException) e).getErrCode();
+			if (e instanceof ErrCodeException) {
+				errCode = ((ErrCodeException) e).getErrCode();
 			} else {
 				errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			}
 			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return commandResponse.setErrCode2(errCode);
+		return commandResponse.setErrCode(errCode);
 	}
 
 }

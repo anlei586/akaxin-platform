@@ -12,7 +12,7 @@ import com.akaxin.common.channel.ChannelWriter;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.ServerAddressUtils;
 import com.akaxin.platform.operation.business.dao.SessionDao;
@@ -77,14 +77,14 @@ public class ImAuthHandler extends AbstractImHandler<Command, Boolean> {
 	private void authResponse(Channel channel, Command command, boolean result) {
 		CommandResponse commandResponse = new CommandResponse().setVersion(CommandConst.PROTOCOL_VERSION)
 				.setAction(CommandConst.ACTION_RES);
-		ErrorCode2 errorCode = ErrorCode2.ERROR_SESSION;
+		ErrorCode errorCode = ErrorCode.ERROR_SESSION;
 		if (result) {
 			String serverAddress = ServerAddressUtils.getAddressPort();
 			ImPlatformAuthProto.ImPlatformAuthResponse response = ImPlatformAuthProto.ImPlatformAuthResponse
 					.newBuilder().setPlatformServer(serverAddress).build();
 			commandResponse.setParams(response.toByteArray());
-			errorCode = ErrorCode2.SUCCESS;
+			errorCode = ErrorCode.SUCCESS;
 		}
-		ChannelWriter.write(channel, commandResponse.setErrCode2(errorCode));
+		ChannelWriter.write(channel, commandResponse.setErrCode(errorCode));
 	}
 }
