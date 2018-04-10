@@ -1,6 +1,6 @@
 package com.akaxin.platform.operation.imessage.handler;
 
-import com.akaxin.common.chain.IHandler;
+import com.akaxin.common.executor.chain.handler.IHandler;
 
 /**
  * 
