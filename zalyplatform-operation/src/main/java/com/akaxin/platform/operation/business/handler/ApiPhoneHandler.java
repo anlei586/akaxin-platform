@@ -9,7 +9,10 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.CommandConst;
+import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.constant.IErrorCode;
+import com.akaxin.common.exceptions.ErrCodeException;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.common.utils.GsonUtils;
 import com.akaxin.common.utils.ValidatorPattern;
@@ -39,13 +42,17 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 	// 用户申请发送验证码VC<br>
 	public CommandResponse verifyCode(Command command) {
 		CommandResponse commandResponse = new CommandResponse();
-		ErrorCode2 errorCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode.ERROR;
 		try {
 			ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeRequest request = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeRequest
 					.parseFrom(command.getParams());
 			String phoneId = request.getPhoneId();
 			int vcType = request.getVcType();
 			LogUtils.requestDebugLog(logger, command, request.toString());
+
+			if (!ValidatorPattern.isPhoneId(phoneId)) {
+				throw new ErrCodeException(ErrorCode.ERROR2_PHONE_FORMATTING);
+			}
 
 			// 这随机生成一个4位数验证码
 			String phoneVC = String.valueOf((int) ((Math.random() * 9 + 1) * 1000));
@@ -56,18 +63,22 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 					ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse response = ApiPhoneVerifyCodeProto.ApiPhoneVerifyCodeResponse
 							.newBuilder().setExpireTime(60).build();
 					commandResponse.setParams(response.toByteArray());
-					errorCode = ErrorCode2.SUCCESS;
+					errCode = ErrorCode.SUCCESS;
 				} else {
-					errorCode = ErrorCode2.ERROR2_PHONE_GETVERIFYCODE;
+					errCode = ErrorCode.ERROR2_PHONE_GETVERIFYCODE;
 				}
 			} else {
-				errorCode = ErrorCode2.ERROR2_PHONE_GETVERIFYCODE;
+				errCode = ErrorCode.ERROR2_PHONE_GETVERIFYCODE;
 			}
 		} catch (Exception e) {
-			errorCode = ErrorCode2.ERROR_SYSTEMERROR;
+			if (e instanceof ErrCodeException) {
+				errCode = ((ErrCodeException) e).getErrCode();
+			} else {
+				errCode = ErrorCode.ERROR_SYSTEMERROR;
+			}
 			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return commandResponse.setErrCode2(errorCode);
+		return commandResponse.setErrCode(errCode);
 	}
 
 	/**
@@ -178,7 +189,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 				commandRespone.setParams(response.toByteArray());
 				errCode = ErrorCode2.SUCCESS;
 			}
-			
+
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			LogUtils.requestErrorLog(logger, command, e);
