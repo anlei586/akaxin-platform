@@ -46,8 +46,9 @@ public class RedisUserInfoDao {
 	}
 
 	public boolean hdel(String key, String field) {
-		logger.debug("hdel user key={},field={}", key, field);
-		return this.jedis.hdel(key, field) == 1;
+		long result = this.jedis.hdel(key, field);
+		logger.info("hdel user key={},field={},result={}", key, field, result);
+		return result == 1;
 	}
 
 	public boolean saveUserInfo(String key, UserBean bean) {
