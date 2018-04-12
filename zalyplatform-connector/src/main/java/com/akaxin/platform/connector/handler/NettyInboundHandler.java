@@ -11,10 +11,10 @@ import com.akaxin.common.channel.ChannelWriter;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.command.RedisCommand;
-import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.common.constant.CommandConst;
 import com.akaxin.platform.common.constant.ErrorCode;
 import com.akaxin.platform.common.constant.RequestAction;
+import com.akaxin.platform.common.logs.Log2Utils;
 import com.akaxin.platform.connector.codec.parser.ParserConst;
 import com.akaxin.platform.operation.service.MesageService;
 import com.akaxin.proto.core.CoreProto;
@@ -87,14 +87,14 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 				if (ErrorCode.ERROR_SESSION.equals(response.getErrCode())) {
 					ctx.close();
 				}
-				LogUtils.requestResultLog(logger, command, response);
+				Log2Utils.requestResultLog(logger, command, response);
 			} else if (RequestAction.API.getName().equals(command.getRety())) {
 				CommandResponse response = new MesageService().doApiRequest(command);
 				if (response == null) {
 					response = customResponse(ErrorCode.ERROR);
 				}
 				ChannelWriter.writeAndClose(ctx.channel(), response);
-				LogUtils.requestResultLog(logger, command, response);
+				Log2Utils.requestResultLog(logger, command, response);
 			} else {
 				logger.error("unknow request command = {}", command.toString());
 			}
