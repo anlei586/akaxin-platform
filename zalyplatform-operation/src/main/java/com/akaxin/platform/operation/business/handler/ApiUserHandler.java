@@ -6,14 +6,14 @@ import org.slf4j.LoggerFactory;
 
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
-import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.constant.IErrorCode;
-import com.akaxin.common.exceptions.ErrCodeException;
 import com.akaxin.common.exceptions.ZalyException;
 import com.akaxin.common.logs.LogUtils;
-import com.akaxin.common.utils.UserIdUtils;
-import com.akaxin.common.utils.ValidatorPattern;
+import com.akaxin.platform.common.constant.ErrorCode;
+import com.akaxin.platform.common.exceptions.ErrCodeException;
+import com.akaxin.platform.common.utils.UserIdUtils;
+import com.akaxin.platform.common.utils.ValidatorPattern;
 import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.storage.bean.UserBean;

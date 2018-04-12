@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 
-import com.akaxin.common.logs.Log2Creater;
 import com.akaxin.common.logs.LogUtils;
-import com.akaxin.common.utils.StringHelper;
+import com.akaxin.platform.common.logs.Log2Creater;
+import com.akaxin.platform.common.utils.StringHelper;
 import com.akaxin.platform.operation.bean.SmsResult;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;

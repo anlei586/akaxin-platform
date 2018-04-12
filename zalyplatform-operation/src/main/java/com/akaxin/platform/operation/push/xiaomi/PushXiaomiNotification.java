@@ -4,7 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.akaxin.common.utils.StringHelper;
+import com.akaxin.platform.common.utils.StringHelper;
 import com.xiaomi.xmpush.server.Message;
 
 public class PushXiaomiNotification {

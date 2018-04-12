@@ -9,7 +9,7 @@ import com.akaxin.common.channel.ChannelManager;
 import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.RedisCommand;
-import com.akaxin.common.constant.CommandConst;
+import com.akaxin.platform.common.constant.CommandConst;
 import com.akaxin.platform.operation.constant.PlatformAction;
 import com.akaxin.proto.core.CoreProto;
 

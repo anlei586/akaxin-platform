@@ -7,9 +7,9 @@ import com.akaxin.common.channel.ChannelSession;
 import com.akaxin.common.channel.ChannelWriter;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
-import com.akaxin.common.constant.CommandConst;
-import com.akaxin.common.constant.ErrorCode;
 import com.akaxin.common.logs.LogUtils;
+import com.akaxin.platform.common.constant.CommandConst;
+import com.akaxin.platform.common.constant.ErrorCode;
 import com.akaxin.proto.platform.ImPlatformHelloProto;
 import com.akaxin.proto.site.ImSiteHelloProto;
 

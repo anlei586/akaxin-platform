@@ -5,7 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.akaxin.common.utils.StringHelper;
+import com.akaxin.platform.common.utils.StringHelper;
 import com.akaxin.platform.storage.service.DeviceDaoService;
 
 /**

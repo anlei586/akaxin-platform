@@ -5,7 +5,7 @@ import java.security.PublicKey;
 import java.security.Signature;
 import java.util.Base64;
 
-import com.akaxin.common.crypto.RSACrypto;
+import com.akaxin.platform.common.crypto.RSACrypto;
 
 public class TestSign {
 	public static void main(String[] args) throws Exception {

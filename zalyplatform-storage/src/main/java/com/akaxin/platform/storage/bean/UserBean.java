@@ -1,6 +1,6 @@
 package com.akaxin.platform.storage.bean;
 
-import com.akaxin.common.utils.GsonUtils;
+import com.akaxin.platform.common.utils.GsonUtils;
 
 public class UserBean {
 	private String userId;

@@ -7,8 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.akaxin.common.utils.GsonUtils;
-import com.akaxin.common.utils.ValidatorPattern;
+import com.akaxin.platform.common.utils.GsonUtils;
+import com.akaxin.platform.common.utils.ValidatorPattern;
 import com.akaxin.platform.storage.bean.PushTokenBean;
 import com.akaxin.platform.storage.bean.UserBean;
 import com.akaxin.platform.storage.constant.UserKey;

@@ -3,7 +3,7 @@ package com.akaxin.platform.operation.constant;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.akaxin.common.utils.ServerAddress;
+import com.akaxin.platform.common.utils.ServerAddress;
 
 /**
  * 配置是否允许push展示原文的host地址

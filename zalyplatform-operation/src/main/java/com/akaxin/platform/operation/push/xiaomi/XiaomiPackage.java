@@ -6,7 +6,7 @@ import java.util.Random;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.akaxin.common.utils.GsonUtils;
+import com.akaxin.platform.common.utils.GsonUtils;
 import com.xiaomi.xmpush.server.Message;
 
 public class XiaomiPackage {
