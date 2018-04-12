@@ -1,22 +1,19 @@
 package com.akaxin.platform.common.utils;
 
 import java.net.Inet4Address;
-import java.net.UnknownHostException;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class IpUtils {
-	
-//	public static String getLocalAddress() {
-//
-//		try {
-//			return Inet4Address.getLocalHost().getHostAddress();
-//		} catch (UnknownHostException e) {
-//			e.printStackTrace();
-//		}
-//
-//		return null;
-//	}
-//
-//	public static int getPort() {
-//		return 8448;
-//	}
+	private static final Logger logger = LoggerFactory.getLogger(IpUtils.class);
+
+	public static String getLocalAddress() {
+		try {
+			return Inet4Address.getLocalHost().getHostAddress();
+		} catch (Exception e) {
+			logger.error("unknown host exception", e);
+		}
+		return null;
+	}
 }

@@ -7,10 +7,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
+import com.akaxin.platform.common.utils.IpUtils;
+
 public abstract class ZalyMonitor {
 
+	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	public static final long INTERVAL_TIME = 1 * 1000;
 
+	private Logger monitorLogger;
 	private long intervalCount = 0;// 间隔输出次数
 
 	private List<String> headers;
@@ -40,11 +44,15 @@ public abstract class ZalyMonitor {
 		return monitorData;
 	}
 
+	public Logger getLogger() {
+		if (monitorLogger == null) {
+			monitorLogger = getMonitorLogger();
+		}
+		return monitorLogger;
+	}
+
 	public void output(List<ZalyMonitor> monitors, Map<String, String> monitorData) {
-		Logger logger = getMonitorLogger();
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
+		Logger logger = this.getLogger();
 		// header
 		StringBuffer sb = new StringBuffer();
 		List<String> monitorHeaders = this.getHeader();
@@ -55,7 +63,7 @@ public abstract class ZalyMonitor {
 		}
 		sb.append("time");
 		if (intervalCount % 15 == 0) {
-			String host = "localhost";
+			String host = IpUtils.getLocalAddress();
 			logger.info(host + ":" + sdf.format(System.currentTimeMillis()));
 			logger.info(sb.toString());
 			intervalCount = 0;
