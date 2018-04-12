@@ -9,6 +9,10 @@ import org.apache.log4j.Logger;
 
 import com.akaxin.platform.common.utils.IpUtils;
 
+/**
+ * @author Sam{@link an.guoyue254@gmail.com}
+ * @since 2018-04-12 19:44:33
+ */
 public abstract class ZalyMonitor {
 
 	private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

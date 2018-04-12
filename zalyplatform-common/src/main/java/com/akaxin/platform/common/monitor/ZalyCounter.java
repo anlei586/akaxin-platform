@@ -3,55 +3,47 @@ package com.akaxin.platform.common.monitor;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ZalyCounter {
-
 	private final AtomicLong count;
-
-	private volatile long prevCount;
 
 	public ZalyCounter() {
 		count = new AtomicLong(0);
 	}
 
-	public ZalyCounter(int count) {
-		this.count = new AtomicLong(count);
+	public ZalyCounter(int num) {
+		this.count = new AtomicLong(num);
 	}
 
+	// add
 	public long inc() {
 		return count.incrementAndGet();
 	}
 
-	public long inc(long i) {
-		return count.addAndGet(i);
+	// add
+	public long inc(long num) {
+		return count.addAndGet(num);
 	}
 
+	// dec
 	public long dec() {
 		return count.decrementAndGet();
 	}
 
-	public long dec(long i) {
-		return count.getAndAdd(-i);
+	// dec
+	public long dec(long num) {
+		return count.getAndAdd(-num);
 	}
 
-	/**
-	 * reset counter to 0
-	 */
-	public void clear() {
-		count.set(0);
-		prevCount = 0;
-	}
-
+	// get
 	public long getCount() {
 		return count.get();
 	}
 
+	// get
 	public String getCountString() {
 		return String.valueOf(count.get());
 	}
 
-	public long getCountChange() {
-		long tempCount = count.get();
-		long change = tempCount - prevCount;
-		prevCount = tempCount;
-		return change;
+	public void clear() {
+		count.set(0);
 	}
 }
