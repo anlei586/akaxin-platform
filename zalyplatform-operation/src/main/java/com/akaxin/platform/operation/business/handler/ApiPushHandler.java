@@ -8,7 +8,6 @@ import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.ErrorCode2;
 import com.akaxin.common.constant.IErrorCode;
-import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.common.constant.CommandConst;
 import com.akaxin.platform.common.constant.ErrorCode;
 import com.akaxin.platform.common.exceptions.ErrCodeException;
@@ -66,7 +65,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String port = request.getSitePort();
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
-			Log2Utils.requestInfoLog(logger, command, request.toString());
+			Log2Utils.requestInfoLog(logger, command,
+					StringHelper.format("siteAddress={} siteName", siteAddress + ":" + port, name));
 
 			if (StringUtils.isNoneEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
 				// save db
