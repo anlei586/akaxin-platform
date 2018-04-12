@@ -12,6 +12,7 @@ import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.common.constant.CommandConst;
 import com.akaxin.platform.common.constant.ErrorCode;
 import com.akaxin.platform.common.exceptions.ErrCodeException;
+import com.akaxin.platform.common.logs.Log2Utils;
 import com.akaxin.platform.common.utils.ServerAddress;
 import com.akaxin.platform.common.utils.StringHelper;
 import com.akaxin.platform.operation.business.dao.MuteSettingDao;
@@ -65,7 +66,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String port = request.getSitePort();
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
-			LogUtils.requestDebugLog(logger, command, request.toString());
+			Log2Utils.requestInfoLog(logger, command, request.toString());
 
 			if (StringUtils.isNoneEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
 				// save db
@@ -82,7 +83,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
-			LogUtils.requestErrorLog(logger, command, e);
+			Log2Utils.requestErrorLog(logger, command, e);
 		}
 
 		return commandResponse.setErrCode(errCode);
@@ -114,7 +115,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId或者群组groupId
 			String pushFromName = notification.getPushFromName();// 发送者用户昵称或者群组昵称
 			String pushAlter = notification.getPushAlert();
-			LogUtils.requestDebugLog(logger, command, request.toString());
+			Log2Utils.requestDebugLog(logger, command, request.toString());
 
 			if (StringUtils.isAnyBlank(userId, userToken, siteServer)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
@@ -197,7 +198,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			}
 			if (!errCode.isSuccess()) {
-				LogUtils.requestErrorLog(logger, command, e);
+				Log2Utils.requestErrorLog(logger, command, e);
 			}
 		}
 		return commandResponse.setErrCode(errCode);
