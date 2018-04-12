@@ -3,6 +3,8 @@ package com.akaxin.platform.connector.main;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.akaxin.platform.common.monitor.JstatMonitor;
+import com.akaxin.platform.common.monitor.ZalyMonitorController;
 import com.akaxin.platform.connector.netty.NettyServer;
 import com.akaxin.platform.operation.push.apns.APNsPushManager;
 
@@ -22,11 +24,25 @@ public class BootStrap {
 		}
 		logger.info("Start Platform Server port:{}", port);
 
-		APNsPushManager.getInstance().start();
+		initZalyMonitor();
+		initApnsPush();
+		startNettyServer(port);
 
+	}
+
+	private static void initZalyMonitor() {
+		ZalyMonitorController zmc = new ZalyMonitorController();
+		zmc.addMonitor(new JstatMonitor());
+		zmc.start();
+	}
+
+	private static void initApnsPush() {
+		APNsPushManager.getInstance().start();
+	}
+
+	private static void startNettyServer(int port) {
 		new NettyServer() {
 		}.start(ServerAddress.getLocalAddress(), port);
-
 	}
 
 }

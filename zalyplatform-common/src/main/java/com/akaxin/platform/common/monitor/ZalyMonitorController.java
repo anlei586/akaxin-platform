@@ -3,7 +3,6 @@ package com.akaxin.platform.common.monitor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -14,7 +13,6 @@ public class ZalyMonitorController {
 	private static Logger logger = Logger.getLogger(ZalyMonitorController.class);
 
 	private List<ZalyMonitor> monitors = new ArrayList<ZalyMonitor>();
-	private Map<String, String> monitorData = new ConcurrentHashMap<String, String>();
 
 	public ZalyMonitorController() {
 	}
@@ -31,14 +29,14 @@ public class ZalyMonitorController {
 				public void run() {
 					while (true) {
 						try {
-							monitor.buildBody(monitorData);
+							Map<String, String> monitorData = monitor.getBody();
 							monitor.output(monitors, monitorData);
 							monitor.clear();
 							long interval = Math.max(monitor.getIntervalTime(), ZalyMonitor.INTERVAL_TIME);
 							ThreadHelper.sleep(interval);
 						} catch (Exception e) {
-							logger.error(StringHelper.format("Monitor Item error! monitor: {}",
-									monitor.getClass().getName()));
+							logger.error(StringHelper.format("Monitor data error! monitor: {}",
+									monitor.getClass().getName()), e);
 						}
 					}
 				}

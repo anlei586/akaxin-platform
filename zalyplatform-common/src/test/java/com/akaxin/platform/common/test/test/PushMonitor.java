@@ -12,7 +12,7 @@ import com.akaxin.platform.common.monitor.ZalyCounter;
 import com.akaxin.platform.common.monitor.ZalyMonitor;
 
 public class PushMonitor extends ZalyMonitor {
-	private static Map<String, ZalyCounter> data = new HashMap<String, ZalyCounter>();;
+	private static Map<String, ZalyCounter> data = new HashMap<String, ZalyCounter>();
 
 	public static ZalyCounter COUNTER_A = new ZalyCounter(1);
 	public static ZalyCounter COUNTER_B = new ZalyCounter(2);

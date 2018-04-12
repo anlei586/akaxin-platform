@@ -1,9 +1,9 @@
 package com.akaxin.platform.common.monitor;
 
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 
@@ -15,9 +15,11 @@ public abstract class ZalyMonitor {
 
 	private List<String> headers;
 
+	private Map<String, String> monitorData = new ConcurrentHashMap<String, String>();
+
 	abstract public List<String> buidHeader();
 
-	abstract public void buildBody(Map<String, String> monitor);
+	abstract public void buildBody(Map<String, String> bodyMap);
 
 	abstract public long getIntervalTime();
 
@@ -33,18 +35,22 @@ public abstract class ZalyMonitor {
 		return headers;
 	}
 
+	public Map<String, String> getBody() {
+		buildBody(monitorData);
+		return monitorData;
+	}
+
 	public void output(List<ZalyMonitor> monitors, Map<String, String> monitorData) {
 		Logger logger = getMonitorLogger();
+
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		// header
 		StringBuffer sb = new StringBuffer();
-		for (ZalyMonitor iMonitor : monitors) {
-			List<String> monitorHeaders = iMonitor.getHeader();
-			if (monitorHeaders != null) {
-				for (String title : iMonitor.getHeader()) {
-					sb.append(title).append("\t");
-				}
+		List<String> monitorHeaders = this.getHeader();
+		if (monitorHeaders != null) {
+			for (String header : this.getHeader()) {
+				sb.append(header).append("\t");
 			}
 		}
 		sb.append("time");
@@ -57,14 +63,12 @@ public abstract class ZalyMonitor {
 
 		// body
 		StringBuffer stat = new StringBuffer();
-		for (ZalyMonitor monitor : monitors) {
-			for (String title : monitor.getHeader()) {
-				String body = monitorData.get(title);
-				int tabCount = (title.length() >>> 3) + 1;
-				stat.append(body);
-				for (int i = 0; i < tabCount; i++) {
-					stat.append("\t");
-				}
+		for (String header : this.getHeader()) {
+			String body = monitorData.get(header);
+			int tabCount = (header.length() >>> 3) + 1;
+			stat.append(body);
+			for (int i = 0; i < tabCount; i++) {
+				stat.append("\t");
 			}
 		}
 
