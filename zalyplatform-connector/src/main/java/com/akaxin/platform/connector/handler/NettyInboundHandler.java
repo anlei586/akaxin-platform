@@ -78,7 +78,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			command.setStartTime(System.currentTimeMillis());
 
 			if (!"ping".equals(command.getMethod())) {
-				logger.info("client id:{} request command:{}", clientIP, command.toString());
+				logger.debug("client id:{} request command:{}", clientIP, command.toString());
 			}
 
 			if (RequestAction.IM.getName().equals(command.getRety())) {
