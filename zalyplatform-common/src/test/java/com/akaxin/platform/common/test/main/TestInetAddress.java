@@ -1,4 +1,4 @@
-package com.akaxin.platform.common.test.test;
+package com.akaxin.platform.common.test.main;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

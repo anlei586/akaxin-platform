@@ -1,7 +1,7 @@
 package com.akaxin.connector.test;
 
 import com.akaxin.platform.common.monitor.ZalyMonitorController;
-import com.akaxin.platform.common.test.test.PushMonitor;
+import com.akaxin.platform.common.test.main.PushMonitor;
 
 public class MonitorTest {
 	public static void main(String[] args) {

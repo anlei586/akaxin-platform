@@ -1,4 +1,4 @@
-package com.akaxin.platform.common.test.test;
+package com.akaxin.platform.common.test.main;
 
 import com.akaxin.platform.common.monitor.JstatMonitor;
 import com.akaxin.platform.common.monitor.ZalyMonitorController;

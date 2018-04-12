@@ -1,4 +1,4 @@
-package com.akaxin.platform.common.test.test;
+package com.akaxin.platform.common.test.main;
 
 import java.util.ArrayList;
 import java.util.HashMap;
