@@ -116,6 +116,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String pushFromName = notification.getPushFromName();// 发送者用户昵称或者群组昵称
 			String pushAlter = notification.getPushAlert();
 			Log2Utils.requestDebugLog(logger, command, request.toString());
+			PushMonitor.COUNTER_TOTAL.inc();
 
 			if (StringUtils.isAnyBlank(userId, userToken, siteServer)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
@@ -309,21 +310,28 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			return "notice";
 		case PUSH_GROUP_TEXT:
 			PushMonitor.COUNTER_G_TEXT.inc();
+			return "group_msg";
 		case PUSH_GROUP_IMAGE:
 			PushMonitor.COUNTER_G_PIC.inc();
+			return "group_msg";
 		case PUSH_GROUP_VOICE:
 			PushMonitor.COUNTER_G_AUDIO.inc();
 			return "group_msg";
 		case PUSH_TEXT:
 			PushMonitor.COUNTER_U2_TEXT.inc();
+			return "u2_msg";
 		case PUSH_IMAGE:
 			PushMonitor.COUNTER_U2_PIC.inc();
+			return "u2_msg";
 		case PUSH_VOICE:
 			PushMonitor.COUNTER_U2_AUDIO.inc();
+			return "u2_msg";
 		case PUSH_SECRET_TEXT:
 			PushMonitor.COUNTER_U2_TEXTS.inc();
+			return "u2_msg";
 		case PUSH_SECRET_IMAGE:
 			PushMonitor.COUNTER_U2_PICS.inc();
+			return "u2_msg";
 		case PUSH_SECRET_VOICE:
 			PushMonitor.COUNTER_U2_AUDIOS.inc();
 			return "u2_msg";
