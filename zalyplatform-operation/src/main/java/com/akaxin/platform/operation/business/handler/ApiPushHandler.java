@@ -192,6 +192,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				errCode = ErrorCode2.SUCCESS;
 			}
 		} catch (Exception e) {
+			PushMonitor.COUNTER_ERROR.inc();
 			if (e instanceof ErrCodeException) {
 				errCode = ((ErrCodeException) e).getErrCode();
 			} else {
@@ -241,36 +242,26 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 
 		switch (pushType) {
 		case PUSH_TEXT:
-			PushMonitor.COUNTER_U2_TEXT.inc();
 			return PushText.TEXT;
 		case PUSH_GROUP_TEXT:
-			PushMonitor.COUNTER_G_TEXT.inc();
 			return PushText.GROUP_TEXT;
 		case PUSH_SECRET_TEXT:
-			PushMonitor.COUNTER_U2_TEXTS.inc();
 		case PUSH_GROUP_SECRET_TEXT:
 			return PushText.SECRE_TEXT;
 		case PUSH_IMAGE:
-			PushMonitor.COUNTER_U2_PIC.inc();
 			return PushText.IMAGE_TEXT;
 		case PUSH_GROUP_IMAGE:
-			PushMonitor.COUNTER_G_PIC.inc();
 			return PushText.GROUP_IMAGE_TEXT;
 		case PUSH_SECRET_IMAGE:
-			PushMonitor.COUNTER_U2_PICS.inc();
 		case PUSH_GROUP_SECRET_IMAGE:
 			return PushText.SECRE_IMAGE_TEXT;
 		case PUSH_VOICE:
-			PushMonitor.COUNTER_U2_AUDIO.inc();
 			return PushText.AUDIO_TEXT;
 		case PUSH_GROUP_VOICE:
-			PushMonitor.COUNTER_G_AUDIO.inc();
 			return PushText.GROUP_AUDIO_TEXT;
 		case PUSH_SECRET_VOICE:
-			PushMonitor.COUNTER_U2_AUDIOS.inc();
 			return PushText.SECRE_AUDIO_TEXT;
 		case PUSH_APPLY_FRIEND_NOTICE:
-			PushMonitor.COUNTER_OTHERS.inc();
 			return PushText.NEW_FRIEND_APPLY;
 		default:
 			break;
@@ -314,21 +305,33 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	private String getGotoType(PushProto.PushType pushType) {
 		switch (pushType) {
 		case PUSH_NOTICE:
+			PushMonitor.COUNTER_OTHERS.inc();
 			return "notice";
 		case PUSH_GROUP_TEXT:
+			PushMonitor.COUNTER_G_TEXT.inc();
 		case PUSH_GROUP_IMAGE:
+			PushMonitor.COUNTER_G_PIC.inc();
 		case PUSH_GROUP_VOICE:
+			PushMonitor.COUNTER_G_AUDIO.inc();
 			return "group_msg";
 		case PUSH_TEXT:
+			PushMonitor.COUNTER_U2_TEXT.inc();
 		case PUSH_IMAGE:
+			PushMonitor.COUNTER_U2_PIC.inc();
 		case PUSH_VOICE:
+			PushMonitor.COUNTER_U2_AUDIO.inc();
 		case PUSH_SECRET_TEXT:
+			PushMonitor.COUNTER_U2_TEXTS.inc();
 		case PUSH_SECRET_IMAGE:
-		case PUSH_GROUP_SECRET_VOICE:
+			PushMonitor.COUNTER_U2_PICS.inc();
+		case PUSH_SECRET_VOICE:
+			PushMonitor.COUNTER_U2_AUDIOS.inc();
 			return "u2_msg";
 		case PUSH_APPLY_FRIEND_NOTICE:
+			PushMonitor.COUNTER_OTHERS.inc();
 			return "friend_apply";// 新的好友申请
 		default:
+			PushMonitor.COUNTER_OTHERS.inc();
 			return "main ";
 		}
 	}

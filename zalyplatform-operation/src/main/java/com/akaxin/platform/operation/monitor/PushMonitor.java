@@ -20,6 +20,7 @@ import com.akaxin.platform.common.monitor.ZalyMonitor;
 public class PushMonitor extends ZalyMonitor {
 	private static Map<String, ZalyCounter> counterMap = new HashMap<String, ZalyCounter>();
 
+	public static ZalyCounter COUNTER_TOTAL = new ZalyCounter();
 	public static ZalyCounter COUNTER_U2_TEXT = new ZalyCounter();
 	public static ZalyCounter COUNTER_U2_TEXTS = new ZalyCounter();
 	public static ZalyCounter COUNTER_U2_PIC = new ZalyCounter();
@@ -31,8 +32,10 @@ public class PushMonitor extends ZalyMonitor {
 	public static ZalyCounter COUNTER_G_AUDIO = new ZalyCounter();
 
 	public static ZalyCounter COUNTER_OTHERS = new ZalyCounter();
+	public static ZalyCounter COUNTER_ERROR = new ZalyCounter();
 
 	static {
+		counterMap.put("Total", COUNTER_TOTAL);
 		counterMap.put("U2_TEXT", COUNTER_U2_TEXT);
 		counterMap.put("U2_TEXTS", COUNTER_U2_TEXTS);
 		counterMap.put("U2_PIC", COUNTER_U2_PIC);
@@ -43,11 +46,13 @@ public class PushMonitor extends ZalyMonitor {
 		counterMap.put("G_PIC", COUNTER_G_PIC);
 		counterMap.put("G_AUDIO", COUNTER_G_AUDIO);
 		counterMap.put("Other", COUNTER_OTHERS);
+		counterMap.put("Error", COUNTER_ERROR);
 	}
 
 	@Override
 	public List<String> buidHeader() {
 		List<String> headers = new ArrayList<String>();
+		headers.add("Total");
 		headers.add("U2_TEXT");
 		headers.add("U2_TEXTS");
 		headers.add("U2_PIC");
@@ -58,6 +63,7 @@ public class PushMonitor extends ZalyMonitor {
 		headers.add("G_PIC");
 		headers.add("G_AUDIO");
 		headers.add("Other");
+		headers.add("Error");
 		return headers;
 	}
 
