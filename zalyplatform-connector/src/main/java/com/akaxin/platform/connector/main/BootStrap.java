@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.platform.common.monitor.JstatMonitor;
 import com.akaxin.platform.common.monitor.ZalyMonitorController;
 import com.akaxin.platform.connector.netty.NettyServer;
+import com.akaxin.platform.operation.monitor.PushMonitor;
+import com.akaxin.platform.operation.monitor.SMSMonitor;
 import com.akaxin.platform.operation.push.apns.APNsPushManager;
 
 /**
@@ -33,6 +35,8 @@ public class BootStrap {
 	private static void initZalyMonitor() {
 		ZalyMonitorController zmc = new ZalyMonitorController();
 		zmc.addMonitor(new JstatMonitor());
+		zmc.addMonitor(new SMSMonitor());
+		zmc.addMonitor(new PushMonitor());
 		zmc.start();
 	}
 
