@@ -46,11 +46,10 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		ChannelSession channelSession = ctx.channel().attr(ParserConst.CHANNELSESSION).get();
-		//
 		if (IM == channelSession.getCtype()) {
 			ChannelManager.delChannelSession(channelSession.getDeviceId());
 		}
-		logger.info("close netty channel connection...client={}", ctx.channel().toString());
+		logger.debug("close netty channel connection...client={}", ctx.channel().toString());
 	}
 
 	@Override

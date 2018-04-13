@@ -21,10 +21,10 @@ public class TempSpaceDao {
 		try {
 			result = tempSpaceDao.setStringValue(key, value, expireTime);
 		} catch (Exception e) {
-			logger.info(StringHelper.format("apply temp space key={} value={} expireTime={}", key, value, expireTime),
+			logger.error(StringHelper.format("apply temp space key={} value={} expireTime={}", key, value, expireTime),
 					e);
 		}
-		logger.info(StringHelper.format("apply temp space key={} value={} expireTime={} result={}", key, value,
+		logger.debug(StringHelper.format("apply temp space key={} value={} expireTime={} result={}", key, value,
 				expireTime, result));
 		return result;
 	}
