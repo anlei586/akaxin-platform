@@ -8,6 +8,7 @@ import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.common.logs.Log2Creater;
 import com.akaxin.platform.common.utils.StringHelper;
 import com.akaxin.platform.operation.bean.SmsResult;
+import com.akaxin.platform.operation.monitor.SMSMonitor;
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.SmsSingleSenderResult;
 import com.google.common.util.concurrent.RateLimiter;
@@ -40,6 +41,7 @@ public class SmsSender {
 			outPrintSmsLog(sendTotalNumber, phoneId, vc, smsResult);
 			return new SmsResult(smsResult.result, smsResult.errMsg);
 		} catch (Exception e) {
+			SMSMonitor.COUNTER_ERROR.inc();
 			logger.error(StringHelper.format("send sms error,phoneId:{} vc:{}", phoneId, vc), e);
 		}
 		return null;
@@ -47,6 +49,12 @@ public class SmsSender {
 
 	private static void outPrintSmsLog(long count, String phoneId, String vc, SmsSingleSenderResult result) {
 		try {
+			SMSMonitor.COUNTER_TOTAL.inc();
+			if (result.result == 0) {
+				SMSMonitor.COUNTER_SUCCESS.inc();
+			} else {
+				SMSMonitor.COUNTER_FILTER.inc();
+			}
 			sendTotalNumber++;
 			LogUtils.info(logger, "sms-count:{} phoneId:{} vc:{} result:{} errorMsg:{} ", sendTotalNumber, phoneId, vc,
 					result.result, result.errMsg);

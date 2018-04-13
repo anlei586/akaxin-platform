@@ -19,6 +19,7 @@ import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.constant.PushText;
 import com.akaxin.platform.operation.executor.ImOperateExecutor;
+import com.akaxin.platform.operation.monitor.PushMonitor;
 import com.akaxin.platform.operation.push.PushNotification;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushApnsNotification;
@@ -102,7 +103,6 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	public CommandResponse notification(Command command) {
 		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
 		IErrorCode errCode = ErrorCode2.ERROR;
-
 		try {
 			ApiPushNotificationProto.ApiPushNotificationRequest request = ApiPushNotificationProto.ApiPushNotificationRequest
 					.parseFrom(command.getParams());
@@ -232,37 +232,45 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 
 	private String getAlterText(ServerAddress address, String fromName, String pushAlter, PushProto.PushType pushType) {
 		// 平台是否配置允许该站点host发送明文push
-		// if (PushHost.isAuthedAddress(address)) {
 		if (StringUtils.isNotEmpty(pushAlter)) {
 			if (StringUtils.isNotEmpty(fromName)) {
 				return fromName + ":" + pushAlter;
 			}
 			return pushAlter;
 		}
-		// }
 
 		switch (pushType) {
 		case PUSH_TEXT:
+			PushMonitor.COUNTER_U2_TEXT.inc();
 			return PushText.TEXT;
 		case PUSH_GROUP_TEXT:
+			PushMonitor.COUNTER_G_TEXT.inc();
 			return PushText.GROUP_TEXT;
 		case PUSH_SECRET_TEXT:
+			PushMonitor.COUNTER_U2_TEXTS.inc();
 		case PUSH_GROUP_SECRET_TEXT:
 			return PushText.SECRE_TEXT;
 		case PUSH_IMAGE:
+			PushMonitor.COUNTER_U2_PIC.inc();
 			return PushText.IMAGE_TEXT;
 		case PUSH_GROUP_IMAGE:
+			PushMonitor.COUNTER_G_PIC.inc();
 			return PushText.GROUP_IMAGE_TEXT;
 		case PUSH_SECRET_IMAGE:
+			PushMonitor.COUNTER_U2_PICS.inc();
 		case PUSH_GROUP_SECRET_IMAGE:
 			return PushText.SECRE_IMAGE_TEXT;
 		case PUSH_VOICE:
+			PushMonitor.COUNTER_U2_AUDIO.inc();
 			return PushText.AUDIO_TEXT;
 		case PUSH_GROUP_VOICE:
+			PushMonitor.COUNTER_G_AUDIO.inc();
 			return PushText.GROUP_AUDIO_TEXT;
 		case PUSH_SECRET_VOICE:
+			PushMonitor.COUNTER_U2_AUDIOS.inc();
 			return PushText.SECRE_AUDIO_TEXT;
 		case PUSH_APPLY_FRIEND_NOTICE:
+			PushMonitor.COUNTER_OTHERS.inc();
 			return PushText.NEW_FRIEND_APPLY;
 		default:
 			break;
