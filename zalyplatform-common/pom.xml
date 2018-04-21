@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>com.akaxin.proto</groupId>
 			<artifactId>openzaly-protobuf</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1-RELEASE</version>
 		</dependency>
 
 		<!-- <dependency> <groupId>org.bouncycastle</groupId> <artifactId>bcprov-jdk16</artifactId> 
@@ -24,7 +24,7 @@
 		<dependency>
 			<groupId>com.akaxin.common</groupId>
 			<artifactId>openzaly-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.1-RELEASE</version>
 		</dependency>
 
 	</dependencies>
