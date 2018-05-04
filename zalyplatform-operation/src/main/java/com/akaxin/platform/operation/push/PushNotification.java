@@ -2,6 +2,8 @@ package com.akaxin.platform.operation.push;
 
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushApnsNotification;
+import com.akaxin.platform.operation.push.umeng.PushUmengNotification;
+import com.akaxin.platform.operation.push.umeng.UmengPackage;
 import com.akaxin.platform.operation.push.xiaomi.PushXiaomiNotification;
 import com.akaxin.platform.operation.push.xiaomi.XiaomiPackage;
 
@@ -22,6 +24,10 @@ public class PushNotification {
 	 */
 	public static void pushXiaomiNotification(XiaomiPackage pack) {
 		PushXiaomiNotification.getInstance().pushNotification(pack);
+	}
+
+	public static void pushUMengNotification(UmengPackage pack) {
+		PushUmengNotification.getInstance().pushNotification(pack);
 	}
 
 }

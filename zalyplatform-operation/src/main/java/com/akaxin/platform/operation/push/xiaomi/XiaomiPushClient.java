@@ -8,15 +8,21 @@ import com.xiaomi.xmpush.server.Message;
 import com.xiaomi.xmpush.server.Result;
 import com.xiaomi.xmpush.server.Sender;
 
-public class XiaomiPushManager {
-	private static final Logger logger = LoggerFactory.getLogger(XiaomiPushManager.class);
+/**
+ * 发送xiaomiPush的客户端管理
+ * 
+ * @author Sam{@link an.guoyue254@gmail.com}
+ * @since 2018-05-04 18:41:48
+ */
+public class XiaomiPushClient {
+	private static final Logger logger = LoggerFactory.getLogger(XiaomiPushClient.class);
 	private static final String APP_SECRET_KEY = "S5BPUWhx4v7F3bxMHoaOfA==";
 	private static final String APP_SECRET_KEY_DEBUG = "m3s/b/KvbKjSZaep1zE2Zw==";
 
 	// private static Sender sandboxSender;
 	// private static Sender officialSender;
 
-	public static void pushMessage(String token, Message message, boolean isSandbox) throws Exception {
+	public static Result pushMessage(String token, Message message, boolean isSandbox) throws Exception {
 		logger.info("push xiaoxi message token={} isSandbox={} message={}", token, isSandbox, message);
 		Sender sender = null;
 		Constants.useOfficial();
@@ -26,7 +32,7 @@ public class XiaomiPushManager {
 			sender = new Sender(APP_SECRET_KEY);
 		}
 		Result result = sender.send(message, token, 1); // 根据regID，发送消息到指定设备上，不重试。
-		logger.info("send xiaomi push result={}", result);
+		return result;
 	}
 
 	/**

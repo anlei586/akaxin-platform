@@ -18,11 +18,11 @@ import com.akaxin.platform.operation.business.dao.MuteSettingDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.business.dao.UserTokenDao;
 import com.akaxin.platform.operation.constant.PushText;
-import com.akaxin.platform.operation.executor.ImOperateExecutor;
 import com.akaxin.platform.operation.monitor.PushMonitor;
 import com.akaxin.platform.operation.push.PushNotification;
 import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushApnsNotification;
+import com.akaxin.platform.operation.push.umeng.UmengPackage;
 import com.akaxin.platform.operation.push.xiaomi.XiaomiPackage;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
@@ -161,8 +161,6 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 						PushApnsNotification.getInstance().pushNotification(apnsPack);
 					}
 					break;
-				case ANDROID_HUAWEI:
-				case ANDROID_OPPO:
 				case ANDROID_XIAOMI:
 					String xmPushToken = UserInfoDao.getInstance().getPushToken(userId);
 					logger.debug("xiaomi push......pushToken={}", xmPushToken);
@@ -181,11 +179,24 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 					}
 
 					break;
+				case ANDROID_HUAWEI:
+				case ANDROID_OPPO:
 				case ANDROID:
-					Command pushCommand = buildPushCommand(pushType, notification);
-					pushCommand.setDeviceId(deviceId);
-					logger.debug("andorid push to client pushcommand={}", pushCommand.toString());
-					ImOperateExecutor.getExecutor().execute("im.ptc.push", pushCommand);
+					String umengToken = UserInfoDao.getInstance().getPushToken(userId);
+					if (StringUtils.isNotBlank(umengToken)) {
+						UmengPackage umpack = new UmengPackage();
+						umpack.setPushToken(umengToken);
+						if (address.isRightAddress()) {
+							umpack.setTitle(title + " " + address.getAddress());
+						} else {
+							umpack.setTitle(title);
+						}
+						umpack.setText(getAlterText(address, pushFromName, pushAlter, pushType));
+						umpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
+						logger.debug("andorid push to client push package={}", umpack.toString());
+						PushNotification.pushUMengNotification(umpack);
+					}
+					break;
 				default:
 					logger.error("unknow client type:{}", clientType);
 					break;
