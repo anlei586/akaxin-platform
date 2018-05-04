@@ -58,7 +58,7 @@ public class PushUmengNotification {
 			}
 			unicast.setDeviceToken(pushToken);
 			unicast.setTicker(pack.getTicker());
-			unicast.setTitle(pack.getTicker());
+			unicast.setTitle(pack.getTitle());
 			unicast.setText(pack.getText());
 			unicast.goAppAfterOpen();
 			unicast.setDisplayType(AndroidNotification.DisplayType.NOTIFICATION);
