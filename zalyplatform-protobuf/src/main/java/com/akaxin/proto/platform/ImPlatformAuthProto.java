@@ -20,7 +20,7 @@ public final class ImPlatformAuthProto {
 
     /**
      * <pre>
-     *用户个人ID
+     *用户个人ID ，这个地方需要使用Global User ID
      * </pre>
      *
      * <code>optional string user_id = 1;</code>
@@ -28,7 +28,7 @@ public final class ImPlatformAuthProto {
     java.lang.String getUserId();
     /**
      * <pre>
-     *用户个人ID
+     *用户个人ID ，这个地方需要使用Global User ID
      * </pre>
      *
      * <code>optional string user_id = 1;</code>
@@ -134,7 +134,7 @@ public final class ImPlatformAuthProto {
     private volatile java.lang.Object userId_;
     /**
      * <pre>
-     *用户个人ID
+     *用户个人ID ，这个地方需要使用Global User ID
      * </pre>
      *
      * <code>optional string user_id = 1;</code>
@@ -153,7 +153,7 @@ public final class ImPlatformAuthProto {
     }
     /**
      * <pre>
-     *用户个人ID
+     *用户个人ID ，这个地方需要使用Global User ID
      * </pre>
      *
      * <code>optional string user_id = 1;</code>
@@ -503,7 +503,7 @@ public final class ImPlatformAuthProto {
       private java.lang.Object userId_ = "";
       /**
        * <pre>
-       *用户个人ID
+       *用户个人ID ，这个地方需要使用Global User ID
        * </pre>
        *
        * <code>optional string user_id = 1;</code>
@@ -522,7 +522,7 @@ public final class ImPlatformAuthProto {
       }
       /**
        * <pre>
-       *用户个人ID
+       *用户个人ID ，这个地方需要使用Global User ID
        * </pre>
        *
        * <code>optional string user_id = 1;</code>
@@ -542,7 +542,7 @@ public final class ImPlatformAuthProto {
       }
       /**
        * <pre>
-       *用户个人ID
+       *用户个人ID ，这个地方需要使用Global User ID
        * </pre>
        *
        * <code>optional string user_id = 1;</code>
@@ -559,7 +559,7 @@ public final class ImPlatformAuthProto {
       }
       /**
        * <pre>
-       *用户个人ID
+       *用户个人ID ，这个地方需要使用Global User ID
        * </pre>
        *
        * <code>optional string user_id = 1;</code>
@@ -572,7 +572,7 @@ public final class ImPlatformAuthProto {
       }
       /**
        * <pre>
-       *用户个人ID
+       *用户个人ID ，这个地方需要使用Global User ID
        * </pre>
        *
        * <code>optional string user_id = 1;</code>

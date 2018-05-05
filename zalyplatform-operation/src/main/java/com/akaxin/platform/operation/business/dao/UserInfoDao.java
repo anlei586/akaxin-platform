@@ -188,4 +188,20 @@ public class UserInfoDao {
 		}
 		return userBean;
 	}
+
+	public String getUserIdPubkByPhoneId(String phoneId) {
+		try {
+			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+			Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
+			if (phoneMap != null) {
+				String userId = phoneMap.get(UserKey.userId);
+				String userIdKey = RedisKeyUtils.getUserIdKey(userId);
+				return userDao.hget(userIdKey, UserKey.userIdPubk);
+			}
+
+		} catch (Exception e) {
+			logger.error("get userIdPubk by phoneid error.", e);
+		}
+		return null;
+	}
 }

@@ -167,7 +167,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 
 			if (StringUtils.isNotEmpty(phoneId)) {
 				ApiUserPhoneProto.ApiUserPhoneResponse response = ApiUserPhoneProto.ApiUserPhoneResponse.newBuilder()
-						.setGlobalRoaming("+86").setPhoneId(phoneId).build();
+						.setCountryCode("+86").setPhoneId(phoneId).build();
 				commandResponse.setParams(response.toByteArray());
 			}
 			errCode = ErrorCode.SUCCESS;

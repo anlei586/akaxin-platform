@@ -48,10 +48,20 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 					.parseFrom(command.getParams());
 			String phoneId = request.getPhoneId();
 			int vcType = request.getVcType();
+			String countryCode = request.getCountryCode();
+			String siteAddress = request.getSiteAddress();
 			LogUtils.requestDebugLog(logger, command, request.toString());
+
+			// 统计日志
+			logger.info("api action={} countryCode={} phoneId={} type={} siteAddress", command.getAction(), countryCode,
+					phoneId, vcType, siteAddress);
 
 			if (!ValidatorPattern.isPhoneId(phoneId)) {
 				throw new ErrCodeException(ErrorCode.ERROR2_PHONE_FORMATTING);
+			}
+
+			if (StringUtils.isEmpty(countryCode)) {
+				countryCode = "+86";
 			}
 
 			// 这随机生成一个4位数验证码
@@ -136,7 +146,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 		try {
 			ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest request = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest
 					.parseFrom(command.getParams());
-			String userId = request.getUserId();
+			String userId = request.getGlobalUserId();
 			String phoneId = UserInfoDao.getInstance().getUserPhoneId(userId);
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
@@ -149,7 +159,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 					ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse.Builder responseBuilder = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse
 							.newBuilder();
 					responseBuilder.setPhoneId(phoneId);
-					responseBuilder.setGlobalRoaming("+86");
+					responseBuilder.setCountryCode("+86");
 					responseBuilder.setPhoneToken(phoneToken);
 					commandRespone.setParams(responseBuilder.build().toByteArray());
 					errCode = ErrorCode2.SUCCESS;
@@ -184,9 +194,16 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (ValidatorPattern.isPhoneId(phoneId)) {
-				ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse response = ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse
-						.newBuilder().setPhoneId(phoneId).setGlobalRoaming("+86").build();
-				commandRespone.setParams(response.toByteArray());
+				// 通过手机号，查询用户账号公钥
+				String userIdPubk = UserInfoDao.getInstance().getUserIdPubkByPhoneId(phoneId);
+				ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse.Builder responseBuilder = ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse
+						.newBuilder();
+				responseBuilder.setPhoneId(phoneId);
+				responseBuilder.setCountryCode("+86");
+				if (StringUtils.isNotEmpty(userIdPubk)) {
+					responseBuilder.setUserIdPubk(userIdPubk);
+				}
+				commandRespone.setParams(responseBuilder.build().toByteArray());
 				errCode = ErrorCode2.SUCCESS;
 			}
 

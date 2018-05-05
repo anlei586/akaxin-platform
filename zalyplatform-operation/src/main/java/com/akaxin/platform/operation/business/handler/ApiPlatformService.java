@@ -32,6 +32,8 @@ import com.akaxin.proto.platform.ApiPlatformLoginProto;
 import com.akaxin.proto.platform.ApiPlatformLogoutProto;
 import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretRequest;
 import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretResponse;
+import com.akaxin.proto.site.ApiPlatformRegisterByPhoneProto.ApiPlatformRegisterByPhoneRequest;
+import com.akaxin.proto.site.ApiPlatformRegisterByPhoneProto.ApiPlatformRegisterByPhoneResponse;
 
 /**
  * 
@@ -42,6 +44,45 @@ import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretR
  */
 public class ApiPlatformService extends AbstractApiHandler<Command, CommandResponse> {
 	private static final Logger logger = LoggerFactory.getLogger(ApiPlatformService.class);
+
+	/**
+	 * 
+	 * @param command
+	 * @return
+	 */
+	public CommandResponse registerByPhone(Command command) {
+		CommandResponse commandResponse = new CommandResponse();
+		IErrorCode errCode = ErrorCode2.ERROR;
+		try {
+			ApiPlatformRegisterByPhoneRequest request = ApiPlatformRegisterByPhoneRequest
+					.parseFrom(command.getParams());
+			String userIdPrik = request.getUserIdPrik();
+			String userIdPubk = request.getUserIdPubk();
+			String pushToken = request.getPushToken();
+			String phontVC = request.getPhoneVerifyCode();
+			String phoneId = request.getPhoneId();
+			String countryCode = request.getCountryCode();
+			int vcType = request.getVcType();
+
+			// 1.校验参数
+
+			// 2.验证手机号与验证码
+
+			// 3.验证手机是否绑定
+
+			// 4-1 成功：保存注册信息
+			// 4-2 失败：返回手机号对应公司要
+			ApiPlatformRegisterByPhoneResponse.Builder responseBuilder = ApiPlatformRegisterByPhoneResponse
+					.newBuilder();
+			responseBuilder.setUserIdPrik("");
+			responseBuilder.setUserIdPubk("");
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return commandResponse;
+	}
 
 	/**
 	 * <pre>
@@ -101,7 +142,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 					int sessionExpireTime = 1 * 24 * 60 * 60;// 90天
 					if (SessionDao.getInstance().addSessionMap(sessionKey, sessionMap, sessionExpireTime)) {
 						ApiPlatformLoginProto.ApiPlatformLoginResponse response = ApiPlatformLoginProto.ApiPlatformLoginResponse
-								.newBuilder().setUserId(globalUserId).setSessionId(sessionId).build();
+								.newBuilder().setGlobalUserId(globalUserId).setSessionId(sessionId).build();
 						commandResponse.setParams(response.toByteArray());
 						errCode = ErrorCode2.SUCCESS;
 					}

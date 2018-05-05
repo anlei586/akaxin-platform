@@ -1269,21 +1269,39 @@ public final class ApiPlatformLoginProto {
 
     /**
      * <pre>
-     *返回个人用户ID
+     *返回个人用户ID，需要返回GlobalUserID
      * </pre>
      *
-     * <code>optional string user_id = 2;</code>
+     * <code>optional string global_user_id = 2;</code>
      */
-    java.lang.String getUserId();
+    java.lang.String getGlobalUserId();
     /**
      * <pre>
-     *返回个人用户ID
+     *返回个人用户ID，需要返回GlobalUserID
      * </pre>
      *
-     * <code>optional string user_id = 2;</code>
+     * <code>optional string global_user_id = 2;</code>
      */
     com.google.protobuf.ByteString
-        getUserIdBytes();
+        getGlobalUserIdBytes();
+
+    /**
+     * <pre>
+     *返回本设备对应的设备ID
+     * </pre>
+     *
+     * <code>optional string device_id = 3;</code>
+     */
+    java.lang.String getDeviceId();
+    /**
+     * <pre>
+     *返回本设备对应的设备ID
+     * </pre>
+     *
+     * <code>optional string device_id = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getDeviceIdBytes();
   }
   /**
    * Protobuf type {@code site.ApiPlatformLoginResponse}
@@ -1298,7 +1316,8 @@ public final class ApiPlatformLoginProto {
     }
     private ApiPlatformLoginResponse() {
       sessionId_ = "";
-      userId_ = "";
+      globalUserId_ = "";
+      deviceId_ = "";
     }
 
     @java.lang.Override
@@ -1335,7 +1354,13 @@ public final class ApiPlatformLoginProto {
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              userId_ = s;
+              globalUserId_ = s;
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              deviceId_ = s;
               break;
             }
           }
@@ -1403,42 +1428,84 @@ public final class ApiPlatformLoginProto {
       }
     }
 
-    public static final int USER_ID_FIELD_NUMBER = 2;
-    private volatile java.lang.Object userId_;
+    public static final int GLOBAL_USER_ID_FIELD_NUMBER = 2;
+    private volatile java.lang.Object globalUserId_;
     /**
      * <pre>
-     *返回个人用户ID
+     *返回个人用户ID，需要返回GlobalUserID
      * </pre>
      *
-     * <code>optional string user_id = 2;</code>
+     * <code>optional string global_user_id = 2;</code>
      */
-    public java.lang.String getUserId() {
-      java.lang.Object ref = userId_;
+    public java.lang.String getGlobalUserId() {
+      java.lang.Object ref = globalUserId_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        userId_ = s;
+        globalUserId_ = s;
         return s;
       }
     }
     /**
      * <pre>
-     *返回个人用户ID
+     *返回个人用户ID，需要返回GlobalUserID
      * </pre>
      *
-     * <code>optional string user_id = 2;</code>
+     * <code>optional string global_user_id = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getUserIdBytes() {
-      java.lang.Object ref = userId_;
+        getGlobalUserIdBytes() {
+      java.lang.Object ref = globalUserId_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        userId_ = b;
+        globalUserId_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DEVICE_ID_FIELD_NUMBER = 3;
+    private volatile java.lang.Object deviceId_;
+    /**
+     * <pre>
+     *返回本设备对应的设备ID
+     * </pre>
+     *
+     * <code>optional string device_id = 3;</code>
+     */
+    public java.lang.String getDeviceId() {
+      java.lang.Object ref = deviceId_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        deviceId_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *返回本设备对应的设备ID
+     * </pre>
+     *
+     * <code>optional string device_id = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDeviceIdBytes() {
+      java.lang.Object ref = deviceId_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        deviceId_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -1460,8 +1527,11 @@ public final class ApiPlatformLoginProto {
       if (!getSessionIdBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, sessionId_);
       }
-      if (!getUserIdBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, userId_);
+      if (!getGlobalUserIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, globalUserId_);
+      }
+      if (!getDeviceIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, deviceId_);
       }
     }
 
@@ -1473,8 +1543,11 @@ public final class ApiPlatformLoginProto {
       if (!getSessionIdBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, sessionId_);
       }
-      if (!getUserIdBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, userId_);
+      if (!getGlobalUserIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, globalUserId_);
+      }
+      if (!getDeviceIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, deviceId_);
       }
       memoizedSize = size;
       return size;
@@ -1494,8 +1567,10 @@ public final class ApiPlatformLoginProto {
       boolean result = true;
       result = result && getSessionId()
           .equals(other.getSessionId());
-      result = result && getUserId()
-          .equals(other.getUserId());
+      result = result && getGlobalUserId()
+          .equals(other.getGlobalUserId());
+      result = result && getDeviceId()
+          .equals(other.getDeviceId());
       return result;
     }
 
@@ -1508,8 +1583,10 @@ public final class ApiPlatformLoginProto {
       hash = (19 * hash) + getDescriptorForType().hashCode();
       hash = (37 * hash) + SESSION_ID_FIELD_NUMBER;
       hash = (53 * hash) + getSessionId().hashCode();
-      hash = (37 * hash) + USER_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getUserId().hashCode();
+      hash = (37 * hash) + GLOBAL_USER_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getGlobalUserId().hashCode();
+      hash = (37 * hash) + DEVICE_ID_FIELD_NUMBER;
+      hash = (53 * hash) + getDeviceId().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1630,7 +1707,9 @@ public final class ApiPlatformLoginProto {
         super.clear();
         sessionId_ = "";
 
-        userId_ = "";
+        globalUserId_ = "";
+
+        deviceId_ = "";
 
         return this;
       }
@@ -1655,7 +1734,8 @@ public final class ApiPlatformLoginProto {
       public com.akaxin.proto.platform.ApiPlatformLoginProto.ApiPlatformLoginResponse buildPartial() {
         com.akaxin.proto.platform.ApiPlatformLoginProto.ApiPlatformLoginResponse result = new com.akaxin.proto.platform.ApiPlatformLoginProto.ApiPlatformLoginResponse(this);
         result.sessionId_ = sessionId_;
-        result.userId_ = userId_;
+        result.globalUserId_ = globalUserId_;
+        result.deviceId_ = deviceId_;
         onBuilt();
         return result;
       }
@@ -1701,8 +1781,12 @@ public final class ApiPlatformLoginProto {
           sessionId_ = other.sessionId_;
           onChanged();
         }
-        if (!other.getUserId().isEmpty()) {
-          userId_ = other.userId_;
+        if (!other.getGlobalUserId().isEmpty()) {
+          globalUserId_ = other.globalUserId_;
+          onChanged();
+        }
+        if (!other.getDeviceId().isEmpty()) {
+          deviceId_ = other.deviceId_;
           onChanged();
         }
         onChanged();
@@ -1820,21 +1904,21 @@ public final class ApiPlatformLoginProto {
         return this;
       }
 
-      private java.lang.Object userId_ = "";
+      private java.lang.Object globalUserId_ = "";
       /**
        * <pre>
-       *返回个人用户ID
+       *返回个人用户ID，需要返回GlobalUserID
        * </pre>
        *
-       * <code>optional string user_id = 2;</code>
+       * <code>optional string global_user_id = 2;</code>
        */
-      public java.lang.String getUserId() {
-        java.lang.Object ref = userId_;
+      public java.lang.String getGlobalUserId() {
+        java.lang.Object ref = globalUserId_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          userId_ = s;
+          globalUserId_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1842,19 +1926,19 @@ public final class ApiPlatformLoginProto {
       }
       /**
        * <pre>
-       *返回个人用户ID
+       *返回个人用户ID，需要返回GlobalUserID
        * </pre>
        *
-       * <code>optional string user_id = 2;</code>
+       * <code>optional string global_user_id = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getUserIdBytes() {
-        java.lang.Object ref = userId_;
+          getGlobalUserIdBytes() {
+        java.lang.Object ref = globalUserId_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          userId_ = b;
+          globalUserId_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -1862,49 +1946,138 @@ public final class ApiPlatformLoginProto {
       }
       /**
        * <pre>
-       *返回个人用户ID
+       *返回个人用户ID，需要返回GlobalUserID
        * </pre>
        *
-       * <code>optional string user_id = 2;</code>
+       * <code>optional string global_user_id = 2;</code>
        */
-      public Builder setUserId(
+      public Builder setGlobalUserId(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        userId_ = value;
+        globalUserId_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       *返回个人用户ID
+       *返回个人用户ID，需要返回GlobalUserID
        * </pre>
        *
-       * <code>optional string user_id = 2;</code>
+       * <code>optional string global_user_id = 2;</code>
        */
-      public Builder clearUserId() {
+      public Builder clearGlobalUserId() {
         
-        userId_ = getDefaultInstance().getUserId();
+        globalUserId_ = getDefaultInstance().getGlobalUserId();
         onChanged();
         return this;
       }
       /**
        * <pre>
-       *返回个人用户ID
+       *返回个人用户ID，需要返回GlobalUserID
        * </pre>
        *
-       * <code>optional string user_id = 2;</code>
+       * <code>optional string global_user_id = 2;</code>
        */
-      public Builder setUserIdBytes(
+      public Builder setGlobalUserIdBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        userId_ = value;
+        globalUserId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object deviceId_ = "";
+      /**
+       * <pre>
+       *返回本设备对应的设备ID
+       * </pre>
+       *
+       * <code>optional string device_id = 3;</code>
+       */
+      public java.lang.String getDeviceId() {
+        java.lang.Object ref = deviceId_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          deviceId_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *返回本设备对应的设备ID
+       * </pre>
+       *
+       * <code>optional string device_id = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDeviceIdBytes() {
+        java.lang.Object ref = deviceId_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          deviceId_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *返回本设备对应的设备ID
+       * </pre>
+       *
+       * <code>optional string device_id = 3;</code>
+       */
+      public Builder setDeviceId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        deviceId_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *返回本设备对应的设备ID
+       * </pre>
+       *
+       * <code>optional string device_id = 3;</code>
+       */
+      public Builder clearDeviceId() {
+        
+        deviceId_ = getDefaultInstance().getDeviceId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *返回本设备对应的设备ID
+       * </pre>
+       *
+       * <code>optional string device_id = 3;</code>
+       */
+      public Builder setDeviceIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        deviceId_ = value;
         onChanged();
         return this;
       }
@@ -1977,16 +2150,17 @@ public final class ApiPlatformLoginProto {
   static {
     java.lang.String[] descriptorData = {
       "\n!platform/api_platform_login.proto\022\004sit" +
-      "e\"\247\001\n\027ApiPlatformLoginRequest\022\024\n\014user_id" +
+      "e\"\255\001\n\027ApiPlatformLoginRequest\022\024\n\014user_id" +
       "_pubk\030\001 \001(\t\022\033\n\023user_device_id_pubk\030\002 \001(\t" +
       "\022\030\n\020user_device_name\030\004 \001(\t\022\033\n\023user_id_si" +
       "gn_base64\030\005 \001(\t\022\"\n\032user_device_id_sign_b" +
-      "ase64\030\006 \001(\t\"?\n\030ApiPlatformLoginResponse\022" +
-      "\022\n\nsession_id\030\001 \001(\t\022\017\n\007user_id\030\002 \001(\t2a\n\027" +
-      "ApiPlatformLoginService\022F\n\005login\022\035.site." +
-      "ApiPlatformLoginRequest\032\036.site.ApiPlatfo" +
-      "rmLoginResponseB2\n\031com.akaxin.proto.plat",
-      "formB\025ApiPlatformLoginProtob\006proto3"
+      "ase64\030\006 \001(\tJ\004\010\003\020\004\"Y\n\030ApiPlatformLoginRes" +
+      "ponse\022\022\n\nsession_id\030\001 \001(\t\022\026\n\016global_user" +
+      "_id\030\002 \001(\t\022\021\n\tdevice_id\030\003 \001(\t2a\n\027ApiPlatf" +
+      "ormLoginService\022F\n\005login\022\035.site.ApiPlatf" +
+      "ormLoginRequest\032\036.site.ApiPlatformLoginR",
+      "esponseB2\n\031com.akaxin.proto.platformB\025Ap" +
+      "iPlatformLoginProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2011,7 +2185,7 @@ public final class ApiPlatformLoginProto {
     internal_static_site_ApiPlatformLoginResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_site_ApiPlatformLoginResponse_descriptor,
-        new java.lang.String[] { "SessionId", "UserId", });
+        new java.lang.String[] { "SessionId", "GlobalUserId", "DeviceId", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

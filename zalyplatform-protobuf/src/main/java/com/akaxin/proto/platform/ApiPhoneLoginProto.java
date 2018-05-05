@@ -56,12 +56,30 @@ public final class ApiPhoneLoginProto {
 
     /**
      * <pre>
-     *手机验证码类型
+     *手机验证码类型,vc_type=1
      * </pre>
      *
      * <code>optional int32 vc_type = 3;</code>
      */
     int getVcType();
+
+    /**
+     * <pre>
+     *+86
+     * </pre>
+     *
+     * <code>optional string country_code = 4;</code>
+     */
+    java.lang.String getCountryCode();
+    /**
+     * <pre>
+     *+86
+     * </pre>
+     *
+     * <code>optional string country_code = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getCountryCodeBytes();
   }
   /**
    * Protobuf type {@code platform.ApiPhoneLoginRequest}
@@ -78,6 +96,7 @@ public final class ApiPhoneLoginProto {
       phoneId_ = "";
       phoneVerifyCode_ = "";
       vcType_ = 0;
+      countryCode_ = "";
     }
 
     @java.lang.Override
@@ -120,6 +139,12 @@ public final class ApiPhoneLoginProto {
             case 24: {
 
               vcType_ = input.readInt32();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              countryCode_ = s;
               break;
             }
           }
@@ -233,13 +258,55 @@ public final class ApiPhoneLoginProto {
     private int vcType_;
     /**
      * <pre>
-     *手机验证码类型
+     *手机验证码类型,vc_type=1
      * </pre>
      *
      * <code>optional int32 vc_type = 3;</code>
      */
     public int getVcType() {
       return vcType_;
+    }
+
+    public static final int COUNTRY_CODE_FIELD_NUMBER = 4;
+    private volatile java.lang.Object countryCode_;
+    /**
+     * <pre>
+     *+86
+     * </pre>
+     *
+     * <code>optional string country_code = 4;</code>
+     */
+    public java.lang.String getCountryCode() {
+      java.lang.Object ref = countryCode_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        countryCode_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     *+86
+     * </pre>
+     *
+     * <code>optional string country_code = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCountryCodeBytes() {
+      java.lang.Object ref = countryCode_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        countryCode_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     private byte memoizedIsInitialized = -1;
@@ -263,6 +330,9 @@ public final class ApiPhoneLoginProto {
       if (vcType_ != 0) {
         output.writeInt32(3, vcType_);
       }
+      if (!getCountryCodeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, countryCode_);
+      }
     }
 
     public int getSerializedSize() {
@@ -279,6 +349,9 @@ public final class ApiPhoneLoginProto {
       if (vcType_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, vcType_);
+      }
+      if (!getCountryCodeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, countryCode_);
       }
       memoizedSize = size;
       return size;
@@ -302,6 +375,8 @@ public final class ApiPhoneLoginProto {
           .equals(other.getPhoneVerifyCode());
       result = result && (getVcType()
           == other.getVcType());
+      result = result && getCountryCode()
+          .equals(other.getCountryCode());
       return result;
     }
 
@@ -318,6 +393,8 @@ public final class ApiPhoneLoginProto {
       hash = (53 * hash) + getPhoneVerifyCode().hashCode();
       hash = (37 * hash) + VC_TYPE_FIELD_NUMBER;
       hash = (53 * hash) + getVcType();
+      hash = (37 * hash) + COUNTRY_CODE_FIELD_NUMBER;
+      hash = (53 * hash) + getCountryCode().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -442,6 +519,8 @@ public final class ApiPhoneLoginProto {
 
         vcType_ = 0;
 
+        countryCode_ = "";
+
         return this;
       }
 
@@ -467,6 +546,7 @@ public final class ApiPhoneLoginProto {
         result.phoneId_ = phoneId_;
         result.phoneVerifyCode_ = phoneVerifyCode_;
         result.vcType_ = vcType_;
+        result.countryCode_ = countryCode_;
         onBuilt();
         return result;
       }
@@ -518,6 +598,10 @@ public final class ApiPhoneLoginProto {
         }
         if (other.getVcType() != 0) {
           setVcType(other.getVcType());
+        }
+        if (!other.getCountryCode().isEmpty()) {
+          countryCode_ = other.countryCode_;
+          onChanged();
         }
         onChanged();
         return this;
@@ -726,7 +810,7 @@ public final class ApiPhoneLoginProto {
       private int vcType_ ;
       /**
        * <pre>
-       *手机验证码类型
+       *手机验证码类型,vc_type=1
        * </pre>
        *
        * <code>optional int32 vc_type = 3;</code>
@@ -736,7 +820,7 @@ public final class ApiPhoneLoginProto {
       }
       /**
        * <pre>
-       *手机验证码类型
+       *手机验证码类型,vc_type=1
        * </pre>
        *
        * <code>optional int32 vc_type = 3;</code>
@@ -749,7 +833,7 @@ public final class ApiPhoneLoginProto {
       }
       /**
        * <pre>
-       *手机验证码类型
+       *手机验证码类型,vc_type=1
        * </pre>
        *
        * <code>optional int32 vc_type = 3;</code>
@@ -757,6 +841,95 @@ public final class ApiPhoneLoginProto {
       public Builder clearVcType() {
         
         vcType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object countryCode_ = "";
+      /**
+       * <pre>
+       *+86
+       * </pre>
+       *
+       * <code>optional string country_code = 4;</code>
+       */
+      public java.lang.String getCountryCode() {
+        java.lang.Object ref = countryCode_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          countryCode_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       *+86
+       * </pre>
+       *
+       * <code>optional string country_code = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCountryCodeBytes() {
+        java.lang.Object ref = countryCode_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          countryCode_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       *+86
+       * </pre>
+       *
+       * <code>optional string country_code = 4;</code>
+       */
+      public Builder setCountryCode(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        countryCode_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *+86
+       * </pre>
+       *
+       * <code>optional string country_code = 4;</code>
+       */
+      public Builder clearCountryCode() {
+        
+        countryCode_ = getDefaultInstance().getCountryCode();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       *+86
+       * </pre>
+       *
+       * <code>optional string country_code = 4;</code>
+       */
+      public Builder setCountryCodeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        countryCode_ = value;
         onChanged();
         return this;
       }
@@ -1541,14 +1714,15 @@ public final class ApiPhoneLoginProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\036platform/api_phone_login.proto\022\010platfo" +
-      "rm\"T\n\024ApiPhoneLoginRequest\022\020\n\010phone_id\030\001" +
+      "rm\"j\n\024ApiPhoneLoginRequest\022\020\n\010phone_id\030\001" +
       " \001(\t\022\031\n\021phone_verify_code\030\002 \001(\t\022\017\n\007vc_ty" +
-      "pe\030\003 \001(\005\"C\n\025ApiPhoneLoginResponse\022\024\n\014use" +
-      "r_id_prik\030\001 \001(\t\022\024\n\014user_id_pubk\030\002 \001(\t2`\n" +
-      "\024ApiPhoneLoginService\022H\n\005login\022\036.platfor" +
-      "m.ApiPhoneLoginRequest\032\037.platform.ApiPho" +
-      "neLoginResponseB/\n\031com.akaxin.proto.plat" +
-      "formB\022ApiPhoneLoginProtob\006proto3"
+      "pe\030\003 \001(\005\022\024\n\014country_code\030\004 \001(\t\"C\n\025ApiPho" +
+      "neLoginResponse\022\024\n\014user_id_prik\030\001 \001(\t\022\024\n" +
+      "\014user_id_pubk\030\002 \001(\t2`\n\024ApiPhoneLoginServ" +
+      "ice\022H\n\005login\022\036.platform.ApiPhoneLoginReq" +
+      "uest\032\037.platform.ApiPhoneLoginResponseB/\n" +
+      "\031com.akaxin.proto.platformB\022ApiPhoneLogi" +
+      "nProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1567,7 +1741,7 @@ public final class ApiPhoneLoginProto {
     internal_static_platform_ApiPhoneLoginRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_platform_ApiPhoneLoginRequest_descriptor,
-        new java.lang.String[] { "PhoneId", "PhoneVerifyCode", "VcType", });
+        new java.lang.String[] { "PhoneId", "PhoneVerifyCode", "VcType", "CountryCode", });
     internal_static_platform_ApiPhoneLoginResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_platform_ApiPhoneLoginResponse_fieldAccessorTable = new

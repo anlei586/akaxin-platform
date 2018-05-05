@@ -95,22 +95,22 @@ public final class ApiUserRealNameProto {
      *国际区号
      * </pre>
      *
-     * <code>optional string global_roaming = 5;</code>
+     * <code>optional string country_code = 5;</code>
      */
-    java.lang.String getGlobalRoaming();
+    java.lang.String getCountryCode();
     /**
      * <pre>
      *国际区号
      * </pre>
      *
-     * <code>optional string global_roaming = 5;</code>
+     * <code>optional string country_code = 5;</code>
      */
     com.google.protobuf.ByteString
-        getGlobalRoamingBytes();
+        getCountryCodeBytes();
 
     /**
      * <pre>
-     *手机验证码类型
+     *手机验证码类型 这里vc_type=2
      * </pre>
      *
      * <code>optional int32 vc_type = 6;</code>
@@ -133,7 +133,7 @@ public final class ApiUserRealNameProto {
       userIdPubk_ = "";
       phoneId_ = "";
       phoneVerifyCode_ = "";
-      globalRoaming_ = "";
+      countryCode_ = "";
       vcType_ = 0;
     }
 
@@ -189,7 +189,7 @@ public final class ApiUserRealNameProto {
             case 42: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              globalRoaming_ = s;
+              countryCode_ = s;
               break;
             }
             case 48: {
@@ -388,24 +388,24 @@ public final class ApiUserRealNameProto {
       }
     }
 
-    public static final int GLOBAL_ROAMING_FIELD_NUMBER = 5;
-    private volatile java.lang.Object globalRoaming_;
+    public static final int COUNTRY_CODE_FIELD_NUMBER = 5;
+    private volatile java.lang.Object countryCode_;
     /**
      * <pre>
      *国际区号
      * </pre>
      *
-     * <code>optional string global_roaming = 5;</code>
+     * <code>optional string country_code = 5;</code>
      */
-    public java.lang.String getGlobalRoaming() {
-      java.lang.Object ref = globalRoaming_;
+    public java.lang.String getCountryCode() {
+      java.lang.Object ref = countryCode_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        globalRoaming_ = s;
+        countryCode_ = s;
         return s;
       }
     }
@@ -414,16 +414,16 @@ public final class ApiUserRealNameProto {
      *国际区号
      * </pre>
      *
-     * <code>optional string global_roaming = 5;</code>
+     * <code>optional string country_code = 5;</code>
      */
     public com.google.protobuf.ByteString
-        getGlobalRoamingBytes() {
-      java.lang.Object ref = globalRoaming_;
+        getCountryCodeBytes() {
+      java.lang.Object ref = countryCode_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        globalRoaming_ = b;
+        countryCode_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -434,7 +434,7 @@ public final class ApiUserRealNameProto {
     private int vcType_;
     /**
      * <pre>
-     *手机验证码类型
+     *手机验证码类型 这里vc_type=2
      * </pre>
      *
      * <code>optional int32 vc_type = 6;</code>
@@ -467,8 +467,8 @@ public final class ApiUserRealNameProto {
       if (!getPhoneVerifyCodeBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 4, phoneVerifyCode_);
       }
-      if (!getGlobalRoamingBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, globalRoaming_);
+      if (!getCountryCodeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, countryCode_);
       }
       if (vcType_ != 0) {
         output.writeInt32(6, vcType_);
@@ -492,8 +492,8 @@ public final class ApiUserRealNameProto {
       if (!getPhoneVerifyCodeBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, phoneVerifyCode_);
       }
-      if (!getGlobalRoamingBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, globalRoaming_);
+      if (!getCountryCodeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, countryCode_);
       }
       if (vcType_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -523,8 +523,8 @@ public final class ApiUserRealNameProto {
           .equals(other.getPhoneId());
       result = result && getPhoneVerifyCode()
           .equals(other.getPhoneVerifyCode());
-      result = result && getGlobalRoaming()
-          .equals(other.getGlobalRoaming());
+      result = result && getCountryCode()
+          .equals(other.getCountryCode());
       result = result && (getVcType()
           == other.getVcType());
       return result;
@@ -545,8 +545,8 @@ public final class ApiUserRealNameProto {
       hash = (53 * hash) + getPhoneId().hashCode();
       hash = (37 * hash) + PHONE_VERIFY_CODE_FIELD_NUMBER;
       hash = (53 * hash) + getPhoneVerifyCode().hashCode();
-      hash = (37 * hash) + GLOBAL_ROAMING_FIELD_NUMBER;
-      hash = (53 * hash) + getGlobalRoaming().hashCode();
+      hash = (37 * hash) + COUNTRY_CODE_FIELD_NUMBER;
+      hash = (53 * hash) + getCountryCode().hashCode();
       hash = (37 * hash) + VC_TYPE_FIELD_NUMBER;
       hash = (53 * hash) + getVcType();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -675,7 +675,7 @@ public final class ApiUserRealNameProto {
 
         phoneVerifyCode_ = "";
 
-        globalRoaming_ = "";
+        countryCode_ = "";
 
         vcType_ = 0;
 
@@ -705,7 +705,7 @@ public final class ApiUserRealNameProto {
         result.userIdPubk_ = userIdPubk_;
         result.phoneId_ = phoneId_;
         result.phoneVerifyCode_ = phoneVerifyCode_;
-        result.globalRoaming_ = globalRoaming_;
+        result.countryCode_ = countryCode_;
         result.vcType_ = vcType_;
         onBuilt();
         return result;
@@ -764,8 +764,8 @@ public final class ApiUserRealNameProto {
           phoneVerifyCode_ = other.phoneVerifyCode_;
           onChanged();
         }
-        if (!other.getGlobalRoaming().isEmpty()) {
-          globalRoaming_ = other.globalRoaming_;
+        if (!other.getCountryCode().isEmpty()) {
+          countryCode_ = other.countryCode_;
           onChanged();
         }
         if (other.getVcType() != 0) {
@@ -1153,21 +1153,21 @@ public final class ApiUserRealNameProto {
         return this;
       }
 
-      private java.lang.Object globalRoaming_ = "";
+      private java.lang.Object countryCode_ = "";
       /**
        * <pre>
        *国际区号
        * </pre>
        *
-       * <code>optional string global_roaming = 5;</code>
+       * <code>optional string country_code = 5;</code>
        */
-      public java.lang.String getGlobalRoaming() {
-        java.lang.Object ref = globalRoaming_;
+      public java.lang.String getCountryCode() {
+        java.lang.Object ref = countryCode_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          globalRoaming_ = s;
+          countryCode_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -1178,16 +1178,16 @@ public final class ApiUserRealNameProto {
        *国际区号
        * </pre>
        *
-       * <code>optional string global_roaming = 5;</code>
+       * <code>optional string country_code = 5;</code>
        */
       public com.google.protobuf.ByteString
-          getGlobalRoamingBytes() {
-        java.lang.Object ref = globalRoaming_;
+          getCountryCodeBytes() {
+        java.lang.Object ref = countryCode_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          globalRoaming_ = b;
+          countryCode_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -1198,15 +1198,15 @@ public final class ApiUserRealNameProto {
        *国际区号
        * </pre>
        *
-       * <code>optional string global_roaming = 5;</code>
+       * <code>optional string country_code = 5;</code>
        */
-      public Builder setGlobalRoaming(
+      public Builder setCountryCode(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        globalRoaming_ = value;
+        countryCode_ = value;
         onChanged();
         return this;
       }
@@ -1215,11 +1215,11 @@ public final class ApiUserRealNameProto {
        *国际区号
        * </pre>
        *
-       * <code>optional string global_roaming = 5;</code>
+       * <code>optional string country_code = 5;</code>
        */
-      public Builder clearGlobalRoaming() {
+      public Builder clearCountryCode() {
         
-        globalRoaming_ = getDefaultInstance().getGlobalRoaming();
+        countryCode_ = getDefaultInstance().getCountryCode();
         onChanged();
         return this;
       }
@@ -1228,16 +1228,16 @@ public final class ApiUserRealNameProto {
        *国际区号
        * </pre>
        *
-       * <code>optional string global_roaming = 5;</code>
+       * <code>optional string country_code = 5;</code>
        */
-      public Builder setGlobalRoamingBytes(
+      public Builder setCountryCodeBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        globalRoaming_ = value;
+        countryCode_ = value;
         onChanged();
         return this;
       }
@@ -1245,7 +1245,7 @@ public final class ApiUserRealNameProto {
       private int vcType_ ;
       /**
        * <pre>
-       *手机验证码类型
+       *手机验证码类型 这里vc_type=2
        * </pre>
        *
        * <code>optional int32 vc_type = 6;</code>
@@ -1255,7 +1255,7 @@ public final class ApiUserRealNameProto {
       }
       /**
        * <pre>
-       *手机验证码类型
+       *手机验证码类型 这里vc_type=2
        * </pre>
        *
        * <code>optional int32 vc_type = 6;</code>
@@ -1268,7 +1268,7 @@ public final class ApiUserRealNameProto {
       }
       /**
        * <pre>
-       *手机验证码类型
+       *手机验证码类型 这里vc_type=2
        * </pre>
        *
        * <code>optional int32 vc_type = 6;</code>
@@ -1713,15 +1713,15 @@ public final class ApiUserRealNameProto {
   static {
     java.lang.String[] descriptorData = {
       "\n platform/api_user_realName.proto\022\010plat" +
-      "form\"\232\001\n\026ApiUserRealNameRequest\022\024\n\014user_" +
+      "form\"\230\001\n\026ApiUserRealNameRequest\022\024\n\014user_" +
       "id_prik\030\001 \001(\t\022\024\n\014user_id_pubk\030\002 \001(\t\022\020\n\010p" +
       "hone_id\030\003 \001(\t\022\031\n\021phone_verify_code\030\004 \001(\t" +
-      "\022\026\n\016global_roaming\030\005 \001(\t\022\017\n\007vc_type\030\006 \001(" +
-      "\005\"\031\n\027ApiUserRealNameResponse2i\n\026ApiUserR" +
-      "ealNameService\022O\n\010realName\022 .platform.Ap" +
-      "iUserRealNameRequest\032!.platform.ApiUserR" +
-      "ealNameResponseB1\n\031com.akaxin.proto.plat" +
-      "formB\024ApiUserRealNameProtob\006proto3"
+      "\022\024\n\014country_code\030\005 \001(\t\022\017\n\007vc_type\030\006 \001(\005\"" +
+      "\031\n\027ApiUserRealNameResponse2i\n\026ApiUserRea" +
+      "lNameService\022O\n\010realName\022 .platform.ApiU" +
+      "serRealNameRequest\032!.platform.ApiUserRea" +
+      "lNameResponseB1\n\031com.akaxin.proto.platfo" +
+      "rmB\024ApiUserRealNameProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1740,7 +1740,7 @@ public final class ApiUserRealNameProto {
     internal_static_platform_ApiUserRealNameRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_platform_ApiUserRealNameRequest_descriptor,
-        new java.lang.String[] { "UserIdPrik", "UserIdPubk", "PhoneId", "PhoneVerifyCode", "GlobalRoaming", "VcType", });
+        new java.lang.String[] { "UserIdPrik", "UserIdPubk", "PhoneId", "PhoneVerifyCode", "CountryCode", "VcType", });
     internal_static_platform_ApiUserRealNameResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_platform_ApiUserRealNameResponse_fieldAccessorTable = new

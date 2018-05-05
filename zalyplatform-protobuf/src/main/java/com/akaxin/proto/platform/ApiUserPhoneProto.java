@@ -406,18 +406,18 @@ public final class ApiUserPhoneProto {
      *+86
      * </pre>
      *
-     * <code>optional string global_roaming = 2;</code>
+     * <code>optional string country_code = 2;</code>
      */
-    java.lang.String getGlobalRoaming();
+    java.lang.String getCountryCode();
     /**
      * <pre>
      *+86
      * </pre>
      *
-     * <code>optional string global_roaming = 2;</code>
+     * <code>optional string country_code = 2;</code>
      */
     com.google.protobuf.ByteString
-        getGlobalRoamingBytes();
+        getCountryCodeBytes();
   }
   /**
    * Protobuf type {@code platform.ApiUserPhoneResponse}
@@ -432,7 +432,7 @@ public final class ApiUserPhoneProto {
     }
     private ApiUserPhoneResponse() {
       phoneId_ = "";
-      globalRoaming_ = "";
+      countryCode_ = "";
     }
 
     @java.lang.Override
@@ -469,7 +469,7 @@ public final class ApiUserPhoneProto {
             case 18: {
               java.lang.String s = input.readStringRequireUtf8();
 
-              globalRoaming_ = s;
+              countryCode_ = s;
               break;
             }
           }
@@ -537,24 +537,24 @@ public final class ApiUserPhoneProto {
       }
     }
 
-    public static final int GLOBAL_ROAMING_FIELD_NUMBER = 2;
-    private volatile java.lang.Object globalRoaming_;
+    public static final int COUNTRY_CODE_FIELD_NUMBER = 2;
+    private volatile java.lang.Object countryCode_;
     /**
      * <pre>
      *+86
      * </pre>
      *
-     * <code>optional string global_roaming = 2;</code>
+     * <code>optional string country_code = 2;</code>
      */
-    public java.lang.String getGlobalRoaming() {
-      java.lang.Object ref = globalRoaming_;
+    public java.lang.String getCountryCode() {
+      java.lang.Object ref = countryCode_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
       } else {
         com.google.protobuf.ByteString bs = 
             (com.google.protobuf.ByteString) ref;
         java.lang.String s = bs.toStringUtf8();
-        globalRoaming_ = s;
+        countryCode_ = s;
         return s;
       }
     }
@@ -563,16 +563,16 @@ public final class ApiUserPhoneProto {
      *+86
      * </pre>
      *
-     * <code>optional string global_roaming = 2;</code>
+     * <code>optional string country_code = 2;</code>
      */
     public com.google.protobuf.ByteString
-        getGlobalRoamingBytes() {
-      java.lang.Object ref = globalRoaming_;
+        getCountryCodeBytes() {
+      java.lang.Object ref = countryCode_;
       if (ref instanceof java.lang.String) {
         com.google.protobuf.ByteString b = 
             com.google.protobuf.ByteString.copyFromUtf8(
                 (java.lang.String) ref);
-        globalRoaming_ = b;
+        countryCode_ = b;
         return b;
       } else {
         return (com.google.protobuf.ByteString) ref;
@@ -594,8 +594,8 @@ public final class ApiUserPhoneProto {
       if (!getPhoneIdBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, phoneId_);
       }
-      if (!getGlobalRoamingBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, globalRoaming_);
+      if (!getCountryCodeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, countryCode_);
       }
     }
 
@@ -607,8 +607,8 @@ public final class ApiUserPhoneProto {
       if (!getPhoneIdBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, phoneId_);
       }
-      if (!getGlobalRoamingBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, globalRoaming_);
+      if (!getCountryCodeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, countryCode_);
       }
       memoizedSize = size;
       return size;
@@ -628,8 +628,8 @@ public final class ApiUserPhoneProto {
       boolean result = true;
       result = result && getPhoneId()
           .equals(other.getPhoneId());
-      result = result && getGlobalRoaming()
-          .equals(other.getGlobalRoaming());
+      result = result && getCountryCode()
+          .equals(other.getCountryCode());
       return result;
     }
 
@@ -642,8 +642,8 @@ public final class ApiUserPhoneProto {
       hash = (19 * hash) + getDescriptorForType().hashCode();
       hash = (37 * hash) + PHONE_ID_FIELD_NUMBER;
       hash = (53 * hash) + getPhoneId().hashCode();
-      hash = (37 * hash) + GLOBAL_ROAMING_FIELD_NUMBER;
-      hash = (53 * hash) + getGlobalRoaming().hashCode();
+      hash = (37 * hash) + COUNTRY_CODE_FIELD_NUMBER;
+      hash = (53 * hash) + getCountryCode().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -764,7 +764,7 @@ public final class ApiUserPhoneProto {
         super.clear();
         phoneId_ = "";
 
-        globalRoaming_ = "";
+        countryCode_ = "";
 
         return this;
       }
@@ -789,7 +789,7 @@ public final class ApiUserPhoneProto {
       public com.akaxin.proto.platform.ApiUserPhoneProto.ApiUserPhoneResponse buildPartial() {
         com.akaxin.proto.platform.ApiUserPhoneProto.ApiUserPhoneResponse result = new com.akaxin.proto.platform.ApiUserPhoneProto.ApiUserPhoneResponse(this);
         result.phoneId_ = phoneId_;
-        result.globalRoaming_ = globalRoaming_;
+        result.countryCode_ = countryCode_;
         onBuilt();
         return result;
       }
@@ -835,8 +835,8 @@ public final class ApiUserPhoneProto {
           phoneId_ = other.phoneId_;
           onChanged();
         }
-        if (!other.getGlobalRoaming().isEmpty()) {
-          globalRoaming_ = other.globalRoaming_;
+        if (!other.getCountryCode().isEmpty()) {
+          countryCode_ = other.countryCode_;
           onChanged();
         }
         onChanged();
@@ -954,21 +954,21 @@ public final class ApiUserPhoneProto {
         return this;
       }
 
-      private java.lang.Object globalRoaming_ = "";
+      private java.lang.Object countryCode_ = "";
       /**
        * <pre>
        *+86
        * </pre>
        *
-       * <code>optional string global_roaming = 2;</code>
+       * <code>optional string country_code = 2;</code>
        */
-      public java.lang.String getGlobalRoaming() {
-        java.lang.Object ref = globalRoaming_;
+      public java.lang.String getCountryCode() {
+        java.lang.Object ref = countryCode_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
               (com.google.protobuf.ByteString) ref;
           java.lang.String s = bs.toStringUtf8();
-          globalRoaming_ = s;
+          countryCode_ = s;
           return s;
         } else {
           return (java.lang.String) ref;
@@ -979,16 +979,16 @@ public final class ApiUserPhoneProto {
        *+86
        * </pre>
        *
-       * <code>optional string global_roaming = 2;</code>
+       * <code>optional string country_code = 2;</code>
        */
       public com.google.protobuf.ByteString
-          getGlobalRoamingBytes() {
-        java.lang.Object ref = globalRoaming_;
+          getCountryCodeBytes() {
+        java.lang.Object ref = countryCode_;
         if (ref instanceof String) {
           com.google.protobuf.ByteString b = 
               com.google.protobuf.ByteString.copyFromUtf8(
                   (java.lang.String) ref);
-          globalRoaming_ = b;
+          countryCode_ = b;
           return b;
         } else {
           return (com.google.protobuf.ByteString) ref;
@@ -999,15 +999,15 @@ public final class ApiUserPhoneProto {
        *+86
        * </pre>
        *
-       * <code>optional string global_roaming = 2;</code>
+       * <code>optional string country_code = 2;</code>
        */
-      public Builder setGlobalRoaming(
+      public Builder setCountryCode(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
   }
   
-        globalRoaming_ = value;
+        countryCode_ = value;
         onChanged();
         return this;
       }
@@ -1016,11 +1016,11 @@ public final class ApiUserPhoneProto {
        *+86
        * </pre>
        *
-       * <code>optional string global_roaming = 2;</code>
+       * <code>optional string country_code = 2;</code>
        */
-      public Builder clearGlobalRoaming() {
+      public Builder clearCountryCode() {
         
-        globalRoaming_ = getDefaultInstance().getGlobalRoaming();
+        countryCode_ = getDefaultInstance().getCountryCode();
         onChanged();
         return this;
       }
@@ -1029,16 +1029,16 @@ public final class ApiUserPhoneProto {
        *+86
        * </pre>
        *
-       * <code>optional string global_roaming = 2;</code>
+       * <code>optional string country_code = 2;</code>
        */
-      public Builder setGlobalRoamingBytes(
+      public Builder setCountryCodeBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
   }
   checkByteStringIsUtf8(value);
         
-        globalRoaming_ = value;
+        countryCode_ = value;
         onChanged();
         return this;
       }
@@ -1111,13 +1111,12 @@ public final class ApiUserPhoneProto {
   static {
     java.lang.String[] descriptorData = {
       "\n\035platform/api_user_phone.proto\022\010platfor" +
-      "m\"\025\n\023ApiUserPhoneRequest\"@\n\024ApiUserPhone" +
-      "Response\022\020\n\010phone_id\030\001 \001(\t\022\026\n\016global_roa" +
-      "ming\030\002 \001(\t2]\n\023ApiUserPhoneService\022F\n\005pho" +
-      "ne\022\035.platform.ApiUserPhoneRequest\032\036.plat" +
-      "form.ApiUserPhoneResponseB.\n\031com.akaxin." +
-      "proto.platformB\021ApiUserPhoneProtob\006proto" +
-      "3"
+      "m\"\025\n\023ApiUserPhoneRequest\">\n\024ApiUserPhone" +
+      "Response\022\020\n\010phone_id\030\001 \001(\t\022\024\n\014country_co" +
+      "de\030\002 \001(\t2]\n\023ApiUserPhoneService\022F\n\005phone" +
+      "\022\035.platform.ApiUserPhoneRequest\032\036.platfo" +
+      "rm.ApiUserPhoneResponseB.\n\031com.akaxin.pr" +
+      "oto.platformB\021ApiUserPhoneProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1142,7 +1141,7 @@ public final class ApiUserPhoneProto {
     internal_static_platform_ApiUserPhoneResponse_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_platform_ApiUserPhoneResponse_descriptor,
-        new java.lang.String[] { "PhoneId", "GlobalRoaming", });
+        new java.lang.String[] { "PhoneId", "CountryCode", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
