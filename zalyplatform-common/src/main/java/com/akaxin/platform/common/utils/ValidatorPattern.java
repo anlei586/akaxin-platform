@@ -46,6 +46,10 @@ public class ValidatorPattern {
 		return Pattern.matches(REGEX_PHONDID, phoneId);
 	}
 
+	public static boolean isNotPhoneId(String phoneId) {
+		return !isPhoneId(phoneId);
+	}
+
 	/**
 	 * 校验邮箱
 	 * 

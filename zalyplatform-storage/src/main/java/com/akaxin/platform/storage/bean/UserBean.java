@@ -8,7 +8,7 @@ public class UserBean {
 	private String userIdPubk;
 	private String deviceId;
 	private String phoneId;
-	private String phoneRoaming;
+	private String countryCode;
 	private int clientType;
 	private String rom;
 	private String pushToken;
@@ -77,12 +77,12 @@ public class UserBean {
 		this.pushToken = pushToken;
 	}
 
-	public String getPhoneRoaming() {
-		return phoneRoaming;
+	public String getCountryCode() {
+		return countryCode;
 	}
 
-	public void setPhoneRoaming(String phoneRoaming) {
-		this.phoneRoaming = phoneRoaming;
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
 	}
 
 	public String toString() {

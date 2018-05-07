@@ -82,7 +82,7 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 					.parseFrom(command.getParams());
 			String userIdPrik = request.getUserIdPrik();
 			String userIdPubk = request.getUserIdPubk();
-			String userId = UserIdUtils.getV1GlobalUserId(userIdPubk);
+			String globalUserId = UserIdUtils.getV1GlobalUserId(userIdPubk);
 			String phoneId = request.getPhoneId();
 			String verifyCode = request.getPhoneVerifyCode();
 			int vcType = request.getVcType();
@@ -90,10 +90,10 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 
 			// 验证条件
 			// 1.判断参数是否合法
-			if (StringUtils.isNoneEmpty(userIdPrik, userIdPubk, userId, phoneId, verifyCode)) {
+			if (StringUtils.isNoneEmpty(userIdPrik, userIdPubk, globalUserId, phoneId, verifyCode)) {
 				// 2.验证手机格式是否合法
 				if (ValidatorPattern.isPhoneId(phoneId)) {
-					String phoneId2 = UserInfoDao.getInstance().getUserPhoneId(userId);
+					String phoneId2 = UserInfoDao.getInstance().getUserPhoneId(globalUserId);
 					// 3.已经绑定的账号，不能绑定其他手机号
 					if (ValidatorPattern.isPhoneId(phoneId2)) {
 						if (phoneId.equals(phoneId2)) {
@@ -113,11 +113,11 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 							String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId + "_" + vcType);
 							if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
 								UserBean bean = new UserBean();
-								bean.setUserId(userId);
+								bean.setUserId(globalUserId);
 								bean.setUserIdPrik(userIdPrik);
 								bean.setUserIdPubk(userIdPubk);
 								bean.setPhoneId(phoneId);
-								bean.setPhoneRoaming("+86");
+								bean.setCountryCode("+86");
 								logger.debug("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode,
 										bean.toString());
 								if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {

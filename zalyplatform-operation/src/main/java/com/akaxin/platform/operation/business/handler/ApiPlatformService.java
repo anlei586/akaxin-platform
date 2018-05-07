@@ -23,15 +23,20 @@ import com.akaxin.platform.common.crypto.RSACrypto;
 import com.akaxin.platform.common.exceptions.ErrCodeException;
 import com.akaxin.platform.common.utils.StringHelper;
 import com.akaxin.platform.common.utils.UserIdUtils;
+import com.akaxin.platform.common.utils.ValidatorPattern;
+import com.akaxin.platform.operation.business.dao.PhoneVCTokenDao;
 import com.akaxin.platform.operation.business.dao.SessionDao;
 import com.akaxin.platform.operation.business.dao.UserDeviceDao;
 import com.akaxin.platform.operation.business.dao.UserInfoDao;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
+import com.akaxin.platform.storage.bean.UserBean;
 import com.akaxin.platform.storage.constant.UserKey;
+import com.akaxin.proto.core.CoreProto.HeaderKey;
 import com.akaxin.proto.platform.ApiPlatformLoginProto;
 import com.akaxin.proto.platform.ApiPlatformLogoutProto;
 import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretRequest;
 import com.akaxin.proto.platform.ApiPlatformTopSecretProto.ApiPlatformTopSecretResponse;
+import com.akaxin.proto.site.ApiPlatformRegisterByPhoneProto;
 import com.akaxin.proto.site.ApiPlatformRegisterByPhoneProto.ApiPlatformRegisterByPhoneRequest;
 import com.akaxin.proto.site.ApiPlatformRegisterByPhoneProto.ApiPlatformRegisterByPhoneResponse;
 
@@ -46,9 +51,20 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 	private static final Logger logger = LoggerFactory.getLogger(ApiPlatformService.class);
 
 	/**
+	 * <pre>
+	 * 通过手机号，注册平台
+	 * 
+	 * </pre>
 	 * 
 	 * @param command
 	 * @return
+	 * 
+	 *         <pre>
+	 * 		return commandResponse
+	 * 		errCode = 0:error
+	 * 		errCode = 1:success
+	 * 		errCode = 2:
+	 *         </pre>
 	 */
 	public CommandResponse registerByPhone(Command command) {
 		CommandResponse commandResponse = new CommandResponse();
@@ -59,29 +75,91 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			String userIdPrik = request.getUserIdPrik();
 			String userIdPubk = request.getUserIdPubk();
 			String pushToken = request.getPushToken();
-			String phontVC = request.getPhoneVerifyCode();
+			String phoneVC = request.getPhoneVerifyCode();
 			String phoneId = request.getPhoneId();
 			String countryCode = request.getCountryCode();
 			int vcType = request.getVcType();
+			// clientType 放在每个header里面
+			String clientType = command.getHeader().get(HeaderKey.CLIENT_SOCKET_TYPE_VALUE);
+			LogUtils.requestInfoLog(logger, command, request.toString());
+			logger.info("action={} clientType={}", command.getAction(), clientType);
 
-			// 1.校验参数
+			// 1.check arguments
+			if (StringUtils.isAnyEmpty(userIdPrik, userIdPubk, phoneVC)) {
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
+			}
 
-			// 2.验证手机号与验证码
+			if (ValidatorPattern.isNotPhoneId(phoneId)) {
+				throw new ErrCodeException(ErrorCode.ERROR2_PHONE_FORMATTING);
+			}
+			// create globalUserId
+			String globalUserId = UserIdUtils.getV1GlobalUserId(userIdPubk);
+			if (StringUtils.isEmpty(countryCode)) {
+				countryCode = "+86";
+			}
 
-			// 3.验证手机是否绑定
+			// 2.check phoneId && vc
+			String dbPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId + "_" + vcType);
+			logger.info("vc1={} vc2={}", phoneVC, dbPhoneVC);
 
-			// 4-1 成功：保存注册信息
-			// 4-2 失败：返回手机号对应公司要
+			if (!phoneVC.equals(dbPhoneVC)) {
+				throw new ErrCodeException(ErrorCode.ERROR2_PHONE_VERIFYCODE);
+			}
+
 			ApiPlatformRegisterByPhoneResponse.Builder responseBuilder = ApiPlatformRegisterByPhoneResponse
 					.newBuilder();
-			responseBuilder.setUserIdPrik("");
-			responseBuilder.setUserIdPubk("");
+			// 3.check whether bind phoneId (current register user)
+			String dbPhoneId = UserInfoDao.getInstance().getUserPhoneId(globalUserId);
+			// phone is null or errFormat from db
+			if (!ValidatorPattern.isPhoneId(dbPhoneId)) {
+				// current user dont bind any phoneid (phoneId == null)
+				// 4.check phoneId is used?
+				UserBean userBean = UserInfoDao.getInstance().getUserInfoByPhoneId(phoneId);
+				if (StringUtils.isAnyEmpty(userBean.getUserIdPrik(), userBean.getUserIdPubk())) {
+					// success: user can bind phoneID
+					// 4-1:register
+					// 4-2:bind phoneID to globalUserId
+					UserBean bean = new UserBean();
+					bean.setUserId(globalUserId);
+					bean.setUserIdPrik(userIdPrik);
+					bean.setUserIdPubk(userIdPubk);
+					bean.setPhoneId(phoneId);
+					bean.setCountryCode(countryCode);
+					bean.setPushToken(pushToken);
+					if (StringUtils.isNumeric(clientType)) {
+						bean.setClientType(Integer.valueOf(clientType));
+					}
+					if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
+						errCode = ErrorCode2.SUCCESS;
+					}
 
+				} else {
+					// phoneID is binded by other user
+					errCode = ErrorCode2.ERROR2_PHONE_BIND_USER;
+					responseBuilder.setUserIdPrik(userBean.getUserIdPrik());
+					responseBuilder.setUserIdPubk(userBean.getUserIdPubk());
+					commandResponse.setParams(responseBuilder.build().toByteArray());
+				}
+
+			} else {
+				// 到这里，说明当前账号已经绑定手机号
+				if (phoneId.equals(dbPhoneId)) {
+					// 已经绑定的号码就是此号码，提醒用户“此账号已经绑定该手机号码”
+					errCode = ErrorCode2.ERROR2_PHONE_SAME;
+				} else {
+					// 此账号已经绑定了手机号码
+					errCode = ErrorCode2.ERROR2_PHONE_REALNAME_EXIST;
+				}
+			}
+
+		} catch (ErrCodeException e) {
+			errCode = e.getErrCode();
+			LogUtils.requestErrorLog(logger, command, e);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			errCode = ErrorCode.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return commandResponse;
+		return commandResponse.setErrCode(errCode);
 	}
 
 	/**

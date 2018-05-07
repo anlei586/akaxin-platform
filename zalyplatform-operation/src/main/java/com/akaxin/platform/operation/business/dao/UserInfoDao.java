@@ -121,7 +121,7 @@ public class UserInfoDao {
 	public String getPhoneGlobalRoaming(String phoneId) {
 		try {
 			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
-			return userDao.hget(phoneKey, UserKey.phoneRoaming);
+			return userDao.hget(phoneKey, UserKey.phoneCountryCode);
 		} catch (Exception e) {
 			logger.error("get phone global roaming error.phoneId=" + phoneId, e);
 		}

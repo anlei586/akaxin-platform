@@ -110,7 +110,7 @@ public class RedisUserInfoDao {
 	public boolean updatePhoneInfo(String phoneKey, UserBean bean) {
 		Map<String, String> phoneMap = new HashMap<String, String>();
 		phoneMap.put(UserKey.userId, bean.getUserId());
-		phoneMap.put(UserKey.phoneRoaming, bean.getPhoneRoaming());
+		phoneMap.put(UserKey.phoneCountryCode, bean.getCountryCode());
 		if (!"OK".equalsIgnoreCase(this.jedis.hmset(phoneKey, phoneMap))) {
 			return false;
 		}
