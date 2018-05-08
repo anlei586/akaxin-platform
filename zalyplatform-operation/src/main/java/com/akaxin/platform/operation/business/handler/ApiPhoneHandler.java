@@ -146,13 +146,17 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 		try {
 			ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest request = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest
 					.parseFrom(command.getParams());
-			String userId = request.getGlobalUserId();
-			String phoneId = UserInfoDao.getInstance().getUserPhoneId(userId);
+			String globalUserId = request.getGlobalUserId();
+			String siteAddress = request.getSiteAddress();// demo.akaxin.com:2021
+			String phoneId = UserInfoDao.getInstance().getUserPhoneId(globalUserId);
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
-			if (ValidatorPattern.isPhoneId(phoneId) && StringUtils.isNotEmpty(userId)) {
+			if (ValidatorPattern.isPhoneId(phoneId) && StringUtils.isNotEmpty(globalUserId)) {
 				String phoneToken = UUID.randomUUID().toString();
-				logger.debug("userId={},phoneId={},phoneToken={}", userId, phoneId, phoneToken);
+				if (StringUtils.isNotEmpty(siteAddress)) {
+					phoneToken = siteAddress + "_" + UUID.randomUUID().toString();
+				}
+				logger.debug("userId={},phoneId={},phoneToken={}", globalUserId, phoneId, phoneToken);
 
 				String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
 				if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneTokenKey, phoneId, EXPIRE_TIME)) {
@@ -189,9 +193,25 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenRequest request = ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenRequest
 					.parseFrom(command.getParams());
 			String phoneToken = request.getPhoneToken();
-			String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
-			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(phoneTokenKey);
+			String siteAddress = request.getSiteAddress();
 			LogUtils.requestDebugLog(logger, command, request.toString());
+
+			if (StringUtils.isEmpty(phoneToken)) {
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
+			}
+
+			String ptKey = phoneToken;
+			if (StringUtils.isNotEmpty(siteAddress)) {
+				ptKey = siteAddress + "_" + phoneToken;
+			}
+			String dbKey = RedisKeyUtils.getPhoneToken(ptKey);
+			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
+
+			if (ValidatorPattern.isNotPhoneId(phoneId)) {
+				// 重新在查询一次，兼容老版本
+				dbKey = RedisKeyUtils.getPhoneToken(phoneToken);
+				phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
+			}
 
 			if (ValidatorPattern.isPhoneId(phoneId)) {
 				// 通过手机号，查询用户账号公钥

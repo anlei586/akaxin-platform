@@ -35,6 +35,24 @@ public final class ApiPhoneApplyTokenProto {
      */
     com.google.protobuf.ByteString
         getGlobalUserIdBytes();
+
+    /**
+     * <pre>
+     * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+     * </pre>
+     *
+     * <code>optional string site_address = 2;</code>
+     */
+    java.lang.String getSiteAddress();
+    /**
+     * <pre>
+     * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+     * </pre>
+     *
+     * <code>optional string site_address = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getSiteAddressBytes();
   }
   /**
    * Protobuf type {@code platform.ApiPhoneApplyTokenRequest}
@@ -49,6 +67,7 @@ public final class ApiPhoneApplyTokenProto {
     }
     private ApiPhoneApplyTokenRequest() {
       globalUserId_ = "";
+      siteAddress_ = "";
     }
 
     @java.lang.Override
@@ -80,6 +99,12 @@ public final class ApiPhoneApplyTokenProto {
               java.lang.String s = input.readStringRequireUtf8();
 
               globalUserId_ = s;
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              siteAddress_ = s;
               break;
             }
           }
@@ -147,6 +172,48 @@ public final class ApiPhoneApplyTokenProto {
       }
     }
 
+    public static final int SITE_ADDRESS_FIELD_NUMBER = 2;
+    private volatile java.lang.Object siteAddress_;
+    /**
+     * <pre>
+     * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+     * </pre>
+     *
+     * <code>optional string site_address = 2;</code>
+     */
+    public java.lang.String getSiteAddress() {
+      java.lang.Object ref = siteAddress_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        siteAddress_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+     * </pre>
+     *
+     * <code>optional string site_address = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getSiteAddressBytes() {
+      java.lang.Object ref = siteAddress_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        siteAddress_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
@@ -162,6 +229,9 @@ public final class ApiPhoneApplyTokenProto {
       if (!getGlobalUserIdBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, globalUserId_);
       }
+      if (!getSiteAddressBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, siteAddress_);
+      }
     }
 
     public int getSerializedSize() {
@@ -171,6 +241,9 @@ public final class ApiPhoneApplyTokenProto {
       size = 0;
       if (!getGlobalUserIdBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, globalUserId_);
+      }
+      if (!getSiteAddressBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, siteAddress_);
       }
       memoizedSize = size;
       return size;
@@ -190,6 +263,8 @@ public final class ApiPhoneApplyTokenProto {
       boolean result = true;
       result = result && getGlobalUserId()
           .equals(other.getGlobalUserId());
+      result = result && getSiteAddress()
+          .equals(other.getSiteAddress());
       return result;
     }
 
@@ -202,6 +277,8 @@ public final class ApiPhoneApplyTokenProto {
       hash = (19 * hash) + getDescriptorForType().hashCode();
       hash = (37 * hash) + GLOBAL_USER_ID_FIELD_NUMBER;
       hash = (53 * hash) + getGlobalUserId().hashCode();
+      hash = (37 * hash) + SITE_ADDRESS_FIELD_NUMBER;
+      hash = (53 * hash) + getSiteAddress().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -322,6 +399,8 @@ public final class ApiPhoneApplyTokenProto {
         super.clear();
         globalUserId_ = "";
 
+        siteAddress_ = "";
+
         return this;
       }
 
@@ -345,6 +424,7 @@ public final class ApiPhoneApplyTokenProto {
       public com.akaxin.proto.platform.ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest buildPartial() {
         com.akaxin.proto.platform.ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest result = new com.akaxin.proto.platform.ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest(this);
         result.globalUserId_ = globalUserId_;
+        result.siteAddress_ = siteAddress_;
         onBuilt();
         return result;
       }
@@ -388,6 +468,10 @@ public final class ApiPhoneApplyTokenProto {
         if (other == com.akaxin.proto.platform.ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest.getDefaultInstance()) return this;
         if (!other.getGlobalUserId().isEmpty()) {
           globalUserId_ = other.globalUserId_;
+          onChanged();
+        }
+        if (!other.getSiteAddress().isEmpty()) {
+          siteAddress_ = other.siteAddress_;
           onChanged();
         }
         onChanged();
@@ -501,6 +585,95 @@ public final class ApiPhoneApplyTokenProto {
   checkByteStringIsUtf8(value);
         
         globalUserId_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object siteAddress_ = "";
+      /**
+       * <pre>
+       * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+       * </pre>
+       *
+       * <code>optional string site_address = 2;</code>
+       */
+      public java.lang.String getSiteAddress() {
+        java.lang.Object ref = siteAddress_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          siteAddress_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+       * </pre>
+       *
+       * <code>optional string site_address = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getSiteAddressBytes() {
+        java.lang.Object ref = siteAddress_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          siteAddress_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+       * </pre>
+       *
+       * <code>optional string site_address = 2;</code>
+       */
+      public Builder setSiteAddress(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        siteAddress_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+       * </pre>
+       *
+       * <code>optional string site_address = 2;</code>
+       */
+      public Builder clearSiteAddress() {
+        
+        siteAddress_ = getDefaultInstance().getSiteAddress();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * 声明此token是为哪一个站申请的，别的站点无法凭此token获取用户的手机号。只有当站点对应，且用户授权过此站点获取手机号，站点才能获取此用户的手机号
+       * </pre>
+       *
+       * <code>optional string site_address = 2;</code>
+       */
+      public Builder setSiteAddressBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        siteAddress_ = value;
         onChanged();
         return this;
       }
@@ -1541,15 +1714,16 @@ public final class ApiPhoneApplyTokenProto {
   static {
     java.lang.String[] descriptorData = {
       "\n#platform/api_phone_applyToken.proto\022\010p" +
-      "latform\"3\n\031ApiPhoneApplyTokenRequest\022\026\n\016" +
-      "global_user_id\030\001 \001(\t\"n\n\032ApiPhoneApplyTok" +
-      "enResponse\022\023\n\013phone_token\030\001 \001(\t\022\023\n\013expir" +
-      "e_time\030\002 \001(\005\022\020\n\010phone_id\030\003 \001(\t\022\024\n\014countr" +
-      "y_code\030\004 \001(\t2t\n\031ApiPhoneApplyTokenServic" +
-      "e\022W\n\napplyToken\022#.platform.ApiPhoneApply" +
-      "TokenRequest\032$.platform.ApiPhoneApplyTok" +
-      "enResponseB4\n\031com.akaxin.proto.platformB" +
-      "\027ApiPhoneApplyTokenProtob\006proto3"
+      "latform\"I\n\031ApiPhoneApplyTokenRequest\022\026\n\016" +
+      "global_user_id\030\001 \001(\t\022\024\n\014site_address\030\002 \001" +
+      "(\t\"n\n\032ApiPhoneApplyTokenResponse\022\023\n\013phon" +
+      "e_token\030\001 \001(\t\022\023\n\013expire_time\030\002 \001(\005\022\020\n\010ph" +
+      "one_id\030\003 \001(\t\022\024\n\014country_code\030\004 \001(\t2t\n\031Ap" +
+      "iPhoneApplyTokenService\022W\n\napplyToken\022#." +
+      "platform.ApiPhoneApplyTokenRequest\032$.pla" +
+      "tform.ApiPhoneApplyTokenResponseB4\n\031com." +
+      "akaxin.proto.platformB\027ApiPhoneApplyToke",
+      "nProtob\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -1568,7 +1742,7 @@ public final class ApiPhoneApplyTokenProto {
     internal_static_platform_ApiPhoneApplyTokenRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_platform_ApiPhoneApplyTokenRequest_descriptor,
-        new java.lang.String[] { "GlobalUserId", });
+        new java.lang.String[] { "GlobalUserId", "SiteAddress", });
     internal_static_platform_ApiPhoneApplyTokenResponse_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_platform_ApiPhoneApplyTokenResponse_fieldAccessorTable = new
