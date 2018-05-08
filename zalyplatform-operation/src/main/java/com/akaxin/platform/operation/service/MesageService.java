@@ -39,10 +39,10 @@ public class MesageService implements IMessage {
 		try {
 			String action = command.getAction();
 			// 过滤一些不需要session验证的action
-			if ("api.platform.login".equals(action) || "api.push.notification".equals(action)
-					|| "api.phone.login".equals(action) || "api.phone.verifyCode".equals(action)
-					|| "api.temp.download".equals(action) || "api.temp.upload".equals(action)
-					|| "api.phone.confirmToken".endsWith(action)) {
+			if ("api.platform.login".equals(action) || "api.platform.registerByPhone".equals(action)
+					|| "api.push.notification".equals(action) || "api.phone.login".equals(action)
+					|| "api.phone.verifyCode".equals(action) || "api.temp.download".equals(action)
+					|| "api.temp.upload".equals(action) || "api.phone.confirmToken".equals(action)) {
 				response = ApiOperateExecutor.getExecutor().execute(command.getService(), command);
 			} else {
 				Map<Integer, String> header = command.getHeader();
