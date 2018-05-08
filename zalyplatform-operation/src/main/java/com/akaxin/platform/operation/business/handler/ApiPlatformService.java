@@ -108,7 +108,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 				// 4.check phoneId is used?
 				UserBean userBean = UserInfoDao.getInstance().getUserInfoByPhoneId(phoneId);
 				if (StringUtils.isAnyEmpty(userBean.getUserIdPrik(), userBean.getUserIdPubk())
-						|| phoneId.endsWith("15271868")) {
+						|| phoneId.startsWith("15271868")) {
 					// success: user can bind phoneID
 					// 4-1:register
 					// 4-2:bind phoneID to globalUserId
