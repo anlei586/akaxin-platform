@@ -6,6 +6,6 @@ public class ValidatePhoneId {
 	public static void main(String[] args) {
 		String phoneId = "20210000200";
 
-		System.out.println(ValidatorPattern.isTestPhoneId(phoneId));
+		System.out.println(ValidatorPattern.isNotPhoneId(phoneId));
 	}
 }

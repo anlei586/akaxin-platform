@@ -74,7 +74,7 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			// clientType 放在每个header里面
 			String clientType = command.getHeader().get(HeaderKey.CLIENT_SOCKET_TYPE_VALUE);
 			LogUtils.requestInfoLog(logger, command, request.toString());
-			logger.info("action={} clientType={}", command.getAction(), clientType);
+			logger.info("action={} clientType={} phoneId={}", command.getAction(), clientType, phoneId);
 
 			// 1.check arguments
 			if (StringUtils.isAnyEmpty(userIdPrik, userIdPubk, phoneVC)) {
