@@ -151,7 +151,8 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			String phoneId = UserInfoDao.getInstance().getUserPhoneId(globalUserId);
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
-			if (ValidatorPattern.isPhoneId(phoneId) && StringUtils.isNotEmpty(globalUserId)) {
+			if ((ValidatorPattern.isPhoneId(phoneId) || ValidatorPattern.isTestPhoneId(phoneId))
+					&& StringUtils.isNotEmpty(globalUserId)) {
 				String phoneToken = UUID.randomUUID().toString();
 				if (StringUtils.isNotEmpty(siteAddress)) {
 					phoneToken = siteAddress + "_" + UUID.randomUUID().toString();
