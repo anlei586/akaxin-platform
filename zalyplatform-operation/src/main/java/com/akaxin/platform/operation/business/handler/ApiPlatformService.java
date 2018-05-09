@@ -86,6 +86,8 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			}
 			// create globalUserId
 			String globalUserId = UserIdUtils.getV1GlobalUserId(userIdPubk);
+			logger.info("clientIp={} action={} globalUserId={}", command.getClientIp(), command.getAction(),
+					globalUserId);
 			if (StringUtils.isEmpty(countryCode)) {
 				countryCode = "+86";
 			}
