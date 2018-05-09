@@ -48,7 +48,7 @@ public class ValidatorPattern {
 		if (phoneId == null) {
 			return false;
 		}
-		return Pattern.matches(REGEX_PHONDID, phoneId);
+		return Pattern.matches(REGEX_PHONDID, phoneId) || Pattern.matches(TEST_REGEX_PHONDID, phoneId);
 	}
 
 	public static boolean isNotPhoneId(String phoneId) {
