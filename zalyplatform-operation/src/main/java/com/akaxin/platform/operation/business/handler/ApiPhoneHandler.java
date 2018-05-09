@@ -142,7 +142,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 	 */
 	public CommandResponse applyToken(Command command) {
 		CommandResponse commandRespone = new CommandResponse().setAction(CommandConst.ACTION_RES);
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode2.ERROR;
 		try {
 			ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest request = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenRequest
 					.parseFrom(command.getParams());
@@ -151,33 +151,39 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			String phoneId = UserInfoDao.getInstance().getUserPhoneId(globalUserId);
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
-			if ((ValidatorPattern.isPhoneId(phoneId) || ValidatorPattern.isTestPhoneId(phoneId))
-					&& StringUtils.isNotEmpty(globalUserId)) {
-				String phoneToken = UUID.randomUUID().toString();
-				if (StringUtils.isNotEmpty(siteAddress)) {
-					phoneToken = siteAddress + "_" + UUID.randomUUID().toString();
-				}
-				logger.debug("userId={},phoneId={},phoneToken={}", globalUserId, phoneId, phoneToken);
-
-				String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
-				if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneTokenKey, phoneId, EXPIRE_TIME)) {
-					ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse.Builder responseBuilder = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse
-							.newBuilder();
-					responseBuilder.setPhoneId(phoneId);
-					responseBuilder.setCountryCode("+86");
-					responseBuilder.setPhoneToken(phoneToken);
-					commandRespone.setParams(responseBuilder.build().toByteArray());
-					errCode = ErrorCode2.SUCCESS;
-				}
-			} else {
-				errCode = ErrorCode2.ERROR_PARAMETER;
+			if (StringUtils.isEmpty(globalUserId)) {
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
+			if (ValidatorPattern.isNotPhoneId(phoneId)) {
+				throw new ErrCodeException(ErrorCode.ERROR2_PHONE_FORMATTING);
+			}
+
+			String phoneToken = UUID.randomUUID().toString();
+			if (StringUtils.isNotEmpty(siteAddress)) {
+				phoneToken = siteAddress + "_" + UUID.randomUUID().toString();
+			}
+			logger.debug("userId={},phoneId={},phoneToken={}", globalUserId, phoneId, phoneToken);
+
+			String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
+			if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneTokenKey, phoneId, EXPIRE_TIME)) {
+				ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse.Builder responseBuilder = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse
+						.newBuilder();
+				responseBuilder.setPhoneId(phoneId);
+				responseBuilder.setCountryCode("+86");
+				responseBuilder.setPhoneToken(phoneToken);
+				commandRespone.setParams(responseBuilder.build().toByteArray());
+				errCode = ErrorCode2.SUCCESS;
+			}
+
+		} catch (ErrCodeException e) {
+			errCode = e.getErrCode();
+			LogUtils.requestErrorLog(logger, command, e);
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return commandRespone.setErrCode2(errCode);
+		return commandRespone.setErrCode(errCode);
 	}
 
 	/**
