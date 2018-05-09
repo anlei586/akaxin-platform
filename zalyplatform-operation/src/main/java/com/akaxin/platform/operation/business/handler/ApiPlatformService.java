@@ -75,6 +75,13 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			String clientType = command.getHeader().get(HeaderKey.CLIENT_SOCKET_TYPE_VALUE);
 			LogUtils.requestInfoLog(logger, command, request.toString());
 			logger.info("action={} clientType={} phoneId={}", command.getAction(), clientType, phoneId);
+			logger.info("userIdPrik={}", userIdPrik);
+			logger.info("userIdPubk={}", userIdPubk);
+			logger.info("pushToken={}", pushToken);
+			logger.info("phoneVC={}", phoneVC);
+			logger.info("phoneId={}", phoneId);
+			logger.info("countryCode={}", countryCode);
+			logger.info("vcType={}", vcType);
 
 			// 1.check arguments
 			if (StringUtils.isAnyEmpty(userIdPrik, userIdPubk, phoneVC)) {
