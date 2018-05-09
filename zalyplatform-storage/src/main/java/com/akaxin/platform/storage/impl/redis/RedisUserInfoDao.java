@@ -62,7 +62,7 @@ public class RedisUserInfoDao {
 		if (bean.getClientType() > 0) {
 			userMap.put(UserKey.clientType, bean.getClientType() + "");
 		}
-		if (ValidatorPattern.isPhoneId(bean.getPhoneId())) {
+		if (ValidatorPattern.isPhoneId(bean.getPhoneId()) || ValidatorPattern.isTestPhoneId(bean.getPhoneId())) {
 			userMap.put(UserKey.userPhoneId, bean.getPhoneId());
 		}
 		if (StringUtils.isNotBlank(bean.getPushToken())) {
