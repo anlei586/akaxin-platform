@@ -150,6 +150,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			String siteAddress = request.getSiteAddress();// demo.akaxin.com:2021
 			String phoneId = UserInfoDao.getInstance().getUserPhoneId(globalUserId);
 			LogUtils.requestDebugLog(logger, command, request.toString());
+			logger.info("action={} phoneId={}", command.getAction(), phoneId);
 
 			if (StringUtils.isEmpty(globalUserId)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
