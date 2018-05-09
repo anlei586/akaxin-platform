@@ -9,6 +9,11 @@ public class ValidatorPattern {
 	public static final String REGEX_PHONDID = "^((13[0-9])|(15[^4,\\D])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))\\d{8}$";
 
 	/**
+	 * 正则表达式：验证测试手机号
+	 */
+	public static final String TEST_REGEX_PHONDID = "^(20210000[0-9])\\d{2}$";
+
+	/**
 	 * 正则表达式：验证邮箱
 	 */
 	public static final String REGEX_EMAIL = "^([a-z0-9A-Z]+[-|\\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\\.)+[a-zA-Z]{2,}$";
@@ -47,7 +52,15 @@ public class ValidatorPattern {
 	}
 
 	public static boolean isNotPhoneId(String phoneId) {
-		return !isPhoneId(phoneId);
+		return !isPhoneId(phoneId) && !isTestPhoneId(phoneId);
+	}
+
+	// 是否为测试手机号格式
+	public static boolean isTestPhoneId(String phoneId) {
+		if (phoneId == null) {
+			return false;
+		}
+		return Pattern.matches(TEST_REGEX_PHONDID, phoneId);
 	}
 
 	/**

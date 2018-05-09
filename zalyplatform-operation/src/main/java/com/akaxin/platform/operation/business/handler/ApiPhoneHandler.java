@@ -213,7 +213,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 				phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
 			}
 
-			if (ValidatorPattern.isPhoneId(phoneId)) {
+			if (ValidatorPattern.isPhoneId(phoneId) || ValidatorPattern.isTestPhoneId(phoneId)) {
 				// 通过手机号，查询用户账号公钥
 				String userIdPubk = UserInfoDao.getInstance().getUserIdPubkByPhoneId(phoneId);
 				ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse.Builder responseBuilder = ApiPhoneConfirmTokenProto.ApiPhoneConfirmTokenResponse
