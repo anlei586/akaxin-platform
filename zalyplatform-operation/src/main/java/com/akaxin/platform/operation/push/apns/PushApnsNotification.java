@@ -53,7 +53,7 @@ public class PushApnsNotification {
 			// 需要通过token，判断是否为开发版本/sandbox/develop/测试版本
 			if (StringUtils.isNotBlank(apnsToken) && apnsToken.startsWith(SANBOX_PRE)) {
 				logger.info("send APNs push by DEV model token={}", apnsToken);
-				isSandboxEnv = false;
+				isSandboxEnv = true;
 				apnsToken = apnsToken.substring(4, apnsToken.length());
 			}
 

@@ -21,9 +21,9 @@ public class XiaomiPackage {
 								// 使用默认震动提示； DEFAULT_LIGHTS = 4; 使用默认led灯光提示；
 	private int notifyType = 1;// 使用默认提示音提示；
 	private long timeToLive = 1 * 60 * 60 * 1000l;// 可选项。如果用户离线，设置消息在服务器保存的时间，单位：ms。服务器默认最长保留两周。
-	private int notifyId;// 默认情况下，通知栏只显示一条推送消息。如果通知栏要显示多条推送消息，需要针对不同的消息设置不同的notify_id（相同notify_id的通知栏消息会覆盖之前的）。
+	private int notifyId = 1000;// 默认情况下，通知栏只显示一条推送消息。如果通知栏要显示多条推送消息，需要针对不同的消息设置不同的notify_id（相同notify_id的通知栏消息会覆盖之前的）。
 	private String extraSoundUri;// 自定义通知栏消息铃声。extra.sound_uri的值设置为铃声的URI。参考2.2.1注：铃声文件放在Android app的raw目录下
-	private int badge = 1;
+	private int badge = 1;//气泡数量
 	private String pushGoto;
 	private String restrictedPackageName = APP_PACKAGE_NAME;
 
@@ -110,8 +110,8 @@ public class XiaomiPackage {
 	}
 
 	public int getNotifyId() {
-		Random random = new Random();
-		this.notifyId = random.nextInt(10000);
+//		Random random = new Random();
+//		this.notifyId = random.nextInt(10000);
 		return notifyId;
 	}
 
