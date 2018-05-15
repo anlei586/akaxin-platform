@@ -55,11 +55,12 @@ public class PushStatistics {
 							+ "<table width='90%' style='border-collapse: collapse; margin: 0 auto;text-align: center;'>  "
 							+ "<caption><h2>阿卡信平台数据统计</h2></caption>  "
 							+ "<thead><tr style='background-color: #CCE8EB;'> "
-							+ "<th>站点地址</th><th>用户使用量</th><th>Push总量</th><th>Push单聊</th><th>Push群聊</th><th>Push其他</th></tr></thead>");
+							+ "<th>序号</th><th>站点地址</th><th>用户使用量</th><th>Push总量</th><th>Push单聊</th><th>Push群聊</th><th>Push其他</th></tr></thead>");
 					JedisClient jedis = new JedisClient();
 					String sitekey = getDBKey("site_address_count");
 					Set<String> sites = jedis.zrange(sitekey, 0, -1);
 
+					int num = 0;
 					for (String siteAddress : sites) {
 						long userCount = 0;
 						long pushTotal = 0;
@@ -92,6 +93,7 @@ public class PushStatistics {
 						}
 
 						String siteHtml = "<tr style='border: 1px solid #cad9ea;color: #666;height: 30px; '>  "
+								+ "<td style='border: 1px solid #cad9ea;'>" + ++num + "</td>"
 								+ "<td style='border: 1px solid #cad9ea;'>" + siteAddress + "</td>"
 								+ "<td style='border: 1px solid #cad9ea;'>" + userCount + "</td>  "
 								+ "<td style='border: 1px solid #cad9ea;'>" + pushTotal + "</td>  "
