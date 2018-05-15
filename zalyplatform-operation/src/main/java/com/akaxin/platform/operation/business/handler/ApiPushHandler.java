@@ -130,7 +130,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			}
 
 			// push total statistics
-			PushStatistics.hincrPush(siteServer, globalUserId);
+//			PushStatistics.hincrPush(siteServer, globalUserId);
 
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);

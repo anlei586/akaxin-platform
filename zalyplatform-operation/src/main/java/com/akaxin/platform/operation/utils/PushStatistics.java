@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.akaxin.common.utils.StringHelper;
@@ -60,21 +61,34 @@ public class PushStatistics {
 					Set<String> sites = jedis.zrange(sitekey, 0, -1);
 
 					for (String siteAddress : sites) {
-						String userkey = getDBKey(siteAddress + "_user");
-						long userCount = jedis.zcard(userkey);
+						long userCount = 0;
+						long pushTotal = 0;
+						long pushU2 = 0;
+						long pushGroup = 0;
+						long pushOthers = 0;
+						try {
+							String userkey = getDBKey(siteAddress + "_user");
+							userCount = jedis.zcard(userkey);
 
-						String pushTotal = null;
-						String pushU2 = null;
-						String pushGroup = null;
-						String pushOthers = null;
+							String pushKey = getDBKey(siteAddress + "_push");
+							Map<String, String> pushMap = jedis.hgetAll(pushKey);
+							if (pushMap != null) {
 
-						String pushKey = getDBKey(siteAddress + "_push");
-						Map<String, String> pushMap = jedis.hgetAll(pushKey);
-						if (pushMap != null) {
-							pushTotal = pushMap.get("total");
-							pushU2 = pushMap.get("u2");
-							pushGroup = pushMap.get("group");
-							pushOthers = pushMap.get("others");
+								if (StringUtils.isNotEmpty(pushMap.get("u2"))) {
+									pushU2 = Integer.valueOf(pushMap.get("u2"));
+								}
+								if (StringUtils.isNotEmpty(pushMap.get("group"))) {
+									pushGroup = Integer.valueOf(pushMap.get("group"));
+								}
+
+								if (StringUtils.isNotEmpty(pushMap.get("others"))) {
+									pushOthers = Integer.valueOf(pushMap.get("others"));
+								}
+								pushTotal += (pushU2 + pushGroup + pushOthers);
+							}
+
+						} catch (Exception e) {
+							logger.error("count platform statistics for user error", e);
 						}
 
 						String siteHtml = "<tr style='border: 1px solid #cad9ea;color: #666;height: 30px; '>  "
@@ -175,26 +189,6 @@ public class PushStatistics {
 			jedis.hincrBy(key, "other", 1);
 		} catch (Exception e) {
 			logger.error("hincr other push error siteAddress=" + siteAddress, e);
-		}
-
-		// 回填一次站点统计数据
-		addUserVisiteSite(globalUserId, siteAddress);
-	}
-
-	/**
-	 * <pre>
-	 * hash结构 
-	 * 		key	 :count_push_20180514 
-	 * 		field:total
-	 * </pre>
-	 */
-	public static void hincrPush(String siteAddress, String globalUserId) {
-		try {
-			String key = getDBKey(siteAddress + "_push");
-			JedisClient jedis = new JedisClient();
-			jedis.hincrBy(key, "total", 1);
-		} catch (Exception e) {
-			logger.error("hincr total push error siteAddress=" + siteAddress, e);
 		}
 
 		// 回填一次站点统计数据
