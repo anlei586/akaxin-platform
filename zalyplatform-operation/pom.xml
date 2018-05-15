@@ -68,6 +68,26 @@
 			<!-- <scope>system</scope> <systemPath>${project.basedir}/lib/json-simple-1.1.1.jar</systemPath> -->
 		</dependency>
 
+
+		<!-- java email -->
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>javax.mail-api</artifactId>
+			<version>1.4.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-email</artifactId>
+			<version>1.4</version>
+		</dependency>
+
 	</dependencies>
 
 </project>

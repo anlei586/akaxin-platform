@@ -1,6 +1,7 @@
 package com.akaxin.platform.storage.impl.redis.client;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,34 @@ public class JedisClient {
 			RedisPoolManager.returnResource(jedis);
 		}
 		return null;
+	}
+
+	public Long incr(final String key) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.incr(key);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis incr key={} error", key), e);
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return -1l;
+	}
+
+	public Long incr(final String key, final long integer) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.incrBy(key, integer);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis incr key={} by integer={} error", key, integer), e);
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return -1l;
 	}
 
 	public String get(final String key) {
@@ -114,6 +143,62 @@ public class JedisClient {
 			RedisPoolManager.returnResource(jedis);
 		}
 		return -1l;
+	}
+
+	public Long hincrBy(final String key, final String field, final long value) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.hincrBy(key, field, value);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis hincrby key={} value={} error", key, value), e);
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return -1l;
+	}
+
+	public Long zcard(final String key) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.zcard(key);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis zcard key={} error", key), e);
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return -1l;
+	}
+
+	public Long zadd(final String key, final double score, final String member) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.zadd(key, score, member);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis zadd key={} score={} member={} error", key, score, member), e);
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return -1l;
+	}
+
+	public Set<String> zrange(final String key, final long start, final long end) {
+		Jedis jedis = null;
+		try {
+			jedis = RedisPoolManager.getJedis();
+			return jedis.zrange(key, start, end);
+		} catch (Exception e) {
+			RedisPoolManager.close(jedis);
+			logger.error(formatMessage("jedis zrange key={} start={} end={} error", key, start, end), e);
+		} finally {
+			RedisPoolManager.returnResource(jedis);
+		}
+		return null;
 	}
 
 	public Long expire(final String key, final int seconds) {

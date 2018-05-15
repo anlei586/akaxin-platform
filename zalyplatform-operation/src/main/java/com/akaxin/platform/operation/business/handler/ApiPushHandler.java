@@ -24,9 +24,9 @@ import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushApnsNotification;
 import com.akaxin.platform.operation.push.umeng.UmengPackage;
 import com.akaxin.platform.operation.push.xiaomi.XiaomiPackage;
+import com.akaxin.platform.operation.utils.PushStatistics;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
-import com.akaxin.proto.client.ImPtcPushProto;
 import com.akaxin.proto.core.ClientProto;
 import com.akaxin.proto.core.PushProto;
 import com.akaxin.proto.platform.ApiPushAuthProto;
@@ -46,8 +46,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 * <pre>
 	 * 
 	 * 每次访问站点同时执行 api.push.auth
-	 * 用户点击登陆站点，允许站点发送push认证
-	 * client->platform
+	 * 用户点击登陆站点，允许站点发送push认证 client -> platform
 	 * 
 	 * </pre>
 	 * 
@@ -66,8 +65,13 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String port = request.getSitePort();
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
+
+			// info log
 			Log2Utils.requestInfoLog(logger, command,
-					StringHelper.format("siteAddress={} siteName", siteAddress + ":" + port, name));
+					StringHelper.format("siteAddress={} siteName={}", siteAddress + ":" + port, name));
+
+			// data statistics
+			PushStatistics.addUserVisiteSite(globalUserId, siteAddress);
 
 			if (StringUtils.isNoneEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
 				// save db
@@ -109,29 +113,35 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			PushProto.PushType pushType = request.getPushType();
 			PushProto.Notification notification = request.getNotification();
 			String siteServer = notification.getSiteServer();
-			String userId = notification.getUserId();
+			String globalUserId = notification.getUserId();
 			String userToken = notification.getUserToken();
 			String title = notification.getPushTitle();
 			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId或者群组groupId
 			String pushFromName = notification.getPushFromName();// 发送者用户昵称或者群组昵称
 			String pushAlter = notification.getPushAlert();
+
+			// debug log
 			Log2Utils.requestDebugLog(logger, command, request.toString());
+			// qps monitor
 			PushMonitor.COUNTER_TOTAL.inc();
 
-			if (StringUtils.isAnyBlank(userId, userToken, siteServer)) {
+			if (StringUtils.isAnyBlank(globalUserId, userToken, siteServer)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
+			// push statistics
+			PushStatistics.addUserVisiteSite(globalUserId, siteServer);
+
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
-			if (MuteSettingDao.getInstance().checkSiteMute(userId, address)) {
+			if (MuteSettingDao.getInstance().checkSiteMute(globalUserId, address)) {
 				throw new ErrCodeException(ErrorCode.SUCCESS);
 			}
 
 			title = StringHelper.getSubString(title, 20);
 
 			// 获取最新一次登陆的用户设备ID
-			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(userId);
+			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(globalUserId);
 			// 获取最新登陆（auth）设备对应的用户令牌（usertoken）
 			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
 					siteServer);
@@ -139,12 +149,12 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			logger.debug("api.push.notification check site_user_token:{} platform_user_token:{}", userToken,
 					userToken2);
 			if (userToken.equals(userToken2)) {
-				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(userId);
+				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(globalUserId);
 				logger.debug("api.push.notification clientType={}", clientType);
 
 				switch (clientType) {
 				case IOS:
-					String pushToken = UserInfoDao.getInstance().getPushToken(userId);
+					String pushToken = UserInfoDao.getInstance().getPushToken(globalUserId);
 					logger.debug("ios push ......pushToken={}", pushToken);
 					if (StringUtils.isNotBlank(pushToken)) {
 						ApnsPackage apnsPack = new ApnsPackage();
@@ -157,12 +167,12 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 							apnsPack.setTitle(title);
 						}
 						apnsPack.setBody(getAlterText(address, pushFromName, pushAlter, pushType));
-						apnsPack.setPushGoto(getPushGoto(address, pushType, pushFromId));
+						apnsPack.setPushGoto(getPushGoto(globalUserId, address, pushType, pushFromId));
 						PushApnsNotification.getInstance().pushNotification(apnsPack);
 					}
 					break;
 				case ANDROID_XIAOMI:
-					String xmPushToken = UserInfoDao.getInstance().getPushToken(userId);
+					String xmPushToken = UserInfoDao.getInstance().getPushToken(globalUserId);
 					logger.debug("xiaomi push......pushToken={}", xmPushToken);
 					if (StringUtils.isNotBlank(xmPushToken)) {
 						XiaomiPackage xmpack = new XiaomiPackage();
@@ -174,7 +184,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 							xmpack.setTitle(title);
 						}
 						xmpack.setDescription(getAlterText(address, pushFromName, pushAlter, pushType));
-						xmpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
+						xmpack.setPushGoto(getPushGoto(globalUserId, address, pushType, pushFromId));
 						PushNotification.pushXiaomiNotification(xmpack);
 					}
 
@@ -182,7 +192,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				case ANDROID_HUAWEI:
 				case ANDROID_OPPO:
 				case ANDROID:
-					String umengToken = UserInfoDao.getInstance().getPushToken(userId);
+					String umengToken = UserInfoDao.getInstance().getPushToken(globalUserId);
 					if (StringUtils.isNotBlank(umengToken)) {
 						UmengPackage umpack = new UmengPackage();
 						umpack.setPushToken(umengToken);
@@ -192,7 +202,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 							umpack.setTitle(title);
 						}
 						umpack.setText(getAlterText(address, pushFromName, pushAlter, pushType));
-						umpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
+						umpack.setPushGoto(getPushGoto(globalUserId, address, pushType, pushFromId));
 						logger.debug("andorid push to client push package={}", umpack.toString());
 						PushNotification.pushUMengNotification(umpack);
 					}
@@ -217,31 +227,34 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		return commandResponse.setErrCode(errCode);
 	}
 
-	private Command buildPushCommand(PushProto.PushType pushType, PushProto.Notification notification) {
-		String siteServer = notification.getSiteServer();// 192.168.0.1:2021
-		String pushTitle = notification.getPushTitle();
-		String pushFromName = notification.getPushFromName();
-		String pushAlter = notification.getPushAlert();
-		String pushFromId = notification.getPushFromId();
-
-		ImPtcPushProto.ImPtcPushRequest.Builder ippRequest = ImPtcPushProto.ImPtcPushRequest.newBuilder();
-		ippRequest.setSiteServer(siteServer);
-		ServerAddress address = new ServerAddress(siteServer);
-		if (address.isRightAddress()) {
-			pushTitle = pushTitle + " " + address.getAddress();
-		}
-		ippRequest.setPushTitle(pushTitle);
-		ippRequest.setPushAlert(getAlterText(address, pushFromName, pushAlter, pushType));
-		ippRequest.setPushJump(getPushGoto(address, pushType, pushFromId));
-		ippRequest.setPushBadge(1);
-		ippRequest.setPushSound("default.caf");// 使用系统默认
-
-		Command command = new Command();
-		command.setAction("im.ptc.push");
-		command.setParams(ippRequest.build().toByteArray());
-		logger.debug("build push command={}", command.toString());
-		return command;
-	}
+	// private Command buildPushCommand(PushProto.PushType pushType,
+	// PushProto.Notification notification) {
+	// String siteServer = notification.getSiteServer();// 192.168.0.1:2021
+	// String pushTitle = notification.getPushTitle();
+	// String pushFromName = notification.getPushFromName();
+	// String pushAlter = notification.getPushAlert();
+	// String pushFromId = notification.getPushFromId();
+	//
+	// ImPtcPushProto.ImPtcPushRequest.Builder ippRequest =
+	// ImPtcPushProto.ImPtcPushRequest.newBuilder();
+	// ippRequest.setSiteServer(siteServer);
+	// ServerAddress address = new ServerAddress(siteServer);
+	// if (address.isRightAddress()) {
+	// pushTitle = pushTitle + " " + address.getAddress();
+	// }
+	// ippRequest.setPushTitle(pushTitle);
+	// ippRequest.setPushAlert(getAlterText(address, pushFromName, pushAlter,
+	// pushType));
+	// ippRequest.setPushJump(getPushGoto(address, pushType, pushFromId));
+	// ippRequest.setPushBadge(1);
+	// ippRequest.setPushSound("default.caf");// 使用系统默认
+	//
+	// Command command = new Command();
+	// command.setAction("im.ptc.push");
+	// command.setParams(ippRequest.build().toByteArray());
+	// logger.debug("build push command={}", command.toString());
+	// return command;
+	// }
 
 	private String getAlterText(ServerAddress address, String fromName, String pushAlter, PushProto.PushType pushType) {
 		// 平台是否配置允许该站点host发送明文push
@@ -293,8 +306,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 * @param pushType
 	 * @return
 	 */
-	private String getPushGoto(ServerAddress address, PushProto.PushType pushType, String id) {
-		String pageValue = getGotoType(pushType);
+	private String getPushGoto(String globalUserId, ServerAddress address, PushProto.PushType pushType, String id) {
+		String pageValue = getGotoType(globalUserId, address, pushType);
 		String pushGoto = "zaly://" + address.getFullAddress() + "/goto?page=" + pageValue;
 		if ("u2_msg".equals(pageValue)) {
 			pushGoto += "&userId=" + id;
@@ -314,44 +327,56 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 * @param pushType
 	 * @return
 	 */
-	private String getGotoType(PushProto.PushType pushType) {
+	private String getGotoType(String globalUserId, ServerAddress address, PushProto.PushType pushType) {
 		switch (pushType) {
 		case PUSH_NOTICE:
 			PushMonitor.COUNTER_OTHERS.inc();
+			PushStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "notice";
 		case PUSH_GROUP_TEXT:
 			PushMonitor.COUNTER_G_TEXT.inc();
+			PushStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
 			return "group_msg";
 		case PUSH_GROUP_IMAGE:
 			PushMonitor.COUNTER_G_PIC.inc();
+			PushStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
 			return "group_msg";
 		case PUSH_GROUP_VOICE:
 			PushMonitor.COUNTER_G_AUDIO.inc();
+			PushStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
 			return "group_msg";
 		case PUSH_TEXT:
 			PushMonitor.COUNTER_U2_TEXT.inc();
+			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_IMAGE:
 			PushMonitor.COUNTER_U2_PIC.inc();
+			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_VOICE:
 			PushMonitor.COUNTER_U2_AUDIO.inc();
+			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_SECRET_TEXT:
 			PushMonitor.COUNTER_U2_TEXTS.inc();
+			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_SECRET_IMAGE:
 			PushMonitor.COUNTER_U2_PICS.inc();
+			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_SECRET_VOICE:
 			PushMonitor.COUNTER_U2_AUDIOS.inc();
+			PushStatistics.hincrU2Push(globalUserId,address.getFullAddress());
 			return "u2_msg";
 		case PUSH_APPLY_FRIEND_NOTICE:
 			PushMonitor.COUNTER_OTHERS.inc();
+			PushStatistics.hincrOtherPush(globalUserId,address.getFullAddress());
 			return "friend_apply";// 新的好友申请
 		default:
 			PushMonitor.COUNTER_OTHERS.inc();
-			return "main ";
+			PushStatistics.hincrOtherPush(globalUserId,address.getFullAddress());
+			return "main";
 		}
 	}
 
