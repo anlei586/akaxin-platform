@@ -61,6 +61,11 @@ public class PushStatistics {
 					Set<String> sites = jedis.zrange(sitekey, 0, -1);
 
 					int num = 0;
+					long userCountNum = 0;
+					long pushTotalNum = 0;
+					long pushU2Num = 0;
+					long pushGroupNum = 0;
+					long pushOthersNum = 0;
 					for (String siteAddress : sites) {
 						long userCount = 0;
 						long pushTotal = 0;
@@ -88,6 +93,11 @@ public class PushStatistics {
 								pushTotal += (pushU2 + pushGroup + pushOthers);
 							}
 
+							userCountNum += userCount;
+							pushTotalNum += pushTotal;
+							pushU2Num += pushU2;
+							pushGroupNum += pushGroup;
+							pushOthersNum += pushOthers;
 						} catch (Exception e) {
 							logger.error("count platform statistics for user error", e);
 						}
@@ -100,9 +110,18 @@ public class PushStatistics {
 								+ "<td style='border: 1px solid #cad9ea;'>" + pushU2 + "</td>"
 								+ "<td style='border: 1px solid #cad9ea;'>" + pushGroup + "</td>"
 								+ "<td style='border: 1px solid #cad9ea;'>" + pushOthers + "</td></tr>";
-
 						pushHtml.append(siteHtml);
 					}
+
+					String siteHtml = "<tr style='border: 1px solid #cad9ea;color: #666;height: 30px; '>  "
+							+ "<td style='border: 1px solid #cad9ea;'>合计</td>"
+							+ "<td style='border: 1px solid #cad9ea;'>" + "" + "</td>"
+							+ "<td style='border: 1px solid #cad9ea;'>" + userCountNum + "</td>  "
+							+ "<td style='border: 1px solid #cad9ea;'>" + pushTotalNum + "</td>  "
+							+ "<td style='border: 1px solid #cad9ea;'>" + pushU2Num + "</td>"
+							+ "<td style='border: 1px solid #cad9ea;'>" + pushGroupNum + "</td>"
+							+ "<td style='border: 1px solid #cad9ea;'>" + pushOthersNum + "</td></tr>";
+					pushHtml.append(siteHtml);
 
 					pushHtml.append("</table></section>" + "<footer id='footer'>"
 							+ "<div class='text-center padder' align='center'><p><small>北京阿卡信信息技术有限公司&copy;2018</small> </p></div>"
@@ -116,7 +135,7 @@ public class PushStatistics {
 					bean.setTitle("阿卡信平台数据统计");
 					bean.setHtmlText(pushHtml.toString());
 					emailService.sendMail(bean);
-					
+
 					MailBean bean2 = new MailBean();
 					bean2.setFromId("an.guoyue@akaxin.xyz");
 					bean2.setPasswd("Agy_19950517");
