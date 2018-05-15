@@ -71,7 +71,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 					StringHelper.format("siteAddress={} siteName={}", siteAddress + ":" + port, name));
 
 			// data statistics
-			PushStatistics.addUserVisiteSite(globalUserId, siteAddress);
+			PushStatistics.addUserVisiteSite(globalUserId, siteAddress + ":" + port);
 
 			if (StringUtils.isNoneEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
 				// save db
