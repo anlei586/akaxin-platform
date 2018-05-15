@@ -129,8 +129,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
-			// push statistics
-			PushStatistics.addUserVisiteSite(globalUserId, siteServer);
+			// push total statistics
+			PushStatistics.hincrPush(siteServer, globalUserId);
 
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
@@ -367,15 +367,15 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			return "u2_msg";
 		case PUSH_SECRET_VOICE:
 			PushMonitor.COUNTER_U2_AUDIOS.inc();
-			PushStatistics.hincrU2Push(globalUserId,address.getFullAddress());
+			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_APPLY_FRIEND_NOTICE:
 			PushMonitor.COUNTER_OTHERS.inc();
-			PushStatistics.hincrOtherPush(globalUserId,address.getFullAddress());
+			PushStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "friend_apply";// 新的好友申请
 		default:
 			PushMonitor.COUNTER_OTHERS.inc();
-			PushStatistics.hincrOtherPush(globalUserId,address.getFullAddress());
+			PushStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "main";
 		}
 	}
