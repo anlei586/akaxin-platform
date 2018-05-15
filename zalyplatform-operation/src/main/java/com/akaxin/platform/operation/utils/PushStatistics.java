@@ -114,12 +114,20 @@ public class PushStatistics {
 					bean.setTitle("阿卡信平台数据统计");
 					bean.setHtmlText(pushHtml.toString());
 					emailService.sendMail(bean);
+					
+					MailBean bean2 = new MailBean();
+					bean2.setFromId("an.guoyue@akaxin.xyz");
+					bean2.setPasswd("Agy_19950517");
+					bean2.setToId("zhang.mingqiang@akaxin.xyz");
+					bean2.setTitle("阿卡信平台数据统计");
+					bean2.setHtmlText(pushHtml.toString());
+					emailService.sendMail(bean2);
 				} catch (Exception e) {
 					logger.error("mail to siteaddress details error", e);
 				}
 			}
 
-		}, 5, 5, TimeUnit.MINUTES);
+		}, 0, 1, TimeUnit.HOURS);
 	}
 
 	public static void addUserVisiteSite(String globalUserId, String siteAddress) {
