@@ -41,9 +41,7 @@ import com.akaxin.platform.storage.impl.redis.client.JedisClient;
  */
 public class PushStatistics {
 	private static final Logger logger = Logger.getLogger(PushStatistics.class);
-	private static final Logger userSiteLogger = Log2Creater.createTimeLogger("count-user-site");
-	// private static final Logger pushLogger =
-	// Log2Creater.createTimeLogger("count-push");
+	private static final Logger userSiteLogger = Log2Creater.createTimeLogger("count-site");
 
 	static {
 		// 定时输出一分钟，输出一次结果
@@ -72,6 +70,9 @@ public class PushStatistics {
 		YESTERDAY, TODAY
 	}
 
+	public static void start() {
+	}
+
 	private static String getDayKey(EmailDay day, String key) {
 		switch (day) {
 		case YESTERDAY:
@@ -81,14 +82,34 @@ public class PushStatistics {
 		default:
 			break;
 		}
-		return null;
+		// 默认发送今天
+		return getTodayDBKey(key);
+	}
+
+	// 20180516
+	private static String getFormatTime(EmailDay day) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		long timeMills = System.currentTimeMillis();
+
+		switch (day) {
+		case YESTERDAY:
+			timeMills = timeMills - 24 * 60 * 60 * 1000l;
+		case TODAY:
+			break;
+		default:
+			break;
+		}
+		return sdf.format(new Date(timeMills));
 	}
 
 	private static void sendEmail(EmailDay day) {
 		try {
+			String ftime = getFormatTime(day);
+
 			StringBuilder pushHtml = new StringBuilder("<body><section id='content'>"
 					+ "<table width='90%' style='border-collapse: collapse; margin: 0 auto;text-align: center;'>  "
-					+ "<caption><h2>阿卡信平台数据统计</h2></caption>  " + "<thead><tr style='background-color: #CCE8EB;'> "
+					+ "<caption><h2>阿卡信平台数据统计-" + ftime + "</h2></caption>  "
+					+ "<thead><tr style='background-color: #CCE8EB;'> "
 					+ "<th>序号</th><th>站点地址</th><th>用户使用量</th><th>Push总量</th><th>Push单聊</th><th>Push群聊</th><th>Push其他</th></tr></thead>");
 			JedisClient jedis = new JedisClient();
 			String sitekey = getDayKey(day, "site_address_count");
@@ -159,9 +180,6 @@ public class PushStatistics {
 			pushHtml.append("</table></section>" + "<footer id='footer'>"
 					+ "<div class='text-center padder' align='center'><p><small>北京阿卡信信息技术有限公司&copy;2018</small> </p></div>"
 					+ "</footer></body>");
-
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-			String ftime = sdf.format(new Date(System.currentTimeMillis()));
 
 			EmailService emailService = new EmailServiceImpl();
 			MailBean bean = new MailBean();
