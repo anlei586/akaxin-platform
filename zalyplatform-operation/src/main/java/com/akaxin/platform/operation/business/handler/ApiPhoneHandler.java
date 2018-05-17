@@ -116,11 +116,14 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 					UserBean userBean = UserInfoDao.getInstance().getRealNameUserInfo(phoneId);
 					logger.debug("phone login userBean={}", GsonUtils.toJson(userBean));
 
-					ApiPhoneLoginProto.ApiPhoneLoginResponse response = ApiPhoneLoginProto.ApiPhoneLoginResponse
-							.newBuilder().setUserIdPrik(String.valueOf(userBean.getUserIdPrik()))
-							.setUserIdPubk(String.valueOf(userBean.getUserIdPubk())).build();
-					commandRespone.setParams(response.toByteArray());
-					errCode = ErrorCode2.SUCCESS;
+					if (userBean != null
+							&& StringUtils.isNoneEmpty(userBean.getUserIdPrik(), userBean.getUserIdPubk())) {
+						ApiPhoneLoginProto.ApiPhoneLoginResponse response = ApiPhoneLoginProto.ApiPhoneLoginResponse
+								.newBuilder().setUserIdPrik(userBean.getUserIdPrik())
+								.setUserIdPubk(userBean.getUserIdPubk()).build();
+						commandRespone.setParams(response.toByteArray());
+						errCode = ErrorCode2.SUCCESS;
+					}
 				} else {
 					errCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
 				}
