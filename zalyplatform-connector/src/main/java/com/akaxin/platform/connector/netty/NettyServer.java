@@ -30,9 +30,11 @@ public abstract class NettyServer {
 	private EventLoopGroup childGroup;
 
 	public NettyServer() {
-		parentGroup = new NioEventLoopGroup(10, new PrefixThreadFactory("zaly-boss-eventloopgroup"));
-		int childThreadNum = Runtime.getRuntime().availableProcessors() + 1;
-		childGroup = new NioEventLoopGroup(childThreadNum, new PrefixThreadFactory("zaly-worker-eventloopgroup"));
+		int needThreadNum = Runtime.getRuntime().availableProcessors() + 1;
+		int parentNum = 10;
+		int childNum = needThreadNum * 5 + 10;
+		parentGroup = new NioEventLoopGroup(parentNum, new PrefixThreadFactory("zaly-boss-eventloopgroup"));
+		childGroup = new NioEventLoopGroup(childNum, new PrefixThreadFactory("zaly-worker-eventloopgroup"));
 		bootstrap = new ServerBootstrap();
 		bootstrap.group(parentGroup, childGroup);
 		bootstrap.channel(NioServerSocketChannel.class);

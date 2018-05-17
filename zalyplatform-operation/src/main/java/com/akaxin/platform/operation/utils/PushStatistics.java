@@ -53,7 +53,7 @@ public class PushStatistics {
 				Calendar cal = Calendar.getInstance();
 				int hourOfDay = cal.get(Calendar.HOUR_OF_DAY);
 
-				if (hourOfDay == 1) {
+				if (hourOfDay == 0) {
 					sendEmail(EmailDay.YESTERDAY);
 				} else if (hourOfDay >= 6) {
 					sendEmail(EmailDay.TODAY);
