@@ -103,8 +103,12 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			String dbPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId + "_" + vcType);
 			logger.info("vc1={} vc2={}", phoneVC, dbPhoneVC);
 
-			if (!phoneVC.equals(dbPhoneVC) && !phoneVC.equals("2021")) {
-				throw new ErrCodeException(ErrorCode.ERROR2_PHONE_VERIFYCODE);
+			if (!phoneVC.equals(dbPhoneVC)) {
+				if (!ValidatorPattern.isTestPhoneId(phoneId) || !phoneVC.equals("2021")) {
+					throw new ErrCodeException(ErrorCode.ERROR2_PHONE_VERIFYCODE);
+				} else {
+					logger.info("api.platform.registerByPhone test phoneId={} vc={}", phoneId, phoneVC);
+				}
 			}
 
 			ApiPlatformRegisterByPhoneResponse.Builder responseBuilder = ApiPlatformRegisterByPhoneResponse
