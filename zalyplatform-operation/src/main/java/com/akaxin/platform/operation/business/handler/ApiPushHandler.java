@@ -24,7 +24,7 @@ import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushApnsNotification;
 import com.akaxin.platform.operation.push.umeng.UmengPackage;
 import com.akaxin.platform.operation.push.xiaomi.XiaomiPackage;
-import com.akaxin.platform.operation.utils.PushStatistics;
+import com.akaxin.platform.operation.statistics.SiteStatistics;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.core.ClientProto;
@@ -71,7 +71,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 					StringHelper.format("siteAddress={} siteName={}", siteAddress + ":" + port, name));
 
 			// data statistics
-			PushStatistics.addUserVisitSite(globalUserId, siteAddress + ":" + port);
+			SiteStatistics.addUserVisitSite(globalUserId, siteAddress + ":" + port);
 
 			if (StringUtils.isNoneEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
 				// save db
@@ -331,51 +331,51 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		switch (pushType) {
 		case PUSH_NOTICE:
 			PushMonitor.COUNTER_OTHERS.inc();
-			PushStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "notice";
 		case PUSH_GROUP_TEXT:
 			PushMonitor.COUNTER_G_TEXT.inc();
-			PushStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
 			return "group_msg";
 		case PUSH_GROUP_IMAGE:
 			PushMonitor.COUNTER_G_PIC.inc();
-			PushStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
 			return "group_msg";
 		case PUSH_GROUP_VOICE:
 			PushMonitor.COUNTER_G_AUDIO.inc();
-			PushStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
 			return "group_msg";
 		case PUSH_TEXT:
 			PushMonitor.COUNTER_U2_TEXT.inc();
-			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_IMAGE:
 			PushMonitor.COUNTER_U2_PIC.inc();
-			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_VOICE:
 			PushMonitor.COUNTER_U2_AUDIO.inc();
-			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_SECRET_TEXT:
 			PushMonitor.COUNTER_U2_TEXTS.inc();
-			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_SECRET_IMAGE:
 			PushMonitor.COUNTER_U2_PICS.inc();
-			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_SECRET_VOICE:
 			PushMonitor.COUNTER_U2_AUDIOS.inc();
-			PushStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_APPLY_FRIEND_NOTICE:
 			PushMonitor.COUNTER_OTHERS.inc();
-			PushStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "friend_apply";// 新的好友申请
 		default:
 			PushMonitor.COUNTER_OTHERS.inc();
-			PushStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
+			SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "main";
 		}
 	}

@@ -9,7 +9,7 @@ import com.akaxin.platform.connector.netty.NettyServer;
 import com.akaxin.platform.operation.monitor.PushMonitor;
 import com.akaxin.platform.operation.monitor.SMSMonitor;
 import com.akaxin.platform.operation.push.apns.APNsPushManager;
-import com.akaxin.platform.operation.utils.PushStatistics;
+import com.akaxin.platform.operation.statistics.SiteStatistics;
 
 /**
  * 
@@ -31,7 +31,7 @@ public class BootStrap {
 		initApnsPush();
 		startNettyServer(port);
 
-		PushStatistics.start();
+		SiteStatistics.start();
 	}
 
 	private static void initZalyMonitor() {

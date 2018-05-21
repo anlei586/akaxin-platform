@@ -1,4 +1,4 @@
-package com.akaxin.platform.operation.utils;
+package com.akaxin.platform.operation.statistics;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -20,27 +20,32 @@ import com.akaxin.platform.storage.impl.redis.client.JedisClient;
 
 /**
  * <pre>
- * 		负责统计数据信息入库,redis持久化,过期 30天
- * 			
- *			当天访问站点地址:
- *			count_site_address_20180514	:（zset）
- *			
- *			用户使用量:
- *			count_user_20180514			:（zset）
- *			
- *			Push统计，Hash结构:
- *			key=count_push_20180514
- *				total	:Push总量（string）
- *				u2		:Push单聊（string）
- *				group	:Push群聊（string）
+ * 	站点信息统计：
+ * 
+ * 	统计所有客户端访问的站点，存储类型zset：
+ * 		key:	  	site_address_count_{20180521}
+ * 		score:	{currentTimeMillis}
+ * 		member:	{demo.akaxin.com}:2021
+ * 
+ * 	统计所有站点上当天的活跃用户，存储类型zset：
+ * 		key:		{demo.akaxin.com:2021}_user_{20180521}
+ * 		score:	{currentTimeMillis}
+ * 		member:	{siteUserId}
+ *
+ * 	统计所有站点，发送平台的PUSH量，存储结构为hash结构 
+ * 		key	:{demo.akaxin.com:2021}_push_{20180514}
+ * 		<field,value>
+ * 		"u2"	:二人消息的数量
+ * 		"group":群消息的数量
+ * 		"other":其他类型的消息数量
  *
  * </pre>
  * 
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2018-05-14 18:19:02
  */
-public class PushStatistics {
-	private static final Logger logger = Logger.getLogger(PushStatistics.class);
+public class SiteStatistics {
+	private static final Logger logger = Logger.getLogger(SiteStatistics.class);
 	private static final Logger userSiteLogger = Log2Creater.createTimeLogger("count-site");
 
 	static {
@@ -197,11 +202,36 @@ public class PushStatistics {
 			bean2.setTitle("阿卡信平台数据统计-" + ftime);
 			bean2.setHtmlText(pushHtml.toString());
 			emailService.sendMail(bean2);
+
+			MailBean bean3 = new MailBean();
+			bean3.setFromId("an.guoyue@akaxin.xyz");
+			bean3.setPasswd("Agy_19950517");
+			bean3.setToId("zhang.jun@akaxin.xyz");
+			bean3.setTitle("阿卡信平台数据统计-" + ftime);
+			bean3.setHtmlText(pushHtml.toString());
+			emailService.sendMail(bean3);
 		} catch (Exception e) {
 			logger.error("mail to siteaddress details error", e);
 		}
 	}
 
+	/**
+	 * <pre>
+	 * 统计所有客户端访问的站点，存储类型zset：
+	 * 		key:	  	site_address_count_{20180521}
+	 * 		score:	{currentTimeMillis}
+	 * 		member:	{demo.akaxin.com}:2021
+	 * 
+	 * 统计所有站点上当天的活跃用户，存储类型zset：
+	 * 		key:		{demo.akaxin.com:2021}_user_{20180521}
+	 * 		score:	{currentTimeMillis}
+	 * 		member:	{siteUserId}
+	 * 
+	 * </pre>
+	 * 
+	 * @param globalUserId
+	 * @param siteAddress
+	 */
 	public static void addUserVisitSite(String globalUserId, String siteAddress) {
 		userSiteLogger.info(StringHelper.format("globalUserId={} visit siteAddress={}", globalUserId, siteAddress));
 
@@ -224,9 +254,8 @@ public class PushStatistics {
 
 	/**
 	 * <pre>
-	 * hash结构 
-	 * 		key	:{site_address}_push_20180514
-	 * 		key	:im.akaxin.com:2021_push_20180514 
+	 * 统计所有站点，发送平台的PUSH量，存储结构为hash结构 
+	 * 		key	:{demo.akaxin.com:2021}_push_{20180514}
 	 * 		field:"u2"
 	 * </pre>
 	 */
