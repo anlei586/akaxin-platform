@@ -100,7 +100,8 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			}
 
 			// 2.check phoneId && vc
-			String dbPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId + "_" + vcType);
+			String vcKey = phoneId + "_" + vcType;
+			String dbPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(vcKey);
 			logger.info("vc1={} vc2={}", phoneVC, dbPhoneVC);
 
 			if (!phoneVC.equals(dbPhoneVC)) {
@@ -137,6 +138,8 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 					}
 					if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
 						errCode = ErrorCode2.SUCCESS;
+						// 删除key
+						PhoneVCTokenDao.getInstance().delPhoneVC(vcKey);
 					}
 
 				} else {

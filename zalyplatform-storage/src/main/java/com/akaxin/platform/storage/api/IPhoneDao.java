@@ -6,4 +6,6 @@ public interface IPhoneDao {
 
 	public String getStringValue(String key);
 
+	public long delStringValue(String key);
+
 }

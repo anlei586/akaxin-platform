@@ -109,10 +109,11 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
 			if (ValidatorPattern.isPhoneId(phoneId) && StringUtils.isNotBlank(phoneVC)) {
-				String realPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId + "_" + vcType);
-				logger.debug("vc1={} vc2={}", phoneVC, realPhoneVC);
+				String vcKey = phoneId + "_" + vcType;
+				String dbPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(vcKey);
+				logger.debug("vc1={} vc2={}", phoneVC, dbPhoneVC);
 
-				if (phoneVC.equals(realPhoneVC)) {
+				if (phoneVC.equals(dbPhoneVC)) {
 					UserBean userBean = UserInfoDao.getInstance().getRealNameUserInfo(phoneId);
 					logger.debug("phone login userBean={}", GsonUtils.toJson(userBean));
 
@@ -123,6 +124,9 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 								.setUserIdPubk(userBean.getUserIdPubk()).build();
 						commandRespone.setParams(response.toByteArray());
 						errCode = ErrorCode2.SUCCESS;
+
+						// 使用完成以后，过期该验证码
+						PhoneVCTokenDao.getInstance().delPhoneVC(vcKey);
 					}
 				} else {
 					errCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;

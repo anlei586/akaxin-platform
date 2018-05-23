@@ -2,7 +2,6 @@ package com.akaxin.platform.storage.service;
 
 import com.akaxin.platform.storage.api.IPhoneDao;
 import com.akaxin.platform.storage.impl.redis.RedisPhoneDao;
-import com.akaxin.platform.storage.impl.redis.RedisTempSpaceDao;
 
 public class PhoneDaoService implements IPhoneDao {
 
@@ -13,6 +12,11 @@ public class PhoneDaoService implements IPhoneDao {
 
 	@Override
 	public String getStringValue(String key) {
-		return RedisTempSpaceDao.getInstance().getStringValue(key);
+		return RedisPhoneDao.getInstance().getStringValue(key);
+	}
+
+	@Override
+	public long delStringValue(String key) {
+		return RedisPhoneDao.getInstance().delStringValue(key);
 	}
 }

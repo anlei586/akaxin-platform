@@ -81,4 +81,15 @@ public class PhoneVCTokenDao {
 		return null;
 	}
 
+	// phoneIdWithType -> 15271868205_4
+	public long delPhoneVC(String phoneIdWithType) {
+		String key = RedisKeyUtils.getPhoneVCKey(phoneIdWithType);
+		try {
+			return phoneDao.delStringValue(key);
+		} catch (Exception e) {
+			logger.error("del phone verify code error key=" + key, e);
+		}
+		return 0;
+	}
+
 }

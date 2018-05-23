@@ -31,4 +31,9 @@ public class RedisPhoneDao {
 		return value;
 	}
 
+	// 0:没有执行，>=1 执行成功
+	public long delStringValue(String key) {
+		JedisClient jedis = new JedisClient();
+		return jedis.del(key);
+	}
 }

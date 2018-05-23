@@ -110,18 +110,22 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 							// 此手机号码已经绑定其他账号
 							errorCode = ErrorCode2.ERROR2_PHONE_EXIST;
 						} else {
-							String realVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(phoneId + "_" + vcType);
-							if (StringUtils.isNotEmpty(realVerifyCode) && realVerifyCode.equals(verifyCode)) {
+							String vcKey = phoneId + "_" + vcType;
+							String dbVerifyCode = PhoneVCTokenDao.getInstance().getPhoneVC(vcKey);
+							if (StringUtils.isNotEmpty(dbVerifyCode) && dbVerifyCode.equals(verifyCode)) {
 								UserBean bean = new UserBean();
 								bean.setUserId(globalUserId);
 								bean.setUserIdPrik(userIdPrik);
 								bean.setUserIdPubk(userIdPubk);
 								bean.setPhoneId(phoneId);
 								bean.setCountryCode("+86");
-								logger.debug("Phone code={} realCode={} bean={}", verifyCode, realVerifyCode,
+								logger.debug("Phone code={} realCode={} bean={}", verifyCode, dbVerifyCode,
 										bean.toString());
 								if (UserInfoDao.getInstance().updatePhoneInfo(bean)) {
 									errorCode = ErrorCode2.SUCCESS;
+
+									// 实名完成，则删除key
+									PhoneVCTokenDao.getInstance().delPhoneVC(vcKey);
 								}
 							} else {
 								errorCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
