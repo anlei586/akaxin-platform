@@ -141,7 +141,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(globalUserId);
 			// 获取最新登陆（auth）设备对应的用户令牌（usertoken）
 			logger.debug("api.push.notification deviceId={} siteServer={}", deviceId, siteServer);
-			logger.debug("api.push.notification deviceId_key={}", deviceId, RedisKeyUtils.getUserTokenKey(deviceId));
+			logger.debug("api.push.notification deviceId_key={} ", RedisKeyUtils.getUserTokenKey(deviceId));
 			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
 					siteServer);
 			// 如果用户令牌相同，则相等（授权校验方式）
