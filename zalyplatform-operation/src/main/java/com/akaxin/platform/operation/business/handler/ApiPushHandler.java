@@ -129,9 +129,6 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
-			// push total statistics
-//			PushStatistics.hincrPush(siteServer, globalUserId);
-
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
 			if (MuteSettingDao.getInstance().checkSiteMute(globalUserId, address)) {
@@ -143,6 +140,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			// 获取最新一次登陆的用户设备ID
 			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(globalUserId);
 			// 获取最新登陆（auth）设备对应的用户令牌（usertoken）
+			logger.debug("api.push.notification deviceId={} siteServer={}", deviceId, siteServer);
+			logger.debug("api.push.notification deviceId_key={}", deviceId, RedisKeyUtils.getUserTokenKey(deviceId));
 			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
 					siteServer);
 			// 如果用户令牌相同，则相等（授权校验方式）
