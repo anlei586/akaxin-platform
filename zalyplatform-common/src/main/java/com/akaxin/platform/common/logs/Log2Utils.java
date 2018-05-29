@@ -33,8 +33,8 @@ public class Log2Utils extends Log2Creater {
 
 	public static void requestInfoLog(Logger logger, Command command, String messagePattern, Object... objects) {
 		FormattingTuple format = MessageFormatter.arrayFormat(messagePattern, objects);
-		logger.info("client={} globalUserId={} action={} msg={}", command.getClientIp(), command.getGlobalUserId(),
-				command.getAction(), command.toString(), format.getMessage());
+		logger.info("client={} globalUserId={} action={} command={} message={}", command.getClientIp(),
+				command.getGlobalUserId(), command.getAction(), command.toString(), format.getMessage());
 		return;
 	}
 
