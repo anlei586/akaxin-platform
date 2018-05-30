@@ -40,7 +40,7 @@ public class MesageService implements IMessage {
 			String action = command.getAction();
 			// 过滤一些不需要session验证的action
 			if ("api.platform.login".equals(action) || "api.platform.registerByPhone".equals(action)
-					|| "api.push.notification".equals(action) || "api.phone.login".equals(action)
+					|| action.startsWith("api.push.notification") || "api.phone.login".equals(action)
 					|| "api.phone.verifyCode".equals(action) || "api.temp.download".equals(action)
 					|| "api.temp.upload".equals(action) || "api.phone.confirmToken".endsWith(action)) {
 				response = ApiOperateExecutor.getExecutor().execute(command.getService(), command);
