@@ -7,10 +7,16 @@ import org.slf4j.LoggerFactory;
 import com.akaxin.common.command.Command;
 import com.akaxin.common.command.CommandResponse;
 import com.akaxin.common.constant.ErrorCode2;
+import com.akaxin.common.constant.IErrorCode;
 import com.akaxin.common.logs.LogUtils;
 import com.akaxin.platform.common.constant.CommandConst;
+import com.akaxin.platform.common.constant.ErrorCode;
+import com.akaxin.platform.common.exceptions.ErrCodeException;
 import com.akaxin.platform.common.utils.ServerAddress;
 import com.akaxin.platform.operation.business.dao.MuteSettingDao;
+import com.akaxin.platform.operation.business.dao.UserTokenDao;
+import com.akaxin.platform.operation.utils.RedisKeyUtils;
+import com.akaxin.proto.platform.ApiSettingDeleteUserTokenProto.ApiSettingDeleteUserTokenRequest;
 import com.akaxin.proto.platform.ApiSettingSiteMuteProto;
 import com.akaxin.proto.platform.ApiSettingUpdateSiteMuteProto;
 
@@ -96,6 +102,41 @@ public class ApiSettingService extends AbstractApiHandler<Command, CommandRespon
 			LogUtils.requestErrorLog(logger, command, e);
 		}
 		return commandResponse.setErrCode2(errCode);
+	}
+
+	// 客户端删除站点
+	public CommandResponse deleteUserToken(Command command) {
+		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
+		IErrorCode errCode = ErrorCode2.ERROR;
+		try {
+			ApiSettingDeleteUserTokenRequest request = ApiSettingDeleteUserTokenRequest.parseFrom(command.getParams());
+			String globalUserId = command.getGlobalUserId();
+			String deviceId = command.getDeviceId();
+			String host = request.getSiteHost();
+			int port = request.getSitePort();
+			LogUtils.requestDebugLog(logger, command, request.toString());
+
+			if (StringUtils.isAnyEmpty(globalUserId, deviceId, host)) {
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
+			}
+			ServerAddress siteAddress = new ServerAddress(host, port);
+			String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
+			String siteServer = siteAddress.getFullAddress();
+			logger.debug("action={} delete user-token,key:{},field:{}", command.getAction(), redisKey, siteServer);
+
+			long result = UserTokenDao.getInstance().delUserToken(redisKey, siteServer);
+
+			logger.debug("action={} delete user-token,key:{},field:{},result={}", command.getAction(), redisKey,
+					siteServer, result);
+
+		} catch (Exception e) {
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			errCode = e.getErrCode();
+			LogUtils.requestErrorLog(logger, command, e);
+		}
+		return commandResponse.setErrCode(errCode);
 	}
 
 }

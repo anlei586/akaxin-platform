@@ -55,4 +55,13 @@ public class UserTokenDao {
 		return null;
 	}
 
+	public long delUserToken(String key, String field) {
+		try {
+			return userTokenDao.delUserToken(key, field);
+		} catch (Exception e) {
+			logger.error("delete user token error", e);
+		}
+		return 0;
+	}
+
 }

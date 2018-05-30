@@ -17,4 +17,9 @@ public class UserTokenDaoService {
 	public String getUserTokenValue(String key, String field) {
 		return RedisUserTokenDao.getInstance().getUserTokenField(key, field);
 	}
+
+	public long delUserToken(String key, String field) {
+		return RedisUserTokenDao.getInstance().delUserTokenField(key, field);
+	}
+
 }

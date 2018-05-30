@@ -38,4 +38,8 @@ public class RedisUserTokenDao {
 		return jedis.hget(key, field);
 	}
 
+	public long delUserTokenField(String key, String field) {
+		return jedis.hdel(key, field);
+	}
+
 }

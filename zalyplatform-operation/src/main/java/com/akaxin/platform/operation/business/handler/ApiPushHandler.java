@@ -91,7 +91,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				if (StringUtils.isNumeric(clientType)) {
 					UserInfoDao.getInstance().updateUserField(globalUserId, UserKey.clientType, clientType);
 					logger.debug("update user device clientType={}",
-							CoreProto.HeaderKey.forNumber(Integer.valueOf(clientType)));
+							ClientProto.ClientType.forNumber(Integer.valueOf(clientType)));
 				}
 				errCode = ErrorCode2.SUCCESS;
 			}
