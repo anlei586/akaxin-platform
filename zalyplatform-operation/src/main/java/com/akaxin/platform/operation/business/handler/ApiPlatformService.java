@@ -326,11 +326,10 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 			}
 
 		} catch (Exception e) {
-			if (e instanceof ErrCodeException) {
-				errCode = ((ErrCodeException) e).getErrCode();
-			} else {
-				errCode = ErrorCode2.ERROR_SYSTEMERROR;
-			}
+			errCode = ErrorCode.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			errCode = e.getErrCode();
 			LogUtils.requestErrorLog(logger, command, e);
 		}
 		return commandResponse.setErrCode(errCode);

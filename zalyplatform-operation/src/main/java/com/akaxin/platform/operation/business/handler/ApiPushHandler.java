@@ -1,5 +1,7 @@
 package com.akaxin.platform.operation.business.handler;
 
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +30,7 @@ import com.akaxin.platform.operation.statistics.SiteStatistics;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.core.ClientProto;
+import com.akaxin.proto.core.CoreProto;
 import com.akaxin.proto.core.PushProto;
 import com.akaxin.proto.platform.ApiPushAuthProto;
 import com.akaxin.proto.platform.ApiPushNotificationProto;
@@ -59,6 +62,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		try {
 			ApiPushAuthProto.ApiPushAuthRequest request = ApiPushAuthProto.ApiPushAuthRequest
 					.parseFrom(command.getParams());
+			Map<Integer, String> header = command.getHeader();
+			String clientType = header.get(CoreProto.HeaderKey.CLIENT_SOCKET_TYPE_VALUE);
 			String globalUserId = command.getGlobalUserId();
 			String deviceId = command.getDeviceId();
 			String siteAddress = request.getSiteAddress();
@@ -73,21 +78,29 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			// data statistics
 			SiteStatistics.addUserVisitSite(globalUserId, siteAddress + ":" + port);
 
-			if (StringUtils.isNoneEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
-				// save db
-				String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
-				String siteServer = siteAddress + ":" + port;
-				logger.debug("add user token,key:{},field:{},value:{}", redisKey, siteServer, userToken);
-				if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
-					UserInfoDao.getInstance().updateUserField(globalUserId, UserKey.deviceId, deviceId);
-					errCode = ErrorCode2.SUCCESS;
+			if (StringUtils.isAnyEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
+			}
+
+			// save db
+			String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
+			String siteServer = siteAddress + ":" + port;
+			logger.debug("add user token,key:{},field:{},value:{}", redisKey, siteServer, userToken);
+			if (UserTokenDao.getInstance().addUserToken(redisKey, siteServer, userToken)) {
+				UserInfoDao.getInstance().updateUserField(globalUserId, UserKey.deviceId, deviceId);
+				if (StringUtils.isNumeric(clientType)) {
+					UserInfoDao.getInstance().updateUserField(globalUserId, UserKey.clientType, clientType);
+					logger.debug("update user device clientType={}",
+							CoreProto.HeaderKey.forNumber(Integer.valueOf(clientType)));
 				}
-			} else {
-				errCode = ErrorCode2.ERROR_PARAMETER;
+				errCode = ErrorCode2.SUCCESS;
 			}
 
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			Log2Utils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			errCode = e.getErrCode();
 			Log2Utils.requestErrorLog(logger, command, e);
 		}
 
@@ -214,46 +227,15 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			}
 		} catch (Exception e) {
 			PushMonitor.COUNTER_ERROR.inc();
-			if (e instanceof ErrCodeException) {
-				errCode = ((ErrCodeException) e).getErrCode();
-			} else {
-				errCode = ErrorCode2.ERROR_SYSTEMERROR;
-			}
-			if (!errCode.isSuccess()) {
-				Log2Utils.requestErrorLog(logger, command, e);
-			}
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			Log2Utils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			PushMonitor.COUNTER_ERROR.inc();
+			errCode = e.getErrCode();
+			Log2Utils.requestErrorLog(logger, command, e);
 		}
 		return commandResponse.setErrCode(errCode);
 	}
-
-	// private Command buildPushCommand(PushProto.PushType pushType,
-	// PushProto.Notification notification) {
-	// String siteServer = notification.getSiteServer();// 192.168.0.1:2021
-	// String pushTitle = notification.getPushTitle();
-	// String pushFromName = notification.getPushFromName();
-	// String pushAlter = notification.getPushAlert();
-	// String pushFromId = notification.getPushFromId();
-	//
-	// ImPtcPushProto.ImPtcPushRequest.Builder ippRequest =
-	// ImPtcPushProto.ImPtcPushRequest.newBuilder();
-	// ippRequest.setSiteServer(siteServer);
-	// ServerAddress address = new ServerAddress(siteServer);
-	// if (address.isRightAddress()) {
-	// pushTitle = pushTitle + " " + address.getAddress();
-	// }
-	// ippRequest.setPushTitle(pushTitle);
-	// ippRequest.setPushAlert(getAlterText(address, pushFromName, pushAlter,
-	// pushType));
-	// ippRequest.setPushJump(getPushGoto(address, pushType, pushFromId));
-	// ippRequest.setPushBadge(1);
-	// ippRequest.setPushSound("default.caf");// 使用系统默认
-	//
-	// Command command = new Command();
-	// command.setAction("im.ptc.push");
-	// command.setParams(ippRequest.build().toByteArray());
-	// logger.debug("build push command={}", command.toString());
-	// return command;
-	// }
 
 	private String getAlterText(ServerAddress address, String fromName, String pushAlter, PushProto.PushType pushType) {
 		// 平台是否配置允许该站点host发送明文push

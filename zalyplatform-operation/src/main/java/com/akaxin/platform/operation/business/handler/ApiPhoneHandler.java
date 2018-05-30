@@ -81,11 +81,10 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 				errCode = ErrorCode.ERROR2_PHONE_GETVERIFYCODE;
 			}
 		} catch (Exception e) {
-			if (e instanceof ErrCodeException) {
-				errCode = ((ErrCodeException) e).getErrCode();
-			} else {
-				errCode = ErrorCode.ERROR_SYSTEMERROR;
-			}
+			errCode = ErrorCode.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			errCode = e.getErrCode();
 			LogUtils.requestErrorLog(logger, command, e);
 		}
 		return commandResponse.setErrCode(errCode);
@@ -243,6 +242,9 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			}
 
 		} catch (Exception e) {
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			LogUtils.requestErrorLog(logger, command, e);
 		}

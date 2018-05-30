@@ -3,7 +3,7 @@ package com.akaxin.platform.common.exceptions;
 import com.akaxin.common.constant.IErrorCode;
 import com.akaxin.platform.common.constant.ErrorCode;
 
-public class ErrCodeException extends Exception {
+public class ErrCodeException extends Throwable {
 	/**
 	 * 
 	 */

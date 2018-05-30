@@ -173,14 +173,14 @@ public class ApiUserHandler extends AbstractApiHandler<Command, CommandResponse>
 				ApiUserPhoneProto.ApiUserPhoneResponse response = ApiUserPhoneProto.ApiUserPhoneResponse.newBuilder()
 						.setCountryCode("+86").setPhoneId(phoneId).build();
 				commandResponse.setParams(response.toByteArray());
+				errCode = ErrorCode.SUCCESS;
 			}
-			errCode = ErrorCode.SUCCESS;
+			logger.debug("action={} phoneId={}", command.getAction(), phoneId);
 		} catch (Exception e) {
-			if (e instanceof ZalyException) {
-				errCode = ((ErrCodeException) e).getErrCode();
-			} else {
-				errCode = ErrorCode.ERROR_SYSTEMERROR;
-			}
+			errCode = ErrorCode.ERROR_SYSTEMERROR;
+			LogUtils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			errCode = e.getErrCode();
 			LogUtils.requestErrorLog(logger, command, e);
 		}
 		return commandResponse.setErrCode(errCode);
