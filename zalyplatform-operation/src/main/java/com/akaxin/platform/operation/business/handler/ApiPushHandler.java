@@ -1,5 +1,6 @@
 package com.akaxin.platform.operation.business.handler;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,7 @@ import com.akaxin.proto.core.CoreProto;
 import com.akaxin.proto.core.PushProto;
 import com.akaxin.proto.platform.ApiPushAuthProto;
 import com.akaxin.proto.platform.ApiPushNotificationProto;
+import com.akaxin.proto.platform.ApiPushNotificationsProto;
 
 /**
  * 站点通过api请求（api.push.notification）请求平台给用户发送push
@@ -130,7 +132,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String globalUserId = notification.getUserId();
 			String userToken = notification.getUserToken();
 			String title = notification.getPushTitle();
-			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId或者群组groupId
+			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId
 			String pushFromName = notification.getPushFromName();// 发送者用户昵称或者群组昵称
 			String pushAlter = notification.getPushAlert();
 
@@ -145,21 +147,106 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
+			PushCount.addPushMonitor(globalUserId, address, pushType);
+
 			if (MuteSettingDao.getInstance().checkSiteMute(globalUserId, address)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PUSH_MUTE);
 			}
 
-			PushCount.addPushMonitor(globalUserId, address, pushType);
+			pushToOneUser(globalUserId, userToken, pushType, address, title, null, pushAlter, pushFromId, pushFromName);
 
-			title = StringHelper.getSubString(title, 20);
+		} catch (Exception e) {
+			PushMonitor.COUNTER_ERROR.inc();
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			Log2Utils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			PushMonitor.COUNTER_ERROR.inc();
+			errCode = e.getErrCode();
+			Log2Utils.requestErrorLog(logger, command, e);
+		}
+		return commandResponse.setErrCode(errCode);
+	}
+
+	/**
+	 * api.push.notifications 支持批量发送，后期同意使用此方法发送push
+	 * 
+	 * @param command
+	 * @return
+	 */
+	public CommandResponse notifications(Command command) {
+		CommandResponse commandResponse = new CommandResponse().setAction(CommandConst.ACTION_RES);
+		IErrorCode errCode = ErrorCode2.ERROR;
+		try {
+			ApiPushNotificationsProto.ApiPushNotificationsRequest request = ApiPushNotificationsProto.ApiPushNotificationsRequest
+					.parseFrom(command.getParams());
+			PushProto.PushType pushType = request.getPushType();
+			PushProto.Notifications notifications = request.getNotifications();
+			PushProto.PushFromUser fromUser = request.getPushFromUser();
+			List<com.akaxin.proto.core.PushProto.PushToUser> toUserList = request.getPushToUserList();
+
+			String siteServer = notifications.getSiteServer();
+			String title = notifications.getPushTitle();
+			String subTitle = notifications.getPushSubtitle();
+			String pushAlter = notifications.getPushAlert();
+
+			String pushFromId = fromUser.getSiteUserId();
+			String fromGlobalUserId = fromUser.getGlobalUserId();
+			String pushFromName = fromUser.getPushFromName();// 发送者用户昵称或者群组昵称
+
+			// debug log
+			Log2Utils.requestDebugLog(logger, command, request.toString());
+
+			// qps monitor
+			PushMonitor.COUNTER_TOTAL.inc();
+			// 参数校验
+			if (StringUtils.isAnyBlank(fromGlobalUserId, title, siteServer) || toUserList == null) {
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
+			}
+
+			// 首先判断当前用户是否对该站点屏蔽
+			ServerAddress address = new ServerAddress(siteServer);
+			PushCount.addPushMonitor(fromGlobalUserId, address, pushType);
+
+			for (PushProto.PushToUser pushToUser : toUserList) {
+				String userToken = pushToUser.getUserToken();
+				String toGlobalUserId = pushToUser.getGlobalUserId();
+
+				if (MuteSettingDao.getInstance().checkSiteMute(toGlobalUserId, address)) {
+					logger.warn("globalUserId={} set address={} mute", toGlobalUserId, address.getFullAddress());
+					continue;
+				}
+
+				pushToOneUser(toGlobalUserId, userToken, pushType, address, title, subTitle, pushAlter, pushFromId,
+						pushFromName);
+			}
+
+		} catch (Exception e) {
+			PushMonitor.COUNTER_ERROR.inc();
+			errCode = ErrorCode2.ERROR_SYSTEMERROR;
+			Log2Utils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			PushMonitor.COUNTER_ERROR.inc();
+			errCode = e.getErrCode();
+			Log2Utils.requestErrorLog(logger, command, e);
+		}
+		return commandResponse.setErrCode(errCode);
+	}
+
+	private ErrorCode2 pushToOneUser(String globalUserId, String userToken, PushProto.PushType pushType,
+			ServerAddress address, String title, String subTitle, String pushAlter, String pushFromId,
+			String pushFromName) {
+		ErrorCode2 errCode = ErrorCode2.ERROR;
+		try {
+			// 截取title在合法长度范围内
+			title = StringHelper.getSubString(title, 30);
 
 			// 获取最新一次登陆的用户设备ID
 			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(globalUserId);
 			// 获取最新登陆（auth）设备对应的用户令牌（usertoken）
 			logger.debug("api.push.notification deviceId={} userTokenKey={} siteServer={}", deviceId,
-					RedisKeyUtils.getUserTokenKey(deviceId), siteServer);
+					RedisKeyUtils.getUserTokenKey(deviceId), address.getFullAddress());
 			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
-					siteServer);
+					address.getFullAddress());
 			// 如果用户令牌相同，则相等（授权校验方式）
 			logger.debug("api.push.notification check site_user_token:{} platform_user_token:{}", userToken,
 					userToken2);
@@ -229,15 +316,10 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				errCode = ErrorCode2.SUCCESS;
 			}
 		} catch (Exception e) {
-			PushMonitor.COUNTER_ERROR.inc();
-			errCode = ErrorCode2.ERROR_SYSTEMERROR;
-			Log2Utils.requestErrorLog(logger, command, e);
-		} catch (ErrCodeException e) {
-			PushMonitor.COUNTER_ERROR.inc();
-			errCode = e.getErrCode();
-			Log2Utils.requestErrorLog(logger, command, e);
+			logger.error("send push to one user error", e);
 		}
-		return commandResponse.setErrCode(errCode);
+
+		return errCode;
 	}
 
 	private String getAlterText(ServerAddress address, String fromName, String pushAlter, PushProto.PushType pushType) {
