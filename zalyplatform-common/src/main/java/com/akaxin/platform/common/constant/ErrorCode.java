@@ -81,6 +81,8 @@ public enum ErrorCode implements IErrorCode {
 
 	ERROR2_SECRETCHAT_CLOSE("error.alter", "站点服务不支持绝密聊天"), //
 
+	ERROR_PUSH_MUTE("error.alert", "PUSH发送失败，用户设置了静音"), //
+
 	ERROR("error.alter", "请求失败"); // 默认未知错误
 
 	private String code;

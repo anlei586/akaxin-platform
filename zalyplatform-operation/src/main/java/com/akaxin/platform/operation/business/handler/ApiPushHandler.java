@@ -26,6 +26,7 @@ import com.akaxin.platform.operation.push.apns.ApnsPackage;
 import com.akaxin.platform.operation.push.apns.PushApnsNotification;
 import com.akaxin.platform.operation.push.umeng.UmengPackage;
 import com.akaxin.platform.operation.push.xiaomi.XiaomiPackage;
+import com.akaxin.platform.operation.statistics.PushCount;
 import com.akaxin.platform.operation.statistics.SiteStatistics;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
@@ -145,16 +146,18 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
 			if (MuteSettingDao.getInstance().checkSiteMute(globalUserId, address)) {
-				throw new ErrCodeException(ErrorCode.SUCCESS);
+				throw new ErrCodeException(ErrorCode.ERROR_PUSH_MUTE);
 			}
+
+			PushCount.addPushMonitor(globalUserId, address, pushType);
 
 			title = StringHelper.getSubString(title, 20);
 
 			// 获取最新一次登陆的用户设备ID
 			String deviceId = UserInfoDao.getInstance().getLatestDeviceId(globalUserId);
 			// 获取最新登陆（auth）设备对应的用户令牌（usertoken）
-			logger.debug("api.push.notification deviceId={} siteServer={}", deviceId, siteServer);
-			logger.debug("api.push.notification deviceId_key={} ", RedisKeyUtils.getUserTokenKey(deviceId));
+			logger.debug("api.push.notification deviceId={} userTokenKey={} siteServer={}", deviceId,
+					RedisKeyUtils.getUserTokenKey(deviceId), siteServer);
 			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
 					siteServer);
 			// 如果用户令牌相同，则相等（授权校验方式）
@@ -179,7 +182,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 							apnsPack.setTitle(title);
 						}
 						apnsPack.setBody(getAlterText(address, pushFromName, pushAlter, pushType));
-						apnsPack.setPushGoto(getPushGoto(globalUserId, address, pushType, pushFromId));
+						apnsPack.setPushGoto(getPushGoto(address, pushType, pushFromId));
 						PushApnsNotification.getInstance().pushNotification(apnsPack);
 					}
 					break;
@@ -196,7 +199,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 							xmpack.setTitle(title);
 						}
 						xmpack.setDescription(getAlterText(address, pushFromName, pushAlter, pushType));
-						xmpack.setPushGoto(getPushGoto(globalUserId, address, pushType, pushFromId));
+						xmpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
 						PushNotification.pushXiaomiNotification(xmpack);
 					}
 
@@ -214,7 +217,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 							umpack.setTitle(title);
 						}
 						umpack.setText(getAlterText(address, pushFromName, pushAlter, pushType));
-						umpack.setPushGoto(getPushGoto(globalUserId, address, pushType, pushFromId));
+						umpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
 						logger.debug("andorid push to client push package={}", umpack.toString());
 						PushNotification.pushUMengNotification(umpack);
 					}
@@ -287,8 +290,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 * @param pushType
 	 * @return
 	 */
-	private String getPushGoto(String globalUserId, ServerAddress address, PushProto.PushType pushType, String id) {
-		String pageValue = getGotoType(globalUserId, address, pushType);
+	private String getPushGoto(ServerAddress address, PushProto.PushType pushType, String id) {
+		String pageValue = getGotoType(pushType);
 		String pushGoto = "zaly://" + address.getFullAddress() + "/goto?page=" + pageValue;
 		if ("u2_msg".equals(pageValue)) {
 			pushGoto += "&userId=" + id;
@@ -308,55 +311,24 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 	 * @param pushType
 	 * @return
 	 */
-	private String getGotoType(String globalUserId, ServerAddress address, PushProto.PushType pushType) {
+	private String getGotoType(PushProto.PushType pushType) {
 		switch (pushType) {
 		case PUSH_NOTICE:
-			PushMonitor.COUNTER_OTHERS.inc();
-			SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "notice";
 		case PUSH_GROUP_TEXT:
-			PushMonitor.COUNTER_G_TEXT.inc();
-			SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
-			return "group_msg";
 		case PUSH_GROUP_IMAGE:
-			PushMonitor.COUNTER_G_PIC.inc();
-			SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
-			return "group_msg";
 		case PUSH_GROUP_VOICE:
-			PushMonitor.COUNTER_G_AUDIO.inc();
-			SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
 			return "group_msg";
 		case PUSH_TEXT:
-			PushMonitor.COUNTER_U2_TEXT.inc();
-			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
-			return "u2_msg";
 		case PUSH_IMAGE:
-			PushMonitor.COUNTER_U2_PIC.inc();
-			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
-			return "u2_msg";
 		case PUSH_VOICE:
-			PushMonitor.COUNTER_U2_AUDIO.inc();
-			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
-			return "u2_msg";
 		case PUSH_SECRET_TEXT:
-			PushMonitor.COUNTER_U2_TEXTS.inc();
-			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
-			return "u2_msg";
 		case PUSH_SECRET_IMAGE:
-			PushMonitor.COUNTER_U2_PICS.inc();
-			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
-			return "u2_msg";
 		case PUSH_SECRET_VOICE:
-			PushMonitor.COUNTER_U2_AUDIOS.inc();
-			SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
 			return "u2_msg";
 		case PUSH_APPLY_FRIEND_NOTICE:
-			PushMonitor.COUNTER_OTHERS.inc();
-			SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "friend_apply";// 新的好友申请
 		default:
-			PushMonitor.COUNTER_OTHERS.inc();
-			SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
 			return "main";
 		}
 	}
