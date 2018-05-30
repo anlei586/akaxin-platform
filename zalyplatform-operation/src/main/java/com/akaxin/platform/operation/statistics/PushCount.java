@@ -16,36 +16,47 @@ public class PushCount {
 			case PUSH_NOTICE:
 				PushMonitor.COUNTER_OTHERS.inc();
 				SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_GROUP_TEXT:
 				PushMonitor.COUNTER_G_TEXT.inc();
 				SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_GROUP_IMAGE:
 				PushMonitor.COUNTER_G_PIC.inc();
 				SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_GROUP_VOICE:
 				PushMonitor.COUNTER_G_AUDIO.inc();
 				SiteStatistics.hincrGroupPush(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_TEXT:
 				PushMonitor.COUNTER_U2_TEXT.inc();
 				SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_IMAGE:
 				PushMonitor.COUNTER_U2_PIC.inc();
 				SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_VOICE:
 				PushMonitor.COUNTER_U2_AUDIO.inc();
 				SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_SECRET_TEXT:
 				PushMonitor.COUNTER_U2_TEXTS.inc();
 				SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_SECRET_IMAGE:
 				PushMonitor.COUNTER_U2_PICS.inc();
 				SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_SECRET_VOICE:
 				PushMonitor.COUNTER_U2_AUDIOS.inc();
 				SiteStatistics.hincrU2Push(globalUserId, address.getFullAddress());
+				break;
 			case PUSH_APPLY_FRIEND_NOTICE:
 				PushMonitor.COUNTER_OTHERS.inc();
 				SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
+				break;
 			default:
 				PushMonitor.COUNTER_OTHERS.inc();
 				SiteStatistics.hincrOtherPush(globalUserId, address.getFullAddress());
