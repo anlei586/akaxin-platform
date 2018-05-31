@@ -147,8 +147,8 @@ public class UserVisitSiteCount {
 							pushGroup = Integer.valueOf(pushMap.get("group"));
 						}
 
-						if (StringUtils.isNotEmpty(pushMap.get("others"))) {
-							pushOthers = Integer.valueOf(pushMap.get("others"));
+						if (StringUtils.isNotEmpty(pushMap.get("other"))) {
+							pushOthers = Integer.valueOf(pushMap.get("other"));
 						}
 						pushTotal += (pushU2 + pushGroup + pushOthers);
 					}
