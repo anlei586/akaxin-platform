@@ -44,8 +44,8 @@ import com.akaxin.platform.storage.impl.redis.client.JedisClient;
  * @author Sam{@link an.guoyue254@gmail.com}
  * @since 2018-05-14 18:19:02
  */
-public class SiteStatistics {
-	private static final Logger logger = Logger.getLogger(SiteStatistics.class);
+public class UserVisitSiteCount {
+	private static final Logger logger = Logger.getLogger(UserVisitSiteCount.class);
 	private static final Logger userSiteLogger = Log2Creater.createTimeLogger("count-site");
 
 	static {
@@ -232,7 +232,7 @@ public class SiteStatistics {
 	 * @param globalUserId
 	 * @param siteAddress
 	 */
-	public static void addUserVisitSite(String globalUserId, String siteAddress) {
+	public static void addVisitUser(String globalUserId, String siteAddress) {
 		userSiteLogger.info(StringHelper.format("globalUserId={} visit siteAddress={}", globalUserId, siteAddress));
 
 		JedisClient jedis = new JedisClient();
@@ -269,7 +269,7 @@ public class SiteStatistics {
 		}
 
 		// 回填一次站点统计数据
-		addUserVisitSite(globalUserId, siteAddress);
+		// addUserVisitSite(globalUserId, siteAddress);
 	}
 
 	/**
@@ -290,7 +290,7 @@ public class SiteStatistics {
 		}
 
 		// 回填一次站点统计数据
-		addUserVisitSite(globalUserId, siteAddress);
+		// addUserVisitSite(globalUserId, siteAddress);
 	}
 
 	/**
@@ -314,16 +314,16 @@ public class SiteStatistics {
 		}
 
 		// 回填一次站点统计数据
-		addUserVisitSite(globalUserId, siteAddress);
+		// addUserVisitSite(globalUserId, siteAddress);
 	}
 
-	public static String getTodayDBKey(String typeName) {
+	private static String getTodayDBKey(String typeName) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		String dayTime = sdf.format(new Date());
 		return typeName + "_" + dayTime;
 	}
 
-	public static String getYesterdayDBKey(String typeName) {
+	private static String getYesterdayDBKey(String typeName) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		String dayTime = sdf.format(new Date(System.currentTimeMillis() - 24 * 60 * 60 * 1000l));
 		return typeName + "_" + dayTime;

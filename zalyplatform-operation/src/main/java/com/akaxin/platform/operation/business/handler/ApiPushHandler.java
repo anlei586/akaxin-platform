@@ -28,7 +28,7 @@ import com.akaxin.platform.operation.push.apns.PushApnsNotification;
 import com.akaxin.platform.operation.push.umeng.UmengPackage;
 import com.akaxin.platform.operation.push.xiaomi.XiaomiPackage;
 import com.akaxin.platform.operation.statistics.PushCount;
-import com.akaxin.platform.operation.statistics.SiteStatistics;
+import com.akaxin.platform.operation.statistics.UserVisitSiteCount;
 import com.akaxin.platform.operation.utils.RedisKeyUtils;
 import com.akaxin.platform.storage.constant.UserKey;
 import com.akaxin.proto.core.ClientProto;
@@ -73,17 +73,16 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String port = request.getSitePort();
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
-
 			// info log
 			Log2Utils.requestInfoLog(logger, command,
 					StringHelper.format("siteAddress={} siteName={}", siteAddress + ":" + port, name));
 
-			// data statistics
-			SiteStatistics.addUserVisitSite(globalUserId, siteAddress + ":" + port);
-
 			if (StringUtils.isAnyEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
+
+			// data statistics
+			UserVisitSiteCount.addVisitUser(globalUserId, siteAddress + ":" + port);
 
 			// save db
 			String redisKey = RedisKeyUtils.getUserTokenKey(deviceId);
@@ -129,7 +128,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			PushProto.PushType pushType = request.getPushType();
 			PushProto.Notification notification = request.getNotification();
 			String siteServer = notification.getSiteServer();
-			String globalUserId = notification.getUserId();
+			String toGlobalUserId = notification.getUserId();
 			String userToken = notification.getUserToken();
 			String title = notification.getPushTitle();
 			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId
@@ -141,19 +140,16 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			// qps monitor
 			PushMonitor.COUNTER_TOTAL.inc();
 
-			if (StringUtils.isAnyBlank(globalUserId, userToken, siteServer)) {
+			if (StringUtils.isAnyBlank(toGlobalUserId, userToken, siteServer)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
-			PushCount.addPushMonitor(globalUserId, address, pushType);
+			UserVisitSiteCount.addVisitUser(toGlobalUserId, address.getFullAddress());
 
-			if (MuteSettingDao.getInstance().checkSiteMute(globalUserId, address)) {
-				throw new ErrCodeException(ErrorCode.ERROR_PUSH_MUTE);
-			}
-
-			pushToOneUser(globalUserId, userToken, pushType, address, title, null, pushAlter, pushFromId, pushFromName);
+			errCode = pushToOneUser(toGlobalUserId, userToken, pushType, address, title, null, pushAlter, pushFromId,
+					pushFromName);
 
 		} catch (Exception e) {
 			PushMonitor.COUNTER_ERROR.inc();
@@ -205,16 +201,12 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
-			PushCount.addPushMonitor(fromGlobalUserId, address, pushType);
+			// 回填一次发送者的用户访问站点记录
+			UserVisitSiteCount.addVisitUser(fromGlobalUserId, address.getFullAddress());
 
 			for (PushProto.PushToUser pushToUser : toUserList) {
 				String userToken = pushToUser.getUserToken();
 				String toGlobalUserId = pushToUser.getGlobalUserId();
-
-				if (MuteSettingDao.getInstance().checkSiteMute(toGlobalUserId, address)) {
-					logger.warn("globalUserId={} set address={} mute", toGlobalUserId, address.getFullAddress());
-					continue;
-				}
 
 				pushToOneUser(toGlobalUserId, userToken, pushType, address, title, subTitle, pushAlter, pushFromId,
 						pushFromName);
@@ -232,11 +224,20 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		return commandResponse.setErrCode(errCode);
 	}
 
-	private ErrorCode2 pushToOneUser(String globalUserId, String userToken, PushProto.PushType pushType,
+	private IErrorCode pushToOneUser(String globalUserId, String userToken, PushProto.PushType pushType,
 			ServerAddress address, String title, String subTitle, String pushAlter, String pushFromId,
 			String pushFromName) {
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode.ERROR;
 		try {
+			// 统计push的数量
+			PushCount.addPushMonitor(globalUserId, address, pushType);
+
+			// 判断用户是否对站点静音
+			if (MuteSettingDao.getInstance().checkSiteMute(globalUserId, address)) {
+				logger.warn("globalUserId={} set address={} mute", globalUserId, address.getFullAddress());
+				return ErrorCode.ERROR_PUSH_MUTE;
+			}
+
 			// 截取title在合法长度范围内
 			title = StringHelper.getSubString(title, 30);
 
@@ -252,12 +253,12 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 					userToken2);
 			if (userToken.equals(userToken2)) {
 				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(globalUserId);
-				logger.debug("api.push.notification clientType={}", clientType);
+				// logger.debug("api.push.notification clientType={}", clientType);
 
 				switch (clientType) {
 				case IOS:
 					String pushToken = UserInfoDao.getInstance().getPushToken(globalUserId);
-					logger.debug("ios push ......pushToken={}", pushToken);
+					logger.debug("{} push ......pushToken={}", clientType, pushToken);
 					if (StringUtils.isNotBlank(pushToken)) {
 						ApnsPackage apnsPack = new ApnsPackage();
 						apnsPack.setToken(pushToken);
@@ -275,7 +276,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 					break;
 				case ANDROID_XIAOMI:
 					String xmPushToken = UserInfoDao.getInstance().getPushToken(globalUserId);
-					logger.debug("xiaomi push......pushToken={}", xmPushToken);
+					logger.debug("{} push......pushToken={}", clientType, xmPushToken);
 					if (StringUtils.isNotBlank(xmPushToken)) {
 						XiaomiPackage xmpack = new XiaomiPackage();
 						xmpack.setPushToken(xmPushToken);
@@ -295,6 +296,7 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 				case ANDROID_OPPO:
 				case ANDROID:
 					String umengToken = UserInfoDao.getInstance().getPushToken(globalUserId);
+					logger.debug("{} umeng push......pushToken={}", clientType, umengToken);
 					if (StringUtils.isNotBlank(umengToken)) {
 						UmengPackage umpack = new UmengPackage();
 						umpack.setPushToken(umengToken);
@@ -305,12 +307,12 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 						}
 						umpack.setText(getAlterText(address, pushFromName, pushAlter, pushType));
 						umpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
-						logger.debug("andorid push to client push package={}", umpack.toString());
 						PushNotification.pushUMengNotification(umpack);
 					}
 					break;
 				default:
-					logger.error("unknow client type:{}", clientType);
+					errCode = ErrorCode.ERROR_PUSH_NO_CLIENTTYPE;
+					logger.debug("unknow clientType : {} error push......", clientType);
 					break;
 				}
 				errCode = ErrorCode2.SUCCESS;
