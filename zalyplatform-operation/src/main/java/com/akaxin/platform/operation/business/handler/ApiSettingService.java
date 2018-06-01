@@ -128,7 +128,7 @@ public class ApiSettingService extends AbstractApiHandler<Command, CommandRespon
 
 			logger.debug("action={} delete user-token,key:{},field:{},result={}", command.getAction(), redisKey,
 					siteServer, result);
-
+			errCode = ErrorCode2.SUCCESS;
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			LogUtils.requestErrorLog(logger, command, e);
