@@ -57,9 +57,9 @@ public class Log2Utils extends Log2Creater {
 
 	public static void requestResultLog(Logger logger, Command command, CommandResponse response) {
 		try {
-			logger.info("client={} globalUserId={} action={} uri={} cost={}ms result=[{}]", command.getClientIp(),
-					command.getGlobalUserId(), command.getAction(), command.getUri(),
-					System.currentTimeMillis() - command.getStartTime(), response.getErrorCodeInfo());
+			logger.info("clientIp={} clientVersion={} globalUserId={} action={} uri={} cost={}ms result=[{}]",
+					command.getClientIp(), command.getClientVersion(), command.getGlobalUserId(), command.getAction(),
+					command.getUri(), System.currentTimeMillis() - command.getStartTime(), response.getErrorCodeInfo());
 		} catch (Exception e) {
 			logger.error(StringHelper.format("request result log error command={} response={}", command, response), e);
 		}

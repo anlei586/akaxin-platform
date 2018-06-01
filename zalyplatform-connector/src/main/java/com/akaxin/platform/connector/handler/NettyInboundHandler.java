@@ -1,6 +1,7 @@
 package com.akaxin.platform.connector.handler;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,7 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			byte[] params = redisCommand.getBytesParamByIndex(2);
 
 			CoreProto.TransportPackageData packageData = CoreProto.TransportPackageData.parseFrom(params);
-
+			Map<Integer, String> header = packageData.getHeaderMap();
 			Command command = new Command();
 			command.setClientIp(clientIP);
 			command.setGlobalUserId(channelSession.getUserId());
@@ -73,7 +74,10 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 			command.setAction(action);
 			command.setChannelSession(channelSession);
 			command.setParams(packageData.getData().toByteArray());
-			command.setHeader(packageData.getHeaderMap());
+			command.setHeader(header);
+			if (header != null) {
+				command.setClientVersion(header.get(CoreProto.HeaderKey.CLIENT_SOCKET_VERSION_VALUE));
+			}
 			command.setStartTime(System.currentTimeMillis());
 
 			if (!"ping".equals(command.getMethod())) {
@@ -92,6 +96,16 @@ public class NettyInboundHandler extends SimpleChannelInboundHandler<RedisComman
 				if (response == null) {
 					response = customResponse(ErrorCode.ERROR);
 				}
+
+				// 兼容"error.alter" AND "error.alert"
+				String errCode = response.getErrCode();
+				int pbVersion = command.getProtoVersion();
+
+				if (pbVersion < 5 && "error.alert".equals(errCode)) {
+					response.setErrCode("error.alter");
+				}
+
+				// send and close socket
 				ChannelWriter.writeAndClose(ctx.channel(), response);
 				Log2Utils.requestResultLog(logger, command, response);
 			} else {
