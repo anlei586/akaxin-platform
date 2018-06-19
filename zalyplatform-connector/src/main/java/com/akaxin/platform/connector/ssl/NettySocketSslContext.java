@@ -8,43 +8,39 @@ import javax.net.ssl.SSLContext;
 import io.netty.util.internal.SystemPropertyUtil;
 
 public class NettySocketSslContext {
-	private static final String PROTOCOL = "TLS";
 
-	private SSLContext serverContext;
+	private static SSLContext serverContext;
 
 	private NettySocketSslContext() {
+
+	}
+
+	public static SSLContext getSSLContext() {
 		String algorithm = SystemPropertyUtil.get("ssl.KeyManagerFactory.algorithm");
 		if (algorithm == null) {
 			algorithm = "SunX509";
 		}
 
 		try {
-			//
-			KeyStore keystore = KeyStore.getInstance("JKS");
-			keystore.load(SslKeyStore.asInputStream(), SslKeyStore.getKeyStorePassword());
+			if (serverContext == null) {
+				//
+				KeyStore keystore = KeyStore.getInstance("JKS");
+				// need storepass
+				keystore.load(SslKeyStore.resourcesAsInputStream(), SslKeyStore.getKeyStorePassword());
 
-			// Set up key manager factory to use our key store
-			KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
-			kmf.init(keystore, SslKeyStore.getCertificatePassword());
+				// init kmf
+				KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
+				// need keypass
+				kmf.init(keystore, SslKeyStore.getCertificatePassword());
 
-			// Initialize the SSLContext to work with our key managers.
-			serverContext = SSLContext.getInstance(PROTOCOL);
-			serverContext.init(kmf.getKeyManagers(), null, null);
+				// Initialize the SSLContext with kmf
+				serverContext = SSLContext.getInstance("TLS");
+				serverContext.init(kmf.getKeyManagers(), null, null);
+			}
 		} catch (Exception e) {
-			throw new Error("Failed to initialize the server-side SSLContext", e);
+			throw new Error("Failed to initialize akaxin-platform server-side SSLContext", e);
 		}
 
-	}
-
-	public static NettySocketSslContext getInstance() {
-		return SingletonHolder.instance;
-	}
-
-	private static class SingletonHolder {
-		static NettySocketSslContext instance = new NettySocketSslContext();
-	}
-
-	public SSLContext getServerContext() {
 		return serverContext;
 	}
 

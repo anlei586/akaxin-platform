@@ -23,13 +23,13 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 
-public abstract class NettyServer {
-	private static Logger logger = LoggerFactory.getLogger(NettyServer.class);
+public abstract class PlatformNettyServer {
+	private static Logger logger = LoggerFactory.getLogger(PlatformNettyServer.class);
 	private ServerBootstrap bootstrap;
 	private EventLoopGroup parentGroup;
 	private EventLoopGroup childGroup;
 
-	public NettyServer() {
+	public PlatformNettyServer() {
 		int needThreadNum = Runtime.getRuntime().availableProcessors() + 1;
 		int parentNum = 10;
 		int childNum = needThreadNum * 5 + 10;

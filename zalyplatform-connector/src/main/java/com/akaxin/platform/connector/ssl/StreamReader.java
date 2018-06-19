@@ -29,7 +29,7 @@ public class StreamReader {
 
 	public static void main(String[] args) {
 		StreamReader reader = new StreamReader();
-		System.out.println(reader.toByteArray(StreamReader.class.getResourceAsStream("/securesocket.jks")));
+		System.out.println(reader.toByteArray(StreamReader.class.getResourceAsStream("/chatchrome1.jks")));
 
 	}
 
