@@ -31,7 +31,7 @@ public class SslKeyStore {
 	 * 
 	 * @return
 	 */
-	public static InputStream resourcesAsInputStream() {
+	public static InputStream keyStoreAsInputStream() {
 		return SslKeyStore.class.getResourceAsStream("/akaxinplatform.jks");
 	}
 
@@ -44,4 +44,11 @@ public class SslKeyStore {
 		return "akaxin1529378162317".toCharArray();
 	}
 
+	public static InputStream trustStoreAsInputStream() {
+		return SslKeyStore.class.getResourceAsStream("/akaxinclient.jks");
+	}
+
+	public static char[] getTrustKeyStorePassword() {
+		return "akaxin1529382054869".toCharArray();
+	}
 }

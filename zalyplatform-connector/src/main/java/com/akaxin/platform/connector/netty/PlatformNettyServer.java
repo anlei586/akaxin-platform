@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.akaxin.platform.connector.codec.protocol.MessageDecoder;
 import com.akaxin.platform.connector.codec.protocol.MessageEncoder;
+import com.akaxin.platform.connector.exceptions.TcpServerException;
 import com.akaxin.platform.connector.handler.NettyInboundHandler;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -22,6 +23,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 
 public abstract class PlatformNettyServer {
 	private static Logger logger = LoggerFactory.getLogger(PlatformNettyServer.class);
@@ -50,41 +53,51 @@ public abstract class PlatformNettyServer {
 		bootstrap.childHandler(new BimChannelInitializer());
 	}
 
-	public void start(String address, int port) {
-		try {
-			if (bootstrap != null) {
-				ChannelFuture channelFuture = bootstrap.bind(address, port).sync();
-				channelFuture.channel().closeFuture().sync();
-			}
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				parentGroup.shutdownGracefully();
-				childGroup.shutdownGracefully();
-				parentGroup.terminationFuture().sync();
-				childGroup.terminationFuture().sync();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
 	private class BimChannelInitializer extends ChannelInitializer<SocketChannel> {
 		@Override
 		protected void initChannel(SocketChannel ch) throws Exception {
-			// SSLEngine sslEngine =
-			// NettySocketSslContext.getInstance().getServerContext().createSSLEngine();
-
 			ch.pipeline().addLast(new MessageDecoder());
 			ch.pipeline().addLast(new MessageEncoder());
-
-			// ch.pipeline().addLast(new SslHandler(sslEngine));
 
 			ch.pipeline().addLast("readTimeoutHandler", new ReadTimeoutHandler(50, TimeUnit.SECONDS));
 			ch.pipeline().addLast(new NettyInboundHandler());
 		}
 
+	}
+
+	public void start(String address, int port) throws TcpServerException {
+		try {
+			ChannelFuture channelFuture = bootstrap.bind(address, port).sync();
+			channelFuture.channel().closeFuture().addListener(new GenericFutureListener<Future<? super Void>>() {
+
+				@Override
+				public void operationComplete(Future<? super Void> future) throws Exception {
+					closeGracefully();
+				}
+			});
+		} catch (Exception e) {
+			closeGracefully();
+			throw new TcpServerException("start openzaly tcp-server error", e);
+		}
+	}
+
+	private void closeGracefully() {
+		try {
+			if (parentGroup != null) {
+				// terminate all threads
+				parentGroup.shutdownGracefully();
+				// wait for all threads terminated
+				parentGroup.terminationFuture().sync();
+			}
+			if (childGroup != null) {
+				// terminate all threads
+				childGroup.shutdownGracefully();
+				// wait for all threads terminated
+				childGroup.terminationFuture().sync();
+			}
+		} catch (Exception e) {
+			logger.error("shutdown netty gracefully error.", e);
+		}
 	}
 
 }
