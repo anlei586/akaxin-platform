@@ -39,7 +39,7 @@ public class NettyConnectionListener {
 			public void run() {
 				logger.info(protectAndShowConnections(true) + protectAndShowConnections(false));
 			}
-		}, 5, 5, TimeUnit.SECONDS);
+		}, 5, 15, TimeUnit.SECONDS);
 
 	}
 
@@ -52,8 +52,7 @@ public class NettyConnectionListener {
 	 * 2.展示Netty客户端链接情况<br>
 	 */
 	private static String protectAndShowConnections(boolean isSandbox) {
-		StringBuilder checkResult = new StringBuilder(
-				"\n------" + (isSandbox ? "SandboxEnv" : "ProductEnv") + "------\n");
+		StringBuilder checkResult = new StringBuilder("\n[" + (isSandbox ? "SandboxEnv" : "ProductEnv") + "]\n");
 
 		INettyConnectionPool<?> nettyConnectionPool = NettyConnectionPool.getWorkingClientPool(isSandbox);
 
