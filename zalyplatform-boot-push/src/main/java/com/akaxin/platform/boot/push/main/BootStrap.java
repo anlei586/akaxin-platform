@@ -33,10 +33,8 @@ public class BootStrap {
 			initZalyMonitor();
 			initApnsPush();
 			startPushSSLServer(sslPort);
-
-			UserVisitSiteCount.start();
 		} catch (TcpServerException e) {
-			logger.error("start netty server error", e);
+			logger.error("start akaxin push server error", e);
 			System.exit(-100);
 		}
 

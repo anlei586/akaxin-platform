@@ -27,4 +27,7 @@ mvn install:install-file -Dfile=zalyplatform-operation/lib/json-simple-1.1.1.jar
 
 cd `dirname $0`
 mvn -T 2C clean package
-cp zalyplatform-connector/target/zalyplatform-connector-jar-with-dependencies.jar zalyplatform-jar-with-dependencies.jar
+
+cp zalyplatform-boot/target/zalyplatform-boot-jar-with-dependencies.jar zalyplatform-server.jar
+
+cp zalyplatform-boot-push/target/zalyplatform-boot-push-jar-with-dependencies.jar zalyplatform-push-server.jar

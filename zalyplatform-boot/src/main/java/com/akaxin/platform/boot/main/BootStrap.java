@@ -49,7 +49,7 @@ public class BootStrap {
 
 			UserVisitSiteCount.start();
 		} catch (TcpServerException e) {
-			logger.error("start netty server error", e);
+			logger.error("start akaxin platform server error", e);
 			System.exit(-100);
 		}
 	}

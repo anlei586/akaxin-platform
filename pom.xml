@@ -13,6 +13,8 @@
 		<module>zalyplatform-storage</module>
 		<module>zalyplatform-apns-http2</module>
 		<module>zalyplatform-common</module>
+		<module>zalyplatform-boot</module>
+		<module>zalyplatform-boot-push</module>
 	</modules>
 
 	<properties>

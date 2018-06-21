@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -48,9 +49,16 @@ public class UserVisitSiteCount {
 	private static final Logger logger = Logger.getLogger(UserVisitSiteCount.class);
 	private static final Logger userSiteLogger = Log2Creater.createTimeLogger("count-site");
 
-	static {
-		// 定时输出一分钟，输出一次结果
-		Executors.newSingleThreadScheduledExecutor().scheduleWithFixedDelay(new Runnable() {
+	private static ScheduledExecutorService threadService;
+
+	enum EmailDay {
+		YESTERDAY, TODAY
+	}
+
+	public static void start() {
+		// 定时输出一小时，输出一次结果
+		threadService = Executors.newSingleThreadScheduledExecutor();
+		threadService.scheduleWithFixedDelay(new Runnable() {
 
 			@Override
 			public void run() {
@@ -69,13 +77,6 @@ public class UserVisitSiteCount {
 			}
 
 		}, 0, 1, TimeUnit.HOURS);
-	}
-
-	enum EmailDay {
-		YESTERDAY, TODAY
-	}
-
-	public static void start() {
 	}
 
 	private static String getDayKey(EmailDay day, String key) {
