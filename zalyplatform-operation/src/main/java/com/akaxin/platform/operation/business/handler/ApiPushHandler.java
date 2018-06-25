@@ -74,8 +74,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			String name = request.getSiteName();
 			String userToken = request.getUserToken();
 			// info log
-			Log2Utils.requestInfoLog(logger, command,
-					StringHelper.format("siteAddress={} siteName={}", siteAddress + ":" + port, name));
+			Log2Utils.requestInfoLog(logger, command, StringHelper.format("siteAddress={} siteName={} userToken={}",
+					siteAddress + ":" + port, name, userToken));
 
 			if (StringUtils.isAnyEmpty(globalUserId, deviceId, siteAddress, port, userToken)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
