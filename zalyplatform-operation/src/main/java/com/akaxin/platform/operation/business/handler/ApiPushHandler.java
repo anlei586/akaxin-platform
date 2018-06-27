@@ -129,7 +129,8 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			PushProto.Notification notification = request.getNotification();
 			String siteServer = notification.getSiteServer();
 			String toGlobalUserId = notification.getUserId();
-			String userToken = notification.getUserToken();
+			String userToken = notification.getUserToken();// 单人发送
+			List<String> userTokenList = notification.getUserTokensList();// 批量发送
 			String title = notification.getPushTitle();
 			String pushFromId = notification.getPushFromId(); // 发送着用户siteUserId
 			String pushFromName = notification.getPushFromName();// 发送者用户昵称或者群组昵称
@@ -140,16 +141,20 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			// qps monitor
 			PushMonitor.COUNTER_TOTAL.inc();
 
-			if (StringUtils.isAnyBlank(toGlobalUserId, userToken, siteServer)) {
+			if (StringUtils.isAnyBlank(toGlobalUserId, siteServer)) {
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
+			}
+
+			if (StringUtils.isEmpty(userToken) && (userTokenList == null || userTokenList.size() == 0)) {
+				throw new ErrCodeException(ErrorCode.ERROR_PUSH_USERTOKEN);
 			}
 
 			// 首先判断当前用户是否对该站点屏蔽
 			ServerAddress address = new ServerAddress(siteServer);
 			UserVisitSiteCount.addVisitUser(toGlobalUserId, address.getFullAddress());
 
-			errCode = pushToOneUser(toGlobalUserId, userToken, pushType, address, title, null, pushAlter, pushFromId,
-					pushFromName);
+			errCode = pushToOneUser(toGlobalUserId, userToken, userTokenList, pushType, address, title, null, pushAlter,
+					pushFromId, pushFromName);
 
 		} catch (Exception e) {
 			PushMonitor.COUNTER_ERROR.inc();
@@ -207,9 +212,9 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			for (PushProto.PushToUser pushToUser : toUserList) {
 				String userToken = pushToUser.getUserToken();
 				String toGlobalUserId = pushToUser.getGlobalUserId();
-
-				pushToOneUser(toGlobalUserId, userToken, pushType, address, title, subTitle, pushAlter, pushFromId,
-						pushFromName);
+				List<String> userTokenList = pushToUser.getUserTokensList();
+				pushToOneUser(toGlobalUserId, userToken, userTokenList, pushType, address, title, subTitle, pushAlter,
+						pushFromId, pushFromName);
 			}
 
 		} catch (Exception e) {
@@ -224,9 +229,9 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 		return commandResponse.setErrCode(errCode);
 	}
 
-	private IErrorCode pushToOneUser(String globalUserId, String userToken, PushProto.PushType pushType,
-			ServerAddress address, String title, String subTitle, String pushAlter, String pushFromId,
-			String pushFromName) {
+	private IErrorCode pushToOneUser(String globalUserId, String userToken, List<String> userTokenList,
+			PushProto.PushType pushType, ServerAddress address, String title, String subTitle, String pushAlter,
+			String pushFromId, String pushFromName) {
 		IErrorCode errCode = ErrorCode.ERROR;
 		try {
 			// 统计push的数量
@@ -246,82 +251,112 @@ public class ApiPushHandler extends AbstractApiHandler<Command, CommandResponse>
 			// 获取最新登陆（auth）设备对应的用户令牌（usertoken）
 			logger.debug("api.push.notification deviceId={} userTokenKey={} siteServer={}", deviceId,
 					RedisKeyUtils.getUserTokenKey(deviceId), address.getFullAddress());
-			String userToken2 = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
+			String rightUserToken = UserTokenDao.getInstance().getUserToken(RedisKeyUtils.getUserTokenKey(deviceId),
 					address.getFullAddress());
 			// 如果用户令牌相同，则相等（授权校验方式）
 			logger.debug("api.push.notification check site_user_token:{} platform_user_token:{}", userToken,
-					userToken2);
-			if (userToken.equals(userToken2)) {
-				ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(globalUserId);
-				// logger.debug("api.push.notification clientType={}", clientType);
+					rightUserToken);
 
-				switch (clientType) {
-				case IOS:
-					String pushToken = UserInfoDao.getInstance().getPushToken(globalUserId);
-					logger.debug("{} push ......pushToken={}", clientType, pushToken);
-					if (StringUtils.isNotBlank(pushToken)) {
-						ApnsPackage apnsPack = new ApnsPackage();
-						apnsPack.setToken(pushToken);
-						apnsPack.setBadge(1);
+			boolean isRightToken = isRightUserTokens(globalUserId, deviceId, userToken, userTokenList, rightUserToken);
 
-						if (address.isRightAddress()) {
-							apnsPack.setTitle(title + " " + address.getAddress());
-						} else {
-							apnsPack.setTitle(title);
-						}
-						apnsPack.setBody(getAlterText(address, pushFromName, pushAlter, pushType));
-						apnsPack.setPushGoto(getPushGoto(address, pushType, pushFromId));
-						PushApnsNotification.getInstance().pushNotification(apnsPack);
-					}
-					break;
-				case ANDROID_XIAOMI:
-					String xmPushToken = UserInfoDao.getInstance().getPushToken(globalUserId);
-					logger.debug("{} push......pushToken={}", clientType, xmPushToken);
-					if (StringUtils.isNotBlank(xmPushToken)) {
-						XiaomiPackage xmpack = new XiaomiPackage();
-						xmpack.setPushToken(xmPushToken);
-						xmpack.setBadge(1);
-						if (address.isRightAddress()) {
-							xmpack.setTitle(title + " " + address.getAddress());
-						} else {
-							xmpack.setTitle(title);
-						}
-						xmpack.setDescription(getAlterText(address, pushFromName, pushAlter, pushType));
-						xmpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
-						PushNotification.pushXiaomiNotification(xmpack);
-					}
+			logger.debug("globalUserId={} deviceId={} check right userToken:{}", globalUserId, deviceId, isRightToken);
 
-					break;
-				case ANDROID_HUAWEI:
-				case ANDROID_OPPO:
-				case ANDROID:
-					String umengToken = UserInfoDao.getInstance().getPushToken(globalUserId);
-					logger.debug("{} umeng push......pushToken={}", clientType, umengToken);
-					if (StringUtils.isNotBlank(umengToken)) {
-						UmengPackage umpack = new UmengPackage();
-						umpack.setPushToken(umengToken);
-						if (address.isRightAddress()) {
-							umpack.setTitle(title + " " + address.getAddress());
-						} else {
-							umpack.setTitle(title);
-						}
-						umpack.setText(getAlterText(address, pushFromName, pushAlter, pushType));
-						umpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
-						PushNotification.pushUMengNotification(umpack);
-					}
-					break;
-				default:
-					errCode = ErrorCode.ERROR_PUSH_NO_CLIENTTYPE;
-					logger.debug("unknow clientType : {} error push......", clientType);
-					break;
-				}
-				errCode = ErrorCode2.SUCCESS;
+			if (!isRightToken) {
+				return ErrorCode.ERROR_PUSH_RIGHT_USERTOKEN;
 			}
+
+			ClientProto.ClientType clientType = UserInfoDao.getInstance().getClientType(globalUserId);
+			// logger.debug("api.push.notification clientType={}", clientType);
+
+			switch (clientType) {
+			case IOS:
+				String pushToken = UserInfoDao.getInstance().getPushToken(globalUserId);
+				logger.debug("{} push ......pushToken={}", clientType, pushToken);
+				if (StringUtils.isNotBlank(pushToken)) {
+					ApnsPackage apnsPack = new ApnsPackage();
+					apnsPack.setToken(pushToken);
+					apnsPack.setBadge(1);
+
+					if (address.isRightAddress()) {
+						apnsPack.setTitle(title + " " + address.getAddress());
+					} else {
+						apnsPack.setTitle(title);
+					}
+					apnsPack.setBody(getAlterText(address, pushFromName, pushAlter, pushType));
+					apnsPack.setPushGoto(getPushGoto(address, pushType, pushFromId));
+					PushApnsNotification.getInstance().pushNotification(apnsPack);
+				}
+				break;
+			case ANDROID_XIAOMI:
+				String xmPushToken = UserInfoDao.getInstance().getPushToken(globalUserId);
+				logger.debug("{} push......pushToken={}", clientType, xmPushToken);
+				if (StringUtils.isNotBlank(xmPushToken)) {
+					XiaomiPackage xmpack = new XiaomiPackage();
+					xmpack.setPushToken(xmPushToken);
+					xmpack.setBadge(1);
+					if (address.isRightAddress()) {
+						xmpack.setTitle(title + " " + address.getAddress());
+					} else {
+						xmpack.setTitle(title);
+					}
+					xmpack.setDescription(getAlterText(address, pushFromName, pushAlter, pushType));
+					xmpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
+					PushNotification.pushXiaomiNotification(xmpack);
+				}
+
+				break;
+			case ANDROID_HUAWEI:
+			case ANDROID_OPPO:
+			case ANDROID:
+				String umengToken = UserInfoDao.getInstance().getPushToken(globalUserId);
+				logger.debug("{} umeng push......pushToken={}", clientType, umengToken);
+				if (StringUtils.isNotBlank(umengToken)) {
+					UmengPackage umpack = new UmengPackage();
+					umpack.setPushToken(umengToken);
+					if (address.isRightAddress()) {
+						umpack.setTitle(title + " " + address.getAddress());
+					} else {
+						umpack.setTitle(title);
+					}
+					umpack.setText(getAlterText(address, pushFromName, pushAlter, pushType));
+					umpack.setPushGoto(getPushGoto(address, pushType, pushFromId));
+					PushNotification.pushUMengNotification(umpack);
+				}
+				break;
+			default:
+				errCode = ErrorCode.ERROR_PUSH_NO_CLIENTTYPE;
+				logger.debug("unknow clientType : {} error push......", clientType);
+				break;
+			}
+			errCode = ErrorCode2.SUCCESS;
+
 		} catch (Exception e) {
 			logger.error("send push to one user error", e);
 		}
 
 		return errCode;
+	}
+
+	private boolean isRightUserTokens(String globalUserId, String deviceId, String userToken, List<String> tokenList,
+			String rightToken) {
+		if (StringUtils.isEmpty(rightToken)) {
+			logger.error("globalUserId={} deviceId={} platform usertoken is null", globalUserId, deviceId);
+			return false;
+		}
+
+		if (rightToken.equals(userToken)) {
+			return true;
+		}
+
+		if (tokenList != null && tokenList.size() > 0) {
+			for (String token : tokenList) {
+				if (rightToken.equals(token)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private String getAlterText(ServerAddress address, String fromName, String pushAlter, PushProto.PushType pushType) {

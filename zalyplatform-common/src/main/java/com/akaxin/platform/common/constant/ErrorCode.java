@@ -83,6 +83,8 @@ public enum ErrorCode implements IErrorCode {
 
 	ERROR_PUSH_MUTE("error.alert", "PUSH发送失败，用户设置了静音"), //
 	ERROR_PUSH_NO_CLIENTTYPE("error.alert", "错误的客户端类型"), //
+	ERROR_PUSH_USERTOKEN("error.alert", "usertoken is null"), //
+	ERROR_PUSH_RIGHT_USERTOKEN("error.alert", "usertoken is not right"), //
 
 	ERROR("error.alert", "请求失败"); // 默认未知错误
 
