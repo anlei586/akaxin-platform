@@ -10,6 +10,7 @@ public enum RequestKeys {
 	API_TEMP_SPACE(5, "temp"), //
 	API_PUSH(50, "push"), //
 	API_SETTING(51, "setting"), //
+	API_RECOMMEND(52, "recommend"), //
 
 	IM_ACTION(100, "im"), //
 	IM_HELLO(101, "hello"), //
