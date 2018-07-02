@@ -86,6 +86,8 @@ public enum ErrorCode implements IErrorCode {
 	ERROR_PUSH_USERTOKEN("error.alert", "usertoken is null"), //
 	ERROR_PUSH_RIGHT_USERTOKEN("error.alert", "usertoken is not right"), //
 
+	ERROR_SITE_REALNAME("error.site.realname", "该站点需要实名登陆"), // 请求参数错误
+
 	ERROR("error.alert", "请求失败"); // 默认未知错误
 
 	private String code;

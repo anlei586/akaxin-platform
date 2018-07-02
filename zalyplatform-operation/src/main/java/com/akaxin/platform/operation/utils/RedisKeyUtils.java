@@ -45,4 +45,9 @@ public class RedisKeyUtils {
 		return "phone:vc:" + key;
 	}
 
+	// 用户访问的站点
+	public static String getUserRealNameSite(String globalUserId) {
+		return "user:" + globalUserId + ":visit:site";
+	}
+
 }

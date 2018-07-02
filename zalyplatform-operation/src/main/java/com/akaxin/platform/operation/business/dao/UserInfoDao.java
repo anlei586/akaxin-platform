@@ -118,12 +118,23 @@ public class UserInfoDao {
 	}
 
 	// 获取手机国际区号
-	public String getPhoneGlobalRoaming(String phoneId) {
+	public String getPhoneCountryCode(String phoneId) {
 		try {
 			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
 			return userDao.hget(phoneKey, UserKey.phoneCountryCode);
 		} catch (Exception e) {
-			logger.error("get phone global roaming error.phoneId=" + phoneId, e);
+			logger.error("get phone country code error.phoneId=" + phoneId, e);
+		}
+		return null;
+	}
+
+	// 获取手机国际区号
+	public Map<String, String> getPhoneMap(String phoneId) {
+		try {
+			String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+			return userDao.getPhoneInfoMap(phoneKey);
+		} catch (Exception e) {
+			logger.error("get phone info map error.phoneId=" + phoneId, e);
 		}
 		return null;
 	}
@@ -204,4 +215,19 @@ public class UserInfoDao {
 		}
 		return null;
 	}
+
+	public String getGlobalUserIdByPhoneId(String phoneId) {
+		String phoneKey = RedisKeyUtils.getUserPhoneKey(phoneId);
+		Map<String, String> phoneMap = userDao.getPhoneInfoMap(phoneKey);
+		if (phoneMap != null) {
+			return phoneMap.get(UserKey.userId);
+		}
+		return null;
+	}
+
+	public String getUserIdPubkByGlobalUserId(String globalUserId) {
+		String userIdKey = RedisKeyUtils.getUserIdKey(globalUserId);
+		return userDao.hget(userIdKey, UserKey.userIdPubk);
+	}
+
 }
