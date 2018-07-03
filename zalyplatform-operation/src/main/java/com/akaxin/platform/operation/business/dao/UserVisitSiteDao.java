@@ -1,5 +1,6 @@
 package com.akaxin.platform.operation.business.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,9 @@ public class UserVisitSiteDao {
 	// 设置站点访问的是实名站点
 	public boolean setRealNameSite(String key, String siteAddress) {
 		try {
-			return userSiteDao.addUserSite(key, siteAddress, REALNAME_SITE);
+			if (StringUtils.isNotBlank(siteAddress)) {
+				return userSiteDao.addUserSite(key, siteAddress, REALNAME_SITE);
+			}
 		} catch (Exception e) {
 			logger.error("set user site to realname site errror.", e);
 		}

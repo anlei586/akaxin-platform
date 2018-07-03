@@ -172,12 +172,16 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 
 			String countryCode = UserInfoDao.getInstance().getPhoneCountryCode(phoneId);
 			String phoneToken = UUID.randomUUID().toString();
-			if (StringUtils.isNotEmpty(siteAddress)) {
-				phoneToken = siteAddress + "_" + UUID.randomUUID().toString();
-			}
-			logger.debug("userId={},phoneId={},phoneToken={}", globalUserId, phoneId, phoneToken);
-
 			String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
+
+			//兼容老版本，此处暂时不处理
+//			if (StringUtils.isNotEmpty(siteAddress)) {
+//				phoneTokenKey = RedisKeyUtils.getPhoneToken(siteAddress + "_" + phoneToken);
+//			}
+
+			logger.debug("api.phone.applyToken globalUserId={},phoneId={},siteAddress={},phoneToken={}", globalUserId,
+					phoneId, siteAddress, phoneToken);
+
 			if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneTokenKey, phoneId, EXPIRE_TIME)) {
 
 				ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse.Builder responseBuilder = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse
@@ -226,12 +230,15 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 
 			String countryCode = UserInfoDao.getInstance().getPhoneCountryCode(phoneId);
 			String phoneToken = UUID.randomUUID().toString();
-			if (StringUtils.isNotEmpty(siteAddress)) {
-				phoneToken = siteAddress + "_" + UUID.randomUUID().toString();
-			}
-			logger.debug("userId={},phoneId={},phoneToken={}", globalUserId, phoneId, phoneToken);
-
 			String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
+
+			if (StringUtils.isNotEmpty(siteAddress)) {
+				phoneTokenKey = RedisKeyUtils.getPhoneToken(siteAddress + "_" + phoneToken);
+			}
+
+			logger.debug("api.phone.applyToken2 globalUserId={},phoneId={},siteAddress={},phoneToken={}", globalUserId,
+					phoneId, siteAddress, phoneToken);
+
 			if (PhoneVCTokenDao.getInstance().applyPhoneToken(phoneTokenKey, phoneId, EXPIRE_TIME)) {
 
 				ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse.Builder responseBuilder = ApiPhoneApplyTokenProto.ApiPhoneApplyTokenResponse
@@ -286,20 +293,24 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
-			String ptKey = phoneToken;
-			if (StringUtils.isNotEmpty(siteAddress)) {
-				ptKey = siteAddress + "_" + phoneToken;
-			}
+//			String ptKey = phoneToken;
+//			if (StringUtils.isNotEmpty(siteAddress)) {
+//				ptKey = siteAddress + "_" + phoneToken;
+//			}
 
+			
+			String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
+			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(phoneTokenKey);
+			
 			// phone:token:im.akaxin.com:2021_xxxxxxxx
-			String dbKey = RedisKeyUtils.getPhoneToken(ptKey);
-			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
+//			String dbKey = RedisKeyUtils.getPhoneToken(ptKey);
+//			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
 
-			if (ValidatorPattern.isNotPhoneId(phoneId)) {
-				// 重新在查询一次，兼容老版本 phone:token:xxxxxxxx
-				dbKey = RedisKeyUtils.getPhoneToken(phoneToken);
-				phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
-			}
+//			if (ValidatorPattern.isNotPhoneId(phoneId)) {
+//				// 重新在查询一次，兼容老版本 phone:token:xxxxxxxx
+//				dbKey = RedisKeyUtils.getPhoneToken(phoneToken);
+//				phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
+//			}
 
 			if (ValidatorPattern.isPhoneId(phoneId) || ValidatorPattern.isTestPhoneId(phoneId)) {
 				// 通过手机号，查询用户账号公钥
@@ -322,7 +333,8 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 				errCode = ErrorCode2.SUCCESS;
 
 				String userSiteKey = RedisKeyUtils.getUserRealNameSite(globalUserId);
-				logger.debug("globalUserId={} set site={} to realName site", globalUserId, siteAddress);
+				logger.debug("api.phone.confirmToken globalUserId={} set site={} to realName site", globalUserId,
+						siteAddress);
 				UserVisitSiteDao.getInstance().setRealNameSite(userSiteKey, siteAddress);
 			}
 
