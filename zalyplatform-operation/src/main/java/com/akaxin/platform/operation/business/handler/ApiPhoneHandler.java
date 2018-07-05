@@ -101,7 +101,7 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 	 */
 	public CommandResponse login(Command command) {
 		CommandResponse commandRespone = new CommandResponse().setAction(CommandConst.ACTION_RES);
-		ErrorCode2 errCode = ErrorCode2.ERROR;
+		IErrorCode errCode = ErrorCode2.ERROR;
 		try {
 			ApiPhoneLoginProto.ApiPhoneLoginRequest request = ApiPhoneLoginProto.ApiPhoneLoginRequest
 					.parseFrom(command.getParams());
@@ -110,37 +110,41 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			int vcType = request.getVcType();
 			LogUtils.requestDebugLog(logger, command, request.toString());
 
-			if (ValidatorPattern.isPhoneId(phoneId) && StringUtils.isNotBlank(phoneVC)) {
-				String vcKey = phoneId + "_" + vcType;
-				String dbPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(vcKey);
-				logger.debug("vc1={} vc2={}", phoneVC, dbPhoneVC);
-
-				if (phoneVC.equals(dbPhoneVC)) {
-					UserBean userBean = UserInfoDao.getInstance().getRealNameUserInfo(phoneId);
-					logger.debug("phone login userBean={}", GsonUtils.toJson(userBean));
-
-					if (userBean != null
-							&& StringUtils.isNoneEmpty(userBean.getUserIdPrik(), userBean.getUserIdPubk())) {
-						ApiPhoneLoginProto.ApiPhoneLoginResponse response = ApiPhoneLoginProto.ApiPhoneLoginResponse
-								.newBuilder().setUserIdPrik(userBean.getUserIdPrik())
-								.setUserIdPubk(userBean.getUserIdPubk()).build();
-						commandRespone.setParams(response.toByteArray());
-						errCode = ErrorCode2.SUCCESS;
-
-						// 使用完成以后，过期该验证码
-						PhoneVCTokenDao.getInstance().delPhoneVC(vcKey);
-					}
-				} else {
-					errCode = ErrorCode2.ERROR2_PHONE_VERIFYCODE;
-				}
-			} else {
-				errCode = ErrorCode2.ERROR_PARAMETER;
+			if (ValidatorPattern.isNotPhoneId(phoneId) || StringUtils.isEmpty(phoneVC)) {
+				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
+
+			String vcKey = phoneId + "_" + vcType;
+			String dbPhoneVC = PhoneVCTokenDao.getInstance().getPhoneVC(vcKey);
+			logger.debug("vc1={} vc2={}", phoneVC, dbPhoneVC);
+
+			if (!phoneVC.equals(dbPhoneVC)) {
+				throw new ErrCodeException(ErrorCode.ERROR2_PHONE_VERIFYCODE);
+			}
+
+			UserBean userBean = UserInfoDao.getInstance().getRealNameUserInfo(phoneId);
+			logger.debug("phone login userBean={}", GsonUtils.toJson(userBean));
+
+			if (userBean == null || StringUtils.isAnyEmpty(userBean.getUserIdPrik(), userBean.getUserIdPubk())) {
+				throw new ErrCodeException(ErrorCode.ERROR2_PHONE_LOGIN_UNREGISTER);
+			}
+
+			ApiPhoneLoginProto.ApiPhoneLoginResponse response = ApiPhoneLoginProto.ApiPhoneLoginResponse.newBuilder()
+					.setUserIdPrik(userBean.getUserIdPrik()).setUserIdPubk(userBean.getUserIdPubk()).build();
+			commandRespone.setParams(response.toByteArray());
+			errCode = ErrorCode2.SUCCESS;
+
+			// 使用完成以后，过期该验证码
+			PhoneVCTokenDao.getInstance().delPhoneVC(vcKey);
+
 		} catch (Exception e) {
 			errCode = ErrorCode2.ERROR_SYSTEMERROR;
 			LogUtils.requestErrorLog(logger, command, e);
+		} catch (ErrCodeException e) {
+			errCode = e.getErrCode();
+			LogUtils.requestErrorLog(logger, command, e);
 		}
-		return commandRespone.setErrCode2(errCode);
+		return commandRespone.setErrCode(errCode);
 	}
 
 	/**
@@ -174,10 +178,10 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 			String phoneToken = UUID.randomUUID().toString();
 			String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
 
-			//兼容老版本，此处暂时不处理
-//			if (StringUtils.isNotEmpty(siteAddress)) {
-//				phoneTokenKey = RedisKeyUtils.getPhoneToken(siteAddress + "_" + phoneToken);
-//			}
+			// 兼容老版本，此处暂时不处理
+			// if (StringUtils.isNotEmpty(siteAddress)) {
+			// phoneTokenKey = RedisKeyUtils.getPhoneToken(siteAddress + "_" + phoneToken);
+			// }
 
 			logger.debug("api.phone.applyToken globalUserId={},phoneId={},siteAddress={},phoneToken={}", globalUserId,
 					phoneId, siteAddress, phoneToken);
@@ -293,24 +297,23 @@ public class ApiPhoneHandler extends AbstractApiHandler<Command, CommandResponse
 				throw new ErrCodeException(ErrorCode.ERROR_PARAMETER);
 			}
 
-//			String ptKey = phoneToken;
-//			if (StringUtils.isNotEmpty(siteAddress)) {
-//				ptKey = siteAddress + "_" + phoneToken;
-//			}
+			// String ptKey = phoneToken;
+			// if (StringUtils.isNotEmpty(siteAddress)) {
+			// ptKey = siteAddress + "_" + phoneToken;
+			// }
 
-			
 			String phoneTokenKey = RedisKeyUtils.getPhoneToken(phoneToken);
 			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(phoneTokenKey);
-			
-			// phone:token:im.akaxin.com:2021_xxxxxxxx
-//			String dbKey = RedisKeyUtils.getPhoneToken(ptKey);
-//			String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
 
-//			if (ValidatorPattern.isNotPhoneId(phoneId)) {
-//				// 重新在查询一次，兼容老版本 phone:token:xxxxxxxx
-//				dbKey = RedisKeyUtils.getPhoneToken(phoneToken);
-//				phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
-//			}
+			// phone:token:im.akaxin.com:2021_xxxxxxxx
+			// String dbKey = RedisKeyUtils.getPhoneToken(ptKey);
+			// String phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
+
+			// if (ValidatorPattern.isNotPhoneId(phoneId)) {
+			// // 重新在查询一次，兼容老版本 phone:token:xxxxxxxx
+			// dbKey = RedisKeyUtils.getPhoneToken(phoneToken);
+			// phoneId = PhoneVCTokenDao.getInstance().getPhoneToken(dbKey);
+			// }
 
 			if (ValidatorPattern.isPhoneId(phoneId) || ValidatorPattern.isTestPhoneId(phoneId)) {
 				// 通过手机号，查询用户账号公钥

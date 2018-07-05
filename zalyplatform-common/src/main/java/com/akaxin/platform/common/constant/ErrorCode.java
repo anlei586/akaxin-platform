@@ -76,6 +76,7 @@ public enum ErrorCode implements IErrorCode {
 	ERROR2_PHONE_VERIFYCODE("error.alert", "验证码验证失败"), //
 	ERROR2_PHONE_GETVERIFYCODE("error.alert", "获取验证码失败"), //
 	ERROR2_PHONE_FORMATTING("error.alert", "手机号格式错误"), //
+	ERROR2_PHONE_LOGIN_UNREGISTER("error.alert", "当前手机号未注册"), //
 
 	ERROR2_PLUGIN_STATUS("error.alert", "扩展状态错误"), //
 

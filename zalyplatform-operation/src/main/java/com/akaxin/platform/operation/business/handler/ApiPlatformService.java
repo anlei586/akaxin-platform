@@ -155,8 +155,10 @@ public class ApiPlatformService extends AbstractApiHandler<Command, CommandRespo
 				if (phoneId.equals(dbPhoneId)) {
 					// 已经绑定的号码就是此号码，提醒用户“此账号已经绑定该手机号码”
 					errCode = ErrorCode2.ERROR2_PHONE_SAME;
+					// 删除key
+					PhoneVCTokenDao.getInstance().delPhoneVC(vcKey);
 				} else {
-					// 此账号已经绑定了手机号码
+					// 此账号已经绑定了手机号码，理论上走不到这里
 					errCode = ErrorCode2.ERROR2_PHONE_REALNAME_EXIST;
 				}
 			}
