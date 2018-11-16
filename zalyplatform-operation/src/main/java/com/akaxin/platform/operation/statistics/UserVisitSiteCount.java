@@ -69,7 +69,7 @@ public class UserVisitSiteCount {
 				if (hourOfDay == 0) {
 					sendEmail(EmailDay.YESTERDAY);
 				} else if (hourOfDay >= 6) {
-					sendEmail(EmailDay.TODAY);
+//					sendEmail(EmailDay.TODAY);
 				} else {
 					logger.info("sleep time ,ignore email");
 				}
